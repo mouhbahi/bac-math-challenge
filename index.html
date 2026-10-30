@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي مواد البكالوريا - حل التحديات (كتابة أو ملف)</title>
+    <title>تحدي مواد البكالوريا - إجابة مرة واحدة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -24,7 +24,7 @@
     </header>
 
     <div class="bg-emerald-900/30 border-b border-emerald-800/40 py-2.5 px-4 text-center text-xs md:text-sm text-emerald-300 font-semibold">
-        💡 <span>"أجب عن التحديات كتابة بالكيبورد أو بارفاق الصور وسيقوم الأدمن بالمصادقة عليها!"</span>
+        💡 <span>"إجابة واحدة لكل تحدي بحذر واهتمام.. فرصة واحدة لحصد النقاط!"</span>
     </div>
 
     <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto space-y-6">
@@ -79,9 +79,9 @@
                 <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition">تسجيل الخروج</button>
             </div>
 
-            <!-- قسم التحديات المرسلة من الأدمن (كتابة أو ملف) -->
+            <!-- قسم التحديات النشطة (تختفي بمجرد إرسال الإجابة) -->
             <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>🔥</span> تحديات الأدمن النشطة</h3>
+                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>🔥</span> تحديات الأدمن النشطة (إجابة لمرة واحدة)</h3>
                 <div id="student-challenges-container" class="space-y-4">
                     <p class="text-center text-slate-500 text-sm py-2">لا توجد تحديات مرسلة حالياً.</p>
                 </div>
@@ -228,7 +228,7 @@
             <!-- 2. قسم مراجعة حلول التحديات المرسلة من الطلاب -->
             <div class="space-y-4 hidden" id="admin-chal-review-section">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-lg">
-                    <h4 class="font-bold text-amber-400 text-sm">🔥 حلول التحديات (الكتابية أو الملفات) قيد المصادقة</h4>
+                    <h4 class="font-bold text-amber-400 text-sm">🔥 حلول التحديات قيد المصادقة</h4>
                     <div id="admin-chal-submissions-list" class="space-y-3">
                         <p class="text-center text-slate-500 text-sm py-4">جاري التحميل...</p>
                     </div>
@@ -281,7 +281,7 @@
     </main>
 
     <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 mt-8">
-        تحدي مواد البكالوريا - حلول التحديات كتابة وملفات © 2026
+        تحدي مواد البكالوريا - إجابة التحدي مرة واحدة © 2026
     </footer>
 
     <script>
@@ -374,7 +374,6 @@
                     loadLeaderboard();
                     loadBacProgress();
                     listenSubmissionsCache();
-                    listenCustomChallenges();
                 }
             }
         });
@@ -431,55 +430,72 @@
                     loadLeaderboard();
                     loadBacProgress();
                     listenSubmissionsCache();
-                    listenCustomChallenges();
                 }
             }
         }
 
-        // استماع للتحديات النشطة مع إمكانية الحل كتابياً أو برفع الملفات
+        // استماع للتحديات وحلها مرة واحدة فقط لتختفي
         function listenCustomChallenges() {
             if(!db) return;
-            db.collection("challenges").onSnapshot((snapshot) => {
-                const container = document.getElementById('student-challenges-container');
-                container.innerHTML = '';
-                let found = false;
+            const currentStudent = localStorage.getItem('bac_username');
 
-                snapshot.forEach((doc) => {
-                    found = true;
+            // نجلب أولاً إجابات الطالب السابقة للتحديات لكي نعرف أي تحدي أجاب عنه
+            db.collection("submissions").where("studentName", "==", currentStudent).onSnapshot((subSnapshot) => {
+                let answeredChallenges = new Set();
+                subSnapshot.forEach(doc => {
                     let data = doc.data();
-                    let chalId = doc.id;
-                    
-                    container.innerHTML += `
-                        <div class="bg-slate-950 border border-amber-500/40 rounded-xl p-4 space-y-3">
-                            <div class="flex justify-between items-center">
-                                <span class="font-bold text-amber-400 text-sm">${data.title}</span>
-                                <span class="bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full text-xs font-bold">+${data.points} نقطة</span>
-                            </div>
-                            <p class="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-lg border border-slate-800">${data.description}</p>
-                            
-                            <div class="space-y-3 pt-2 border-t border-slate-900">
-                                <div>
-                                    <label class="block text-xs text-slate-300 font-semibold mb-1">✍️ أكتب إجابتك هنا بالكيبورد (اختياري/مباشر):</label>
-                                    <textarea id="chal-text-${chalId}" rows="2" placeholder="اكتب خطوات الحل أو النتائج النهائية هنا..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-slate-300 font-semibold mb-1">📁 أو ارفع صور/ملف الإجابة من كراسك:</label>
-                                    <input type="file" id="chal-file-${chalId}" accept="image/*" multiple class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white">
-                                </div>
-                                <button onclick="submitChallengeSolution('${chalId}', '${data.title}', ${data.points})" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-lg text-xs transition">
-                                    إرسال إجابة التحدي للأدمن للمصادقة 📤
-                                </button>
-                            </div>
-                        </div>`;
+                    if(data.type === 'challenge_solution' && data.topic) {
+                        answeredChallenges.add(data.topic); // نخزن عنوان التحدي الذي أجاب عليه مسبقاً
+                    }
                 });
 
-                if(!found) {
-                    container.innerHTML = '<p class="text-center text-slate-500 text-sm py-2">لا توجد تحديات نشطة حالياً من الأدمن.</p>';
-                }
+                // ثم نستمع للتحديات النشطة ونقارنها
+                db.collection("challenges").onSnapshot((chalSnapshot) => {
+                    const container = document.getElementById('student-challenges-container');
+                    container.innerHTML = '';
+                    let found = false;
+
+                    chalSnapshot.forEach((doc) => {
+                        let data = doc.data();
+                        let chalId = doc.id;
+
+                        // إذا كان الطالب قد أجاب مسبقاً عن هذا التحدي، فلا نعرضه له (يختفي)
+                        if(answeredChallenges.has(data.title)) {
+                            return; 
+                        }
+
+                        found = true;
+                        container.innerHTML += `
+                            <div class="bg-slate-950 border border-amber-500/40 rounded-xl p-4 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-amber-400 text-sm">${data.title}</span>
+                                    <span class="bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full text-xs font-bold">+${data.points} نقطة</span>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-lg border border-slate-800">${data.description}</p>
+                                
+                                <div class="space-y-3 pt-2 border-t border-slate-900">
+                                    <div>
+                                        <label class="block text-xs text-slate-300 font-semibold mb-1">✍️ أكتب إجابتك هنا بالكيبورد (اختياري/مباشر):</label>
+                                        <textarea id="chal-text-${chalId}" rows="2" placeholder="اكتب خطوات الحل أو النتائج النهائية هنا..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-slate-300 font-semibold mb-1">📁 أو ارفع صور/ملف الإجابة من كراسك:</label>
+                                        <input type="file" id="chal-file-${chalId}" accept="image/*" multiple class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white">
+                                    </div>
+                                    <button onclick="submitChallengeSolution('${chalId}', '${data.title}', ${data.points})" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-lg text-xs transition">
+                                        إرسال إجابة التحدي نهائياً 📤
+                                    </button>
+                                </div>
+                            </div>`;
+                    });
+
+                    if(!found && container.innerHTML === '') {
+                        container.innerHTML = '<p class="text-center text-slate-500 text-sm py-2">لا توجد تحديات نشطة حالياً أو أنك أتممتها كلها!</p>';
+                    }
+                });
             });
         }
 
-        // إرسال إجابة التحدي (كتابة أو ملف)
         async function submitChallengeSolution(chalId, chalTitle, chalPoints) {
             const name = localStorage.getItem('bac_username');
             const stream = localStorage.getItem('bac_user_stream') || 'experimental';
@@ -515,9 +531,7 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert('تم إرسال إجابة التحدي للأدمن محمد بنجاح! في انتظار المصادقة 🚀');
-                document.getElementById(`chal-text-${chalId}`).value = '';
-                if(filesInput) filesInput.value = '';
+                alert('تم إرسال إجابتك نهائياً واختفى التحدي! في انتظار مصادقة الأدمن 🚀');
             } catch(e) {
                 alert('خطأ أثناء الإرسال: ' + e.message);
             }
@@ -598,6 +612,7 @@
                 }
 
                 checkExistingSubmission();
+                listenCustomChallenges(); // تفعيل استماع التحديات بعد جلب المشاركات
             });
         }
 
@@ -960,7 +975,6 @@
             });
         }
 
-        // جلب إجابات التحديات (الكتابية والملفات) لمصادقة الأدمن
         function loadAdminChalSubmissions() {
             if(!db) return;
             db.collection("submissions").where("status", "==", "pending_challenge").onSnapshot((snapshot) => {
@@ -1007,7 +1021,6 @@
             alert('تمت المصادقة على الإجابة وإضافة النقاط لرصيد الطالب بنجاح! 🎉');
         }
 
-        // جلب تصريحات الفروض
         function loadAdminExamsList() {
             if(!db) return;
             db.collection("submissions").where("status", "==", "pending_exam").onSnapshot((snapshot) => {
