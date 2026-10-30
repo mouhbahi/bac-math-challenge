@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي رياضيات البكالوريا - شعبة علوم تجريبية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <header class="bg-emerald-950 border-b border-emerald-800/60 py-4 px-6 shadow-xl">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-black text-emerald-400 flex items-center gap-2">
+                <span>🧪</span> تحدي رياضيات البكالوريا
+            </h1>
+            <span class="text-xs bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-3 py-1 rounded-full font-bold">شعبة علوم تجريبية</span>
+        </div>
+    </header>
+
+    <div class="bg-emerald-900/30 border-b border-emerald-800/40 py-2.5 px-4 text-center text-xs md:text-sm text-emerald-300 font-semibold">
+        💡 <span id="motivational-quote">"النجاح في البكالوريا ليس حظاً، بل خطوة بخطوة من الانضباط والتحدي!"</span>
+    </div>
+
+    <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto">
+
+        <!-- 1. شاشة تسجيل الدخول -->
+        <div id="login-screen" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
+            <div class="text-center mb-2">
+                <h2 class="text-2xl font-bold text-white mb-2">مرحباً بك يا بطل البكالوريا</h2>
+                <p class="text-slate-400 text-sm">سجل دخولك لتشارك حلولك وتنافس أصدقاءك نحو علامة ممتازة</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-2">اختر صفتك:</label>
+                <select id="user-role" onchange="toggleRoleInput()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-emerald-500 font-bold">
+                    <option value="student">متنافس (طالب بكالوريا)</option>
+                    <option value="admin">مشرف المنصة (أدمن - محمد)</option>
+                </select>
+            </div>
+
+            <div id="name-group">
+                <label class="block text-sm font-semibold text-slate-300 mb-2">اسمك المستعار:</label>
+                <input type="text" id="username-input" placeholder="اكتب اسمك هنا..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div id="pin-group" class="hidden">
+                <label class="block text-sm font-semibold text-slate-300 mb-2">رمز المشرف السري:</label>
+                <input type="password" id="admin-pin" placeholder="أدخل كلمة السر الخاصة بك" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <button type="button" onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition duration-200">
+                دخول إلى المنصة 🚀
+            </button>
+        </div>
+
+        <!-- 2. لوحة تحكم الطالب -->
+        <div id="student-dashboard" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-slate-400">مرحباً بالمتحدي،</p>
+                    <h3 id="student-display-name" class="text-xl font-bold text-emerald-400"></h3>
+                </div>
+                <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition">تسجيل الخروج</button>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>📤</span> إرسال حل تمرين</h3>
+                    <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg hover:bg-amber-500/20 transition font-semibold">
+                        📊 البكالوريات المحلولة
+                    </button>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">اختر المحور الرياضي:</label>
+                    <select id="math-unit" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                        <option value="الدوال">الدوال (العددية، الأسية، اللوغاريتمية)</option>
+                        <option value="المتتاليات">المتتاليات العددية</option>
+                        <option value="الاحتمالات">الإحصاء والاحتمالات</option>
+                        <option value="الأعداد المركبة">الأعداد المركبة والهندسة في الفضاء</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">دورة البكالوريا:</label>
+                    <select id="bac-year" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">صور الحل من كراسك:</label>
+                    <input type="file" id="solution-images" accept="image/*" multiple class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
+                </div>
+
+                <button id="submit-btn" onclick="submitSolution()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition">
+                    إرسال الحل للمشرف للمراجعة ✅
+                </button>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>🏆</span> لوحة الصدارة والتنافس</h3>
+                <div id="leaderboard-list" class="space-y-2">
+                    <p class="text-center text-slate-500 text-sm py-4">جاري تحميل الترتيب...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- نافذة البكالوريات المحلولة -->
+        <div id="bac-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="text-lg font-bold text-emerald-400">📊 خريطة البكالوريات المحلولة</h3>
+                    <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+                </div>
+                <div id="bac-status-list" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- 3. لوحة المشرف -->
+        <div id="admin-dashboard" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold text-emerald-400">🛠️ لوحة المشرف (محمد)</h3>
+                    <p class="text-xs text-slate-400">تقييم الحلول وإضافة ملاحظات وإرشادات للطلاب</p>
+                </div>
+                <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition">تسجيل الخروج</button>
+            </div>
+            <div class="space-y-4" id="pending-list">
+                <p class="text-center text-slate-500 text-sm py-8">جاري جلب الحلول المعلقة...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 mt-8">
+        تحدي رياضيات البكالوريا - شعبة العلوم التجريبية © 2026
+    </footer>
+
+    <script>
+        const quotes = [
+            '"الرياضيات مادة النقاط الكاملة في البكالوريا، كل تمرين تحله هو نقطة في جيبك!"',
+            '"الاستمرار يومياً أفضل بكثير من المراجعة العشوائية.. واصل التحدي!"',
+            '"علامة ممتازة في البكالوريا تبدأ بكرّاس وتمارين محلولة بيدك!"',
+            '"ثق في قدراتك يا بطل العلوم التجريبية، العلم بالتعلم والتفوق بالممارسة!"'
+        ];
+        document.getElementById('motivational-quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjhPYyOtm7maxcq4WNQIDJwFOBbCEIiaY",
+            authDomain: "bac-math-challenge.firebaseapp.com",
+            projectId: "bac-math-challenge",
+            storageBucket: "bac-math-challenge.firebasestorage.app",
+            messagingSenderId: "499117956219",
+            appId: "1:499117956219:web:42b92dcaeeee82e8a116de",
+            measurementId: "G-QYPW46359Q"
+        };
+
+        let db = null, storage = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            storage = firebase.storage();
+        } catch(e) {
+            console.warn("Firebase Init Error:", e);
+        }
+
+        const yearSelect = document.getElementById('bac-year');
+        for (let y = 2026; y >= 2009; y--) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = `بكالوريا ${y}`;
+            yearSelect.appendChild(opt);
+        }
+
+        // 🟢 الفحص التلقائي عند فتح الموقع (هل المستخدم مسجل من قبل؟)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedStudent = localStorage.getItem('bac_username');
+            const savedAdmin = localStorage.getItem('bac_is_admin');
+
+            if (savedAdmin === 'true') {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                if (db) loadAdminSubmissions();
+            } else if (savedStudent) {
+                document.getElementById('student-display-name').textContent = savedStudent;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('student-dashboard').classList.remove('hidden');
+                if (db) {
+                    loadLeaderboard();
+                    loadBacProgress();
+                }
+            }
+        });
+
+        function toggleRoleInput() {
+            const role = document.getElementById('user-role').value;
+            const nameGroup = document.getElementById('name-group');
+            const pinGroup = document.getElementById('pin-group');
+            
+            if (role === 'admin') {
+                nameGroup.classList.add('hidden');
+                pinGroup.classList.remove('hidden');
+            } else {
+                nameGroup.classList.remove('hidden');
+                pinGroup.classList.add('hidden');
+            }
+        }
+
+        function handleLogin() {
+            const role = document.getElementById('user-role').value;
+            
+            if (role === 'admin') {
+                const pin = document.getElementById('admin-pin').value;
+                if (pin === '1234') {
+                    localStorage.setItem('bac_is_admin', 'true');
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('admin-dashboard').classList.remove('hidden');
+                    if (db) loadAdminSubmissions();
+                } else {
+                    alert('رمز المشرف خطأ!');
+                }
+            } else {
+                const nameInput = document.getElementById('username-input');
+                const name = nameInput.value.trim();
+                
+                if (!name) {
+                    alert('الرجاء كتابة اسمك المستعار أولاً!');
+                    nameInput.focus();
+                    return;
+                }
+                
+                localStorage.setItem('bac_username', name);
+                document.getElementById('student-display-name').textContent = name;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('student-dashboard').classList.remove('hidden');
+                
+                if (db) {
+                    loadLeaderboard();
+                    loadBacProgress();
+                }
+            }
+        }
+
+        async function submitSolution() {
+            const name = localStorage.getItem('bac_username') || document.getElementById('student-display-name').textContent;
+            const unit = document.getElementById('math-unit').value;
+            const year = document.getElementById('bac-year').value;
+            const filesInput = document.getElementById('solution-images');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (filesInput.files.length === 0) {
+                alert('الرجاء اختيار صورة واحدة على الأقل من كراسك!');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'جاري رفع الصور...';
+
+            try {
+                if (storage && db) {
+                    let imageUrls = [];
+                    for (let i = 0; i < filesInput.files.length; i++) {
+                        const file = filesInput.files[i];
+                        const storageRef = storage.ref(`solutions/${Date.now()}_${file.name}`);
+                        const snapshot = await storageRef.put(file);
+                        const url = await snapshot.ref.getDownloadURL();
+                        imageUrls.push(url);
+                    }
+
+                    await db.collection("submissions").add({
+                        studentName: name,
+                        unit: unit,
+                        year: year,
+                        images: imageUrls,
+                        status: 'pending',
+                        adminNote: '',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                alert('تم إرسال الحل للمشرف محمد بنجاح!');
+                filesInput.value = '';
+            } catch (error) {
+                console.error(error);
+                alert('حدث خطأ أثناء الرفع!');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'إرسال الحل للمشرف للمراجعة ✅';
+            }
+        }
+
+        function loadLeaderboard() {
+            if(!db) return;
+            db.collection("submissions").onSnapshot((snapshot) => {
+                let scores = {};
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.status === 'approved') {
+                        scores[data.studentName] = (scores[data.studentName] || 0) + 1;
+                    }
+                });
+
+                const listEl = document.getElementById('leaderboard-list');
+                listEl.innerHTML = '';
+                const sorted = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+
+                if (sorted.length === 0) {
+                    listEl.innerHTML = '<p class="text-center text-slate-500 text-sm py-4">لا توجد تمارين معتمدة بعد. كن الأول!</p>';
+                    return;
+                }
+
+                sorted.forEach((student, index) => {
+                    let medal = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : '🔹'));
+                    listEl.innerHTML += `
+                        <div class="flex justify-between items-center bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                            <span class="font-semibold text-white flex items-center gap-2">${medal} ${student}</span>
+                            <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">${scores[student]} تمارين</span>
+                        </div>`;
+                });
+            });
+        }
+
+        function loadBacProgress() {
+            if(!db) return;
+            db.collection("submissions").onSnapshot((snapshot) => {
+                let solvedMap = {};
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.status === 'approved') {
+                        solvedMap[`${data.year}_${data.unit}`] = data.studentName;
+                    }
+                });
+
+                const container = document.getElementById('bac-status-list');
+                container.innerHTML = '';
+
+                for (let y = 2026; y >= 2009; y--) {
+                    let items = ['الدوال', 'المتتاليات', 'الاحتمالات', 'الأعداد المركبة'].map(u => {
+                        let isSolved = solvedMap[`${y}_${u}`];
+                        return `
+                            <div class="flex justify-between items-center bg-slate-950 p-2 rounded-lg text-xs">
+                                <span class="text-slate-300">${u}</span>
+                                ${isSolved ? `<span class="text-emerald-400 font-bold">✅ (${isSolved})</span>` : `<span class="text-slate-600">❌ غير محلول</span>`}
+                            </div>`;
+                    }).join('');
+
+                    container.innerHTML += `
+                        <div class="border border-slate-800 rounded-xl p-3 bg-slate-900/50">
+                            <p class="font-bold text-amber-400 text-sm mb-2">بكالوريا ${y}</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">${items}</div>
+                        </div>`;
+                }
+            });
+        }
+
+        function toggleBacProgressModal() {
+            document.getElementById('bac-modal').classList.toggle('hidden');
+        }
+
+        function loadAdminSubmissions() {
+            if(!db) return;
+            db.collection("submissions").onSnapshot((snapshot) => {
+                const listEl = document.getElementById('pending-list');
+                listEl.innerHTML = '';
+                let found = false;
+
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (data.status === 'pending') {
+                        found = true;
+                        let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-16 h-16 object-cover rounded-lg border border-slate-700 hover:opacity-80 transition"></a>`).join('');
+
+                        listEl.innerHTML += `
+                            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-lg">
+                                <div class="flex justify-between text-sm">
+                                    <span class="font-bold text-emerald-400">المتنافس: ${data.studentName}</span>
+                                    <span class="text-slate-400">بكالوريا ${data.year} (${data.unit})</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-slate-400 block mb-1">صور الحل:</span>
+                                    <div class="flex gap-2 flex-wrap">${imgs}</div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-300 mb-1 font-semibold">ملاحظة للطالب:</label>
+                                    <input type="text" id="note-${docSnap.id}" placeholder="اكتب ملاحظتك هنا..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div class="flex gap-3 pt-2">
+                                    <button onclick="review('${docSnap.id}', 'approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-sm transition">قبول ✅</button>
+                                    <button onclick="review('${docSnap.id}', 'rejected')" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl text-sm transition">رفض ❌</button>
+                                </div>
+                            </div>`;
+                    }
+                });
+
+                if (!found) {
+                    listEl.innerHTML = '<p class="text-center text-slate-500 text-sm py-8">لا توجد مشاركات معلقة حالياً.</p>';
+                }
+            });
+        }
+
+        async function review(id, status) {
+            if(!db) return;
+            const noteInput = document.getElementById(`note-${id}`);
+            const noteText = noteInput ? noteInput.value : '';
+            await db.collection("submissions").doc(id).update({
+                status: status,
+                adminNote: noteText
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('bac_username');
+            localStorage.removeItem('bac_is_admin');
+            location.reload();
+        }
+    </script>
+</body>
+</html>
