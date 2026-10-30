@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي مواد البكالوريا - شرط العلامة الكاملة</title>
+    <title>تحدي مواد البكالوريا - لوحة الأدمن الشاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -17,14 +17,14 @@
     <header class="bg-emerald-950 border-b border-emerald-800/60 py-4 px-6 shadow-xl">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-black text-emerald-400 flex items-center gap-2">
-                <span>🧪</span> تحدي مواضيع البكالوريا (العلامة الكاملة 10/10)
+                <span>🧪</span> تحدي مواضيع البكالوريا (نظام التحكم الكامل)
             </h1>
-            <span id="header-stream-badge" class="text-xs bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-3 py-1 rounded-full font-bold">شعبة علوم / رياضيات</span>
+            <span class="text-xs bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-3 py-1 rounded-full font-bold">شعبة علوم / رياضيات</span>
         </div>
     </header>
 
     <div class="bg-emerald-900/30 border-b border-emerald-800/40 py-2.5 px-4 text-center text-xs md:text-sm text-emerald-300 font-semibold">
-        💡 <span>"لا قبول للحل إلا بالاتقان التام والعلامة الكاملة (10/10)!"</span>
+        💡 <span>"فترة الفروض والاختبارات فرصة لحصد النقاط والتقدم في الصدارة!"</span>
     </div>
 
     <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto space-y-6">
@@ -33,7 +33,7 @@
         <div id="login-screen" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
             <div class="text-center mb-2">
                 <h2 class="text-2xl font-bold text-white mb-2">مرحباً بك يا بطل البكالوريا</h2>
-                <p class="text-slate-400 text-sm">ادخل لتبدأ تحدي الحلول والوصول إلى العلامة الكاملة</p>
+                <p class="text-slate-400 text-sm">ادخل لتبدأ التحدي وحل المواضيع وجمع النقاط</p>
             </div>
 
             <div>
@@ -79,10 +79,18 @@
                 <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition">تسجيل الخروج</button>
             </div>
 
-            <!-- قسم إرسال الحلول -->
+            <!-- قسم التحديات الخاصة والأسئلة الإضافية من الأدمن -->
+            <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-xl space-y-4">
+                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>🔥</span> التحديات الخاصة وفترة الفروض</h3>
+                <div id="student-custom-challenges" class="space-y-3">
+                    <p class="text-center text-slate-500 text-sm py-2">لا توجد تحديات خاصة حالياً.</p>
+                </div>
+            </div>
+
+            <!-- قسم إرسال الحلول العادية -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>📤</span> إرسال حل تمرين</h3>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>📤</span> إرسال حل تمرين بكالوريا</h3>
                     <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg hover:bg-amber-500/20 transition font-semibold">
                         📊 خريطة البكالوريات
                     </button>
@@ -144,9 +152,9 @@
                 </div>
             </div>
 
-            <!-- قسم التمارين التي تحتاج إعادة محاولة (أقل من 10/10) -->
+            <!-- قسم التمارين التي تحتاج إعادة محاولة -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>🔄</span> تمارين تحتاج إعادة محاولة (لم تحصل على 10/10 بعد)</h3>
+                <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>🔄</span> تمارين تحتاج إعادة محاولة (لم تحصل على 10/10)</h3>
                 <div id="retry-list" class="space-y-3">
                     <p class="text-center text-slate-500 text-sm py-4">لا توجد تمارين تحتاج إعادة محاولة. ممتاز!</p>
                 </div>
@@ -169,33 +177,81 @@
             </div>
         </div>
 
-        <!-- لوحة الأدمن (محمد) -->
+        <!-- لوحة الأدمن الشاملة (محمد) -->
         <div id="admin-dashboard" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-bold text-emerald-400">🛠️ لوحة الأدمن (محمد)</h3>
-                    <p class="text-xs text-slate-400">القبول حصراً بالـ 10/10 أو طلب إعادة محاولة</p>
+                    <p class="text-xs text-slate-400">تحكم كامل بالتقييمات، النقاط، الفروض، والتحديات</p>
                 </div>
                 <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition">تسجيل الخروج</button>
             </div>
 
             <!-- تبديل أقسام الأدمن -->
-            <div class="flex gap-2 border-b border-slate-800 pb-3">
-                <button onclick="switchAdminTab('pending')" id="tab-pending" class="flex-1 bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs transition">التقييمات المعلقة 📥</button>
-                <button onclick="switchAdminTab('users')" id="tab-users" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 rounded-xl text-xs transition">قائمة المستخدمين 👥</button>
+            <div class="flex gap-1 border-b border-slate-800 pb-3 overflow-x-auto">
+                <button onclick="switchAdminTab('pending')" id="tab-pending" class="flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">التقييمات 📥</button>
+                <button onclick="switchAdminTab('challenge')" id="tab-challenge" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">إرسال تحدي 🔥</button>
+                <button onclick="switchAdminTab('exam')" id="tab-exam" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">نقاط الفروض 📝</button>
+                <button onclick="switchAdminTab('users')" id="tab-users" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">المستخدمين 👥</button>
             </div>
 
-            <!-- قسم الحلول المعلقة -->
+            <!-- 1. قسم الحلول المعلقة -->
             <div class="space-y-4" id="admin-pending-section">
                 <div id="pending-list" class="space-y-4">
                     <p class="text-center text-slate-500 text-sm py-8">جاري جلب الحلول المعلقة...</p>
                 </div>
             </div>
 
-            <!-- قائمة المستخدمين -->
+            <!-- 2. قسم إرسال تحدي أو سؤال برصيد نقاط مخصص -->
+            <div class="space-y-4 hidden" id="admin-challenge-section">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-lg">
+                    <h4 class="font-bold text-amber-400 text-sm">🎯 نشر تحدي أو سؤال جديد برصيد نقاط</h4>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1 font-semibold">عنوان التحدي أو السؤال:</label>
+                        <input type="text" id="chal-title" placeholder="مثال: تحدي إضافي في الدوال الأسية..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1 font-semibold">تفاصيل أو نص التمرين:</label>
+                        <textarea id="chal-desc" rows="3" placeholder="اكتب نص التمرين أو تفاصيل التحدي هنا..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-amber-400 mb-1 font-bold">النقاط المرصودة للإجابة الصحيحة:</label>
+                        <input type="number" id="chal-points" value="20" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-amber-400 font-bold text-center focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <button onclick="publishChallenge()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl text-xs transition">
+                        نشر التحدي للمنصة 🚀
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. قسم إضافة نقاط الفروض والاختبارات للمستخدمين -->
+            <div class="space-y-4 hidden" id="admin-exam-section">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-lg">
+                    <h4 class="font-bold text-emerald-400 text-sm">📝 إضافة نقاط الفروض والاختبارات لترتيب الطالب</h4>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1 font-semibold">اختر اسم الطالب:</label>
+                        <select id="exam-student-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500 font-bold">
+                            <!-- تتحدث تلقائياً بأسماء الطلاب -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1 font-semibold">عنوان الفرض أو الاختبار:</label>
+                        <input type="text" id="exam-title" placeholder="مثال: فرض الفصل الأول في الرياضيات..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-emerald-400 mb-1 font-bold">النقاط المحصلة (تُضاف للترتيب العام):</label>
+                        <input type="number" id="exam-points" placeholder="مثال: 15" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-emerald-400 font-bold text-center focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <button onclick="awardExamPoints()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition">
+                        إضافة النقاط إلى رصيد الطالب 🌟
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. قسم إدارة المستخدمين (مع خيار الحذف) -->
             <div class="space-y-4 hidden" id="admin-users-section">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-lg">
-                    <h4 class="font-bold text-emerald-400 text-sm">👥 قائمة المتنافسين المسجلين</h4>
+                    <h4 class="font-bold text-emerald-400 text-sm">👥 قائمة المتنافسين المسجلين (مع إمكانية الحذف)</h4>
                     <div id="admin-users-list" class="space-y-2">
                         <p class="text-center text-slate-500 text-sm py-4">جاري التحميل...</p>
                     </div>
@@ -206,7 +262,7 @@
     </main>
 
     <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 mt-8">
-        تحدي مواد البكالوريا - شرط العلامة الكاملة © 2026
+        تحدي مواد البكالوريا - التحكم الكامل © 2026
     </footer>
 
     <script>
@@ -299,6 +355,7 @@
                     loadLeaderboard();
                     loadBacProgress();
                     listenSubmissionsCache();
+                    listenCustomChallenges();
                 }
             }
         });
@@ -355,8 +412,36 @@
                     loadLeaderboard();
                     loadBacProgress();
                     listenSubmissionsCache();
+                    listenCustomChallenges();
                 }
             }
+        }
+
+        // استماع للتحديات الخاصة المرسلة من الأدمن
+        function listenCustomChallenges() {
+            if(!db) return;
+            db.collection("challenges").onSnapshot((snapshot) => {
+                const container = document.getElementById('student-custom-challenges');
+                container.innerHTML = '';
+                let found = false;
+
+                snapshot.forEach((doc) => {
+                    found = true;
+                    let data = doc.data();
+                    container.innerHTML += `
+                        <div class="bg-slate-950 border border-amber-500/30 rounded-xl p-4 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-amber-400 text-sm">${data.title}</span>
+                                <span class="bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full text-xs font-bold">+${data.points} نقطة</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">${data.description}</p>
+                        </div>`;
+                });
+
+                if(!found) {
+                    container.innerHTML = '<p class="text-center text-slate-500 text-sm py-2">لا توجد تحديات خاصة حالياً.</p>';
+                }
+            });
         }
 
         function listenSubmissionsCache() {
@@ -373,8 +458,7 @@
                     data.id = doc.id;
                     allSubmissionsCache.push(data);
 
-                    // إذا كان التمرين بحاجة لإعادة محاولة (يعني قيّم بأقل من 10)
-                    if (data.studentName === currentStudent && (data.status === 'retry' || (data.score !== undefined && data.score < 10))) {
+                    if (data.studentName === currentStudent && (data.status === 'retry' || (data.score !== undefined && data.score < 10 && data.type !== 'exam_points'))) {
                         hasRetry = true;
                         let note = data.adminNote ? data.adminNote : 'يرجى تصحيح الخطأ والحصول على العلامة الكاملة 10/10.';
                         let scoreText = data.score !== undefined ? `التقييم: ${data.score}/10` : 'يحتاج تصحيح';
@@ -418,7 +502,6 @@
             const uploadForm = document.getElementById('upload-form-section');
             const alreadyMsg = document.getElementById('already-submitted-msg');
 
-            // لا يُمنع من إعادة الإرسال إلا إذا حصل على 10/10 كاملة (approved)
             const found = allSubmissionsCache.find(item => 
                 item.studentName === name &&
                 item.subject === subject &&
@@ -529,7 +612,7 @@
             }
         }
 
-        // لوحة الصدارة وتصنيف النقاط (تحتسب فقط لمن جاب 10/10)
+        // لوحة الصدارة وتصنيف النقاط الشاملة (تشمل التمارين ونقاط الفروض والتحديات)
         function loadLeaderboard() {
             if(!db) return;
             db.collection("submissions").onSnapshot((snapshot) => {
@@ -541,16 +624,22 @@
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     let sName = data.studentName;
+                    if(!sName) return;
+                    
                     if(!scoresMap[sName]) {
                         scoresMap[sName] = 0;
                         userPointsMap[sName] = 0;
                     }
                     if(data.studentStream) userStreams[sName] = data.studentStream;
 
-                    // الاعتماد والاحتساب يكون حصراً إذا كان الـ score يساوي 10 أو الحالة approved
-                    if (data.status === 'approved' || data.score === 10) {
+                    // إذا كانت نقاط مضافة مباشرة من الفروض/الاختبارات
+                    if(data.type === 'exam_points') {
+                        userPointsMap[sName] += (data.points || 0);
+                    } 
+                    // إذا كان تمريناً معتمداً بالعلامة الكاملة 10/10
+                    else if (data.status === 'approved' || data.score === 10) {
                         scoresMap[sName]++;
-                        userPointsMap[sName] += 10; // كل تمرين بعلامة كاملة يمنح 10 نقاط
+                        userPointsMap[sName] += 10; 
                     }
                 });
 
@@ -563,14 +652,12 @@
                 const sortedStudents = Object.keys(userPointsMap).sort((a, b) => userPointsMap[b] - userPointsMap[a]);
 
                 if (sortedStudents.length === 0 || sortedStudents.every(s => userPointsMap[s] === 0)) {
-                    listEl.innerHTML = '<p class="text-center text-slate-500 text-sm py-4">لا توجد نقاط مسجلة بعد. كن أول من يحصل على العلامة الكاملة!</p>';
+                    listEl.innerHTML = '<p class="text-center text-slate-500 text-sm py-4">لا توجد نقاط مسجلة بعد. كن متصدر التحدي!</p>';
                     return;
                 }
 
                 sortedStudents.forEach((student, index) => {
                     let points = userPointsMap[student];
-                    if (points === 0) return;
-
                     let medal = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : '🔹'));
                     let stStream = userStreams[student] || 'experimental';
                     let totalTarget = (stStream === 'math') ? TOTAL_MATH : TOTAL_EXPERIMENTAL;
@@ -583,7 +670,7 @@
                             <div class="flex justify-between items-center">
                                 <div>
                                     <span class="font-bold text-white flex items-center gap-2">${medal} ${student}</span>
-                                    <span class="text-[10px] text-amber-400 font-semibold">شعبة: ${streamName} | ${count} تمارين بالعلامة الكاملة</span>
+                                    <span class="text-[10px] text-amber-400 font-semibold">شعبة: ${streamName} | ${count} تمارين تامة</span>
                                 </div>
                                 <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-bold">⭐ ${points} نقطة</span>
                             </div>
@@ -653,22 +740,42 @@
             document.getElementById('bac-modal').classList.toggle('hidden');
         }
 
+        // إدارة أقسام لوحة الأدمن
         function switchAdminTab(tab) {
             const pendingSec = document.getElementById('admin-pending-section');
+            const challengeSec = document.getElementById('admin-challenge-section');
+            const examSec = document.getElementById('admin-exam-section');
             const usersSec = document.getElementById('admin-users-section');
+            
             const tabPending = document.getElementById('tab-pending');
+            const tabChallenge = document.getElementById('tab-challenge');
+            const tabExam = document.getElementById('tab-exam');
             const tabUsers = document.getElementById('tab-users');
+
+            // إخفاء الكل
+            pendingSec.classList.add('hidden');
+            challengeSec.classList.add('hidden');
+            examSec.classList.add('hidden');
+            usersSec.classList.add('hidden');
+
+            tabPending.className = "flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
+            tabChallenge.className = "flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
+            tabExam.className = "flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
+            tabUsers.className = "flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
 
             if(tab === 'pending') {
                 pendingSec.classList.remove('hidden');
-                usersSec.classList.add('hidden');
-                tabPending.className = "flex-1 bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs transition";
-                tabUsers.className = "flex-1 bg-slate-800 text-slate-300 font-bold py-2 rounded-xl text-xs transition";
-            } else {
-                pendingSec.classList.add('hidden');
+                tabPending.className = "flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
+            } else if(tab === 'challenge') {
+                challengeSec.classList.remove('hidden');
+                tabChallenge.className = "flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
+            } else if(tab === 'exam') {
+                examSec.classList.remove('hidden');
+                tabExam.className = "flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
+                loadExamStudentsDropdown();
+            } else if(tab === 'users') {
                 usersSec.classList.remove('hidden');
-                tabUsers.className = "flex-1 bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs transition";
-                tabPending.className = "flex-1 bg-slate-800 text-slate-300 font-bold py-2 rounded-xl text-xs transition";
+                tabUsers.className = "flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
                 loadAdminUsersList();
             }
         }
@@ -686,7 +793,7 @@
 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    if (data.status === 'pending') {
+                    if (data.status === 'pending' && data.type !== 'exam_points') {
                         found = true;
                         let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-20 h-20 object-cover rounded-lg border border-slate-700 hover:opacity-80 transition"></a>`).join('');
                         let stStreamText = (data.studentStream === 'math') ? 'رياضيات/تقني' : 'علوم تجريبية';
@@ -728,6 +835,85 @@
             });
         }
 
+        // نشر تحدي جديد
+        async function publishChallenge() {
+            const title = document.getElementById('chal-title').value.trim();
+            const desc = document.getElementById('chal-desc').value.trim();
+            const points = parseInt(document.getElementById('chal-points').value) || 20;
+
+            if(!title || !desc) {
+                alert('الرجاء إدخال عنوان وتفاصيل التحدي!');
+                return;
+            }
+
+            try {
+                await db.collection("challenges").add({
+                    title: title,
+                    description: desc,
+                    points: points,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert('تم نشر التحدي بنجاح لجميع الطلاب في المنصة! 🚀');
+                document.getElementById('chal-title').value = '';
+                document.getElementById('chal-desc').value = '';
+            } catch(e) {
+                alert('خطأ في النشر: ' + e.message);
+            }
+        }
+
+        // إبداء قائمة الطلاب لاختيارهم في إضافة نقاط الفروض
+        function loadExamStudentsDropdown() {
+            if(!db) return;
+            db.collection("submissions").get().then((snapshot) => {
+                let studentsSet = new Set();
+                snapshot.forEach(doc => {
+                    let name = doc.data().studentName;
+                    if(name) studentsSet.add(name);
+                });
+
+                const selectEl = document.getElementById('exam-student-select');
+                selectEl.innerHTML = '';
+                studentsSet.forEach(s => {
+                    selectEl.innerHTML += `<option value="${s}">${s}</option>`;
+                });
+            });
+        }
+
+        // إضافة نقاط الفروض للطالب
+        async function awardExamPoints() {
+            const studentName = document.getElementById('exam-student-select').value;
+            const title = document.getElementById('exam-title').value.trim();
+            const points = parseInt(document.getElementById('exam-points').value) || 0;
+
+            if(!studentName || !title || points <= 0) {
+                alert('الرجاء التأكد من اختيار الطالب وإدخال العنوان والنقاط بشكل صحيح!');
+                return;
+            }
+
+            try {
+                await db.collection("submissions").add({
+                    studentName: studentName,
+                    subject: 'نقاط الفروض والاختبارات',
+                    topic: title,
+                    category: 'تقييم أدمن',
+                    year: '2026',
+                    images: [],
+                    status: 'approved',
+                    score: 10,
+                    points: points,
+                    type: 'exam_points',
+                    adminNote: 'تم إضافة رصيد الفرض/الاختبار بنجاح',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert(`تم إضافة ${points} نقطة بنجاح إلى رصيد الطالب ${studentName}! 🌟`);
+                document.getElementById('exam-title').value = '';
+                document.getElementById('exam-points').value = '';
+            } catch(e) {
+                alert('خطأ: ' + e.message);
+            }
+        }
+
+        // قائمة المستخدمين مع زر الحذف النهائي
         function loadAdminUsersList() {
             if(!db) return;
             db.collection("submissions").get().then((snapshot) => {
@@ -739,7 +925,9 @@
                         if(!usersMap[name]) {
                             usersMap[name] = { stream: data.studentStream || 'experimental', approvedCount: 0, totalPoints: 0 };
                         }
-                        if(data.status === 'approved' || data.score === 10) {
+                        if(data.type === 'exam_points') {
+                            usersMap[name].totalPoints += (data.points || 0);
+                        } else if (data.status === 'approved' || data.score === 10) {
                             usersMap[name].approvedCount++;
                             usersMap[name].totalPoints += 10;
                         }
@@ -764,13 +952,35 @@
                                 <span class="font-bold text-white text-sm">${u}</span>
                                 <span class="text-slate-400 block">الشعبة: ${streamText}</span>
                             </div>
-                            <div class="text-left">
-                                <span class="bg-emerald-600/20 text-emerald-400 px-2.5 py-1 rounded-full font-bold">${info.approvedCount} تمارين كاملة</span>
-                                <span class="bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full font-bold ml-1">⭐ ${info.totalPoints} نقطة</span>
+                            <div class="flex items-center gap-2">
+                                <div class="text-left">
+                                    <span class="bg-emerald-600/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">${info.approvedCount} تمرين</span>
+                                    <span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold ml-1">⭐ ${info.totalPoints} نقطة</span>
+                                </div>
+                                <button onclick="deleteUserCompletely('${u}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-2.5 py-1.5 rounded-lg hover:bg-rose-600 hover:text-white transition font-bold">حذف 🗑️</button>
                             </div>
                         </div>`;
                 });
             });
+        }
+
+        // حذف المستخدم وكل بياناته من قاعدة البيانات
+        async function deleteUserCompletely(username) {
+            if(!db) return;
+            if(confirm(`هل أنت متأكد من حذف المستخدم "${username}" نهائياً من المنصة وكل مشاركاته؟`)) {
+                try {
+                    const snapshot = await db.collection("submissions").where("studentName", "==", username).get();
+                    let batch = db.batch();
+                    snapshot.forEach((doc) => {
+                        batch.delete(doc.ref);
+                    });
+                    await batch.commit();
+                    alert(`تم حذف المستخدم ${username} بنجاح!`);
+                    loadAdminUsersList();
+                } catch(e) {
+                    alert('خطأ أثناء الحذف: ' + e.message);
+                }
+            }
         }
 
         async function reviewSubmission(id) {
@@ -780,7 +990,6 @@
             const noteText = noteInput ? noteInput.value : '';
             const scoreVal = scoreInput ? parseInt(scoreInput.value) || 0 : 0;
 
-            // القاعدة الصارمة: القبول والاعتماد فقط إذا كانت العلامة 10/10 بالضبط
             let finalStatus = (scoreVal === 10) ? 'approved' : 'retry';
 
             await db.collection("submissions").doc(id).update({
@@ -792,14 +1001,7 @@
             if (scoreVal === 10) {
                 alert('تم منح العلامة الكاملة (10/10) واعتماد الحل بنجاح! 🎉');
             } else {
-                alert(`تم منح التقييم (${scoreVal}/10). وبما أنها ليست علامة كاملة، تم إرسال الحل إلى قسم إعادة المحاولة للتصحيح 🔄`);
-            }
-        }
-
-        async function deleteSubmission(id) {
-            if(!db) return;
-            if(confirm('هل أنت متأكد من حذف هذه المشاركة؟')) {
-                await db.collection("submissions").doc(id).delete();
+                alert(`تم منح التقييم (${scoreVal}/10). وتم إرسال الحل لقسم إعادة المحاولة للتصحيح 🔄`);
             }
         }
 
