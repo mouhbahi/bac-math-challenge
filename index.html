@@ -126,10 +126,10 @@
                 </div>
             </div>
 
-            <!-- لوحة الصدارة والتنافس (مع نسبة إنجاز الحلول واسم كل طالب) -->
+            <!-- لوحة الصدارة والتنافس ونسبة الإنجاز الكلي -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>🏆</span> لوحة الصدارة ونسبة الإنجاز</h3>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>🏆</span> لوحة الصدارة ونسبة الإنجاز الكلي</h3>
                     <span id="total-approved-count" class="text-xs text-slate-400 font-semibold">إجمالي التمارين المقبولة: 0</span>
                 </div>
                 <div id="leaderboard-list" class="space-y-3">
@@ -137,7 +137,7 @@
                 </div>
             </div>
 
-            <!-- قسم التمارين المرفوضة وملاحظات المشرف (أصبح تحت لوحة الصدارة) -->
+            <!-- قسم التمارين المرفوضة وملاحظات المشرف -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>❌</span> التمارين المرفوضة (تحتاج تعديل)</h3>
                 <div id="rejected-list" class="space-y-3">
@@ -195,8 +195,9 @@
 
         let db = null;
         let allSubmissionsCache = [];
-        // إجمالي عدد التمارين الإفتراضي في المنصة (مثلاً 18 سنة لكل مادة أو إجمالي التمارين المتاحة للمنافسة)
-        const TOTAL_AVAILABLE_EXERCISES = 54; 
+        
+        // العدد الكلي الحقيقي لكل التمارين والمواضيع في المنصة (3 مواد × 18 سنة (2009-2026) × موضوعين = 108 موضوعاً رئيسياً متكاملاً)
+        const TOTAL_ALL_EXERCISES = 108; 
 
         try {
             if (!firebase.apps.length) {
@@ -465,7 +466,7 @@
             }
         }
 
-        // لوحة الصدارة المحسنة مع نسبة الحل لكل طالب واسمه
+        // لوحة الصدارة مع حساب النسبة بناءً على العدد الكلي الحقيقي للمواضيع
         function loadLeaderboard() {
             if(!db) return;
             db.collection("submissions").onSnapshot((snapshot) => {
@@ -494,8 +495,8 @@
                 sorted.forEach((student, index) => {
                     let medal = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : '🔹'));
                     let count = scores[student];
-                    // حساب نسبة الإنجاز بناءً على عدد التمارين المقبولة مقارنة بالإجمالي
-                    let percentage = Math.min(100, Math.round((count / TOTAL_AVAILABLE_EXERCISES) * 100));
+                    // حساب النسبة بدقة من العدد الكلي للمواضيع (108 موضوعاً للثلاث مواد من 2009 إلى 2026)
+                    let percentage = Math.min(100, Number(((count / TOTAL_ALL_EXERCISES) * 100).toFixed(1)));
 
                     listEl.innerHTML += `
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
@@ -505,7 +506,7 @@
                             </div>
                             <div class="space-y-1">
                                 <div class="flex justify-between text-xs text-slate-400 font-semibold">
-                                    <span>نسبة إنجاز وحل المواضيع</span>
+                                    <span>نسبة إنجاز وحل المواضيع الكلية</span>
                                     <span class="text-emerald-400">${percentage}%</span>
                                 </div>
                                 <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
