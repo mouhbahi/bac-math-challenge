@@ -11,7 +11,6 @@
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
 
@@ -25,7 +24,7 @@
     </header>
 
     <div class="bg-emerald-900/30 border-b border-emerald-800/40 py-2.5 px-4 text-center text-xs md:text-sm text-emerald-300 font-semibold">
-        💡 <span id="motivational-quote">"التفوق في العلوم والفيزياء والرياضيات يبدأ بممارسة تمارين المواضيع باليد يومياً!"</span>
+        💡 <span>"التفوق في العلوم والفيزياء والرياضيات يبدأ بممارسة تمارين المواضيع باليد يومياً!"</span>
     </div>
 
     <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto">
@@ -78,7 +77,6 @@
                     </button>
                 </div>
                 
-                <!-- 1. اختيار المادة -->
                 <div>
                     <label class="block text-sm font-semibold text-slate-300 mb-1">اختر المادة:</label>
                     <select id="subject-select" onchange="updateCategoryOptions()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 font-bold">
@@ -88,7 +86,6 @@
                     </select>
                 </div>
 
-                <!-- 2. اختيار الموضوع (الأول أو الثاني) -->
                 <div>
                     <label class="block text-sm font-semibold text-slate-300 mb-1">اختر الموضوع:</label>
                     <select id="topic-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
@@ -97,23 +94,20 @@
                     </select>
                 </div>
 
-                <!-- 3. نوع التمرين / المحور -->
                 <div>
                     <label id="category-label" class="block text-sm font-semibold text-slate-300 mb-1">المحور أو نوع التمرين:</label>
                     <select id="category-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
                     </select>
                 </div>
 
-                <!-- 4. دورة البكالوريا -->
                 <div>
                     <label class="block text-sm font-semibold text-slate-300 mb-1">دورة البكالوريا:</label>
                     <select id="bac-year" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
                     </select>
                 </div>
 
-                <!-- 5. رفع الصور -->
                 <div>
-                    <label class="block text-sm font-semibold text-slate-300 mb-1">صور الحل من كراسك:</label>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">صور الحل من كراسك (يمكنك اختيار عدة صور واضحة):</label>
                     <input type="file" id="solution-images" accept="image/*" multiple class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
                 </div>
 
@@ -130,14 +124,19 @@
             </div>
         </div>
 
-        <!-- نافذة البكالوريات المحلولة -->
+        <!-- خريطة البكالوريات -->
         <div id="bac-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="text-lg font-bold text-emerald-400">📊 متابعة حل البكالوريات</h3>
-                    <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+                    <div>
+                        <h3 class="text-lg font-bold text-emerald-400">📊 خريطة البكالوريات (2009 - 2026)</h3>
+                        <p class="text-xs text-slate-400">متابعة الحلول المقبولة لكل دورة وموضوع ومادة</p>
+                    </div>
+                    <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1 bg-slate-800 rounded-lg">✕</button>
                 </div>
-                <div id="bac-status-list" class="space-y-2"></div>
+                <div id="bac-status-list" class="space-y-3">
+                    <p class="text-center text-slate-500 text-sm py-4">جاري تحميل الخريطة...</p>
+                </div>
             </div>
         </div>
 
@@ -172,13 +171,14 @@
             measurementId: "G-QYPW46359Q"
         };
 
-        let db = null, storage = null;
+        let db = null;
         try {
-            firebase.initializeApp(firebaseConfig);
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
             db = firebase.firestore();
-            storage = firebase.storage();
         } catch(e) {
-            console.warn("Firebase Init Error:", e);
+            console.error("Firebase Init Error:", e);
         }
 
         const yearSelect = document.getElementById('bac-year');
@@ -275,12 +275,33 @@
             }
         }
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
+        // رفع الحجم والجودة لتكون الصور واضحة جداً ودقيقة للمصحح
+        function processImage(file) {
+            return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 1600; // رفعنا الحد الأقصى لتصبح الصور عالية الدقة وواضحة جداً
+                        if (width > height && width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                        } else if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.85)); // جودة عالية 85%
+                    };
+                };
             });
         }
 
@@ -298,35 +319,38 @@
                 return;
             }
 
+            if (!db) {
+                alert('قاعدة البيانات غير متصلة.');
+                return;
+            }
+
             submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري إرسال الحل...';
+            submitBtn.textContent = 'جاري معالجة وإرسال صور الحل بدقة عالية...';
 
             try {
                 let imageUrls = [];
                 for (let i = 0; i < filesInput.files.length; i++) {
-                    const base64Img = await fileToBase64(filesInput.files[i]);
-                    imageUrls.push(base64Img);
+                    const processedImg = await processImage(filesInput.files[i]);
+                    imageUrls.push(processedImg);
                 }
 
-                if (db) {
-                    await db.collection("submissions").add({
-                        studentName: name,
-                        subject: subject,
-                        topic: topic,
-                        category: category,
-                        year: year,
-                        images: imageUrls,
-                        status: 'pending',
-                        adminNote: '',
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
+                await db.collection("submissions").add({
+                    studentName: name,
+                    subject: subject,
+                    topic: topic,
+                    category: category,
+                    year: year,
+                    images: imageUrls,
+                    status: 'pending',
+                    adminNote: '',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
 
-                alert('تم إرسال الحل بنجاح للمشرف محمد!');
+                alert('تم إرسال صور الحل بنجاح للمشرف محمد! 🚀');
                 filesInput.value = '';
             } catch (error) {
-                console.error(error);
-                alert('حدث خطأ، يرجى المحاولة بصورة ذات حجم أصغر!');
+                console.error("Firestore Error:", error);
+                alert('تعذر الإرسال: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'إرسال الحل للمشرف للمراجعة ✅';
@@ -367,15 +391,47 @@
         function loadBacProgress() {
             if(!db) return;
             db.collection("submissions").onSnapshot((snapshot) => {
+                let approvedMap = {};
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.status === 'approved') {
+                        let key = `${data.year}_${data.subject}_${data.topic}`;
+                        if(!approvedMap[key]) approvedMap[key] = [];
+                        approvedMap[key].push({category: data.category, student: data.studentName});
+                    }
+                });
+
                 const container = document.getElementById('bac-status-list');
                 container.innerHTML = '';
 
-                for (let y = 2026; y >= 2020; y--) {
-                    container.innerHTML += `
-                        <div class="border border-slate-800 rounded-xl p-3 bg-slate-900/50">
-                            <p class="font-bold text-amber-400 text-sm mb-1">بكالوريا ${y}</p>
-                            <p class="text-xs text-slate-400">تتبع المشاركات المقبولة للموضوع الأول والثاني عبر لوحة الأدمن.</p>
-                        </div>`;
+                for (let y = 2026; y >= 2009; y--) {
+                    let subjectsHtml = '';
+                    ['الرياضيات', 'العلوم الطبيعية', 'العلوم الفيزيائية'].forEach(subj => {
+                        ['الموضوع الأول', 'الموضوع الثاني'].forEach(top => {
+                            let key = `${y}_${subj}_${top}`;
+                            let items = approvedMap[key];
+                            if(items && items.length > 0) {
+                                let details = items.map(i => `<span class="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2 py-0.5 rounded-md font-semibold">${i.category} (${i.student})</span>`).join(' ');
+                                subjectsHtml += `
+                                    <div class="mt-2 p-2 bg-slate-950 rounded-lg border border-slate-800">
+                                        <div class="text-xs font-bold text-emerald-400 mb-1">${subj} - ${top}</div>
+                                        <div class="flex flex-wrap gap-1">${details}</div>
+                                    </div>`;
+                            }
+                        });
+                    });
+
+                    if(subjectsHtml !== '') {
+                        container.innerHTML += `
+                            <div class="border border-slate-800 rounded-xl p-3 bg-slate-900/80">
+                                <p class="font-bold text-amber-400 text-sm mb-1">📅 دورة بكالوريا ${y}</p>
+                                ${subjectsHtml}
+                            </div>`;
+                    }
+                }
+
+                if(container.innerHTML === '') {
+                    container.innerHTML = '<p class="text-center text-slate-500 text-sm py-6">لم يتم اعتماد أي حلول في البكالوريات بعد. كن أول من يحل بكالوريا! 🚀</p>';
                 }
             });
         }
@@ -405,10 +461,10 @@
                                 </div>
                                 <div class="text-xs text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between">
                                     <span>📌 ${data.topic || 'الموضوع الأول'}</span>
-                                    <span>بكالوريا ${data.year} (${data.category || data.unit})</span>
+                                    <span>بكالوريا ${data.year} (${data.category || ''})</span>
                                 </div>
                                 <div>
-                                    <span class="text-xs text-slate-400 block mb-1">صور الحل:</span>
+                                    <span class="text-xs text-slate-400 block mb-1">صور الحل (اضغط على أي صورة لتكبيرها ورؤيتها بوضوح):</span>
                                     <div class="flex gap-2 flex-wrap">${imgs}</div>
                                 </div>
                                 <div>
@@ -418,6 +474,7 @@
                                 <div class="flex gap-3 pt-2">
                                     <button onclick="review('${docSnap.id}', 'approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-sm transition">قبول ✅</button>
                                     <button onclick="review('${docSnap.id}', 'rejected')" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl text-sm transition">رفض ❌</button>
+                                    <button onclick="deleteSubmission('${docSnap.id}')" class="bg-rose-900/40 text-rose-300 px-3 rounded-xl text-xs hover:bg-rose-900/60 transition">حذف</button>
                                 </div>
                             </div>`;
                     }
@@ -437,6 +494,13 @@
                 status: status,
                 adminNote: noteText
             });
+        }
+
+        async function deleteSubmission(id) {
+            if(!db) return;
+            if(confirm('هل أنت متأكد من حذف هذه المشاركة؟')) {
+                await db.collection("submissions").doc(id).delete();
+            }
         }
 
         function logout() {
