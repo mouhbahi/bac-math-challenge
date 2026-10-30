@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي رياضيات البكالوريا - شعبة علوم تجريبية</title>
+    <title>تحدي مواد البكالوريا - علوم تجريبية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -18,23 +18,23 @@
     <header class="bg-emerald-950 border-b border-emerald-800/60 py-4 px-6 shadow-xl">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-black text-emerald-400 flex items-center gap-2">
-                <span>🧪</span> تحدي رياضيات البكالوريا
+                <span>🧪</span> تحدي البكالوريا (رياضيات • علوم • فيزياء)
             </h1>
             <span class="text-xs bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-3 py-1 rounded-full font-bold">شعبة علوم تجريبية</span>
         </div>
     </header>
 
     <div class="bg-emerald-900/30 border-b border-emerald-800/40 py-2.5 px-4 text-center text-xs md:text-sm text-emerald-300 font-semibold">
-        💡 <span id="motivational-quote">"النجاح في البكالوريا ليس حظاً، بل خطوة بخطوة من الانضباط والتحدي!"</span>
+        💡 <span id="motivational-quote">"التفوق في العلوم والفيزياء والرياضيات يبدأ بممارسة تمارين المواضيع باليد يومياً!"</span>
     </div>
 
     <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto">
 
-        <!-- 1. شاشة تسجيل الدخول -->
+        <!-- شاشة تسجيل الدخول -->
         <div id="login-screen" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
             <div class="text-center mb-2">
                 <h2 class="text-2xl font-bold text-white mb-2">مرحباً بك يا بطل البكالوريا</h2>
-                <p class="text-slate-400 text-sm">سجل دخولك لتشارك حلولك وتنافس أصدقاءك نحو علامة ممتازة</p>
+                <p class="text-slate-400 text-sm">شارِك حلولك للموضوع الأول والثاني في العلوم والفيزياء والرياضيات</p>
             </div>
 
             <div>
@@ -60,7 +60,7 @@
             </button>
         </div>
 
-        <!-- 2. لوحة تحكم الطالب -->
+        <!-- لوحة الطالب -->
         <div id="student-dashboard" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex justify-between items-center">
                 <div>
@@ -74,26 +74,44 @@
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                     <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>📤</span> إرسال حل تمرين</h3>
                     <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg hover:bg-amber-500/20 transition font-semibold">
-                        📊 البكالوريات المحلولة
+                        📊 خريطة البكالوريات
                     </button>
                 </div>
                 
+                <!-- 1. اختيار المادة -->
                 <div>
-                    <label class="block text-sm font-semibold text-slate-300 mb-1">اختر المحور الرياضي:</label>
-                    <select id="math-unit" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
-                        <option value="الدوال">الدوال (العددية، الأسية، اللوغاريتمية)</option>
-                        <option value="المتتاليات">المتتاليات العددية</option>
-                        <option value="الاحتمالات">الإحصاء والاحتمالات</option>
-                        <option value="الأعداد المركبة">الأعداد المركبة والهندسة في الفضاء</option>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">اختر المادة:</label>
+                    <select id="subject-select" onchange="updateCategoryOptions()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 font-bold">
+                        <option value="الرياضيات">📐 الرياضيات</option>
+                        <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
+                        <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
                     </select>
                 </div>
 
+                <!-- 2. اختيار الموضوع (الأول أو الثاني) -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">اختر الموضوع:</label>
+                    <select id="topic-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
+                        <option value="الموضوع الأول">📄 الموضوع الأول</option>
+                        <option value="الموضوع الثاني">📄 الموضوع الثاني</option>
+                    </select>
+                </div>
+
+                <!-- 3. نوع التمرين / المحور -->
+                <div>
+                    <label id="category-label" class="block text-sm font-semibold text-slate-300 mb-1">المحور أو نوع التمرين:</label>
+                    <select id="category-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                    </select>
+                </div>
+
+                <!-- 4. دورة البكالوريا -->
                 <div>
                     <label class="block text-sm font-semibold text-slate-300 mb-1">دورة البكالوريا:</label>
                     <select id="bac-year" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
                     </select>
                 </div>
 
+                <!-- 5. رفع الصور -->
                 <div>
                     <label class="block text-sm font-semibold text-slate-300 mb-1">صور الحل من كراسك:</label>
                     <input type="file" id="solution-images" accept="image/*" multiple class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
@@ -116,19 +134,19 @@
         <div id="bac-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="text-lg font-bold text-emerald-400">📊 خريطة البكالوريات المحلولة</h3>
+                    <h3 class="text-lg font-bold text-emerald-400">📊 متابعة حل البكالوريات</h3>
                     <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
                 </div>
                 <div id="bac-status-list" class="space-y-2"></div>
             </div>
         </div>
 
-        <!-- 3. لوحة المشرف -->
+        <!-- لوحة المشرف -->
         <div id="admin-dashboard" class="hidden space-y-6">
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-bold text-emerald-400">🛠️ لوحة المشرف (محمد)</h3>
-                    <p class="text-xs text-slate-400">تقييم الحلول وإضافة ملاحظات وإرشادات للطلاب</p>
+                    <p class="text-xs text-slate-400">تقييم حلول الموضوعين الأول والثاني للمواد العلمية</p>
                 </div>
                 <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition">تسجيل الخروج</button>
             </div>
@@ -140,18 +158,10 @@
     </main>
 
     <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 mt-8">
-        تحدي رياضيات البكالوريا - شعبة العلوم التجريبية © 2026
+        تحدي المواد العلمية للبكالوريا - شعبة العلوم التجريبية © 2026
     </footer>
 
     <script>
-        const quotes = [
-            '"الرياضيات مادة النقاط الكاملة في البكالوريا، كل تمرين تحله هو نقطة في جيبك!"',
-            '"الاستمرار يومياً أفضل بكثير من المراجعة العشوائية.. واصل التحدي!"',
-            '"علامة ممتازة في البكالوريا تبدأ بكرّاس وتمارين محلولة بيدك!"',
-            '"ثق في قدراتك يا بطل العلوم التجريبية، العلم بالتعلم والتفوق بالممارسة!"'
-        ];
-        document.getElementById('motivational-quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
-
         const firebaseConfig = {
             apiKey: "AIzaSyAjhPYyOtm7maxcq4WNQIDJwFOBbCEIiaY",
             authDomain: "bac-math-challenge.firebaseapp.com",
@@ -179,7 +189,24 @@
             yearSelect.appendChild(opt);
         }
 
-        // 🟢 الفحص التلقائي عند فتح الموقع (هل المستخدم مسجل من قبل؟)
+        function updateCategoryOptions() {
+            const subject = document.getElementById('subject-select').value;
+            const categorySelect = document.getElementById('category-select');
+            categorySelect.innerHTML = '';
+
+            if (subject === 'الرياضيات') {
+                const options = ['الدوال (العددية، الأسية، اللوغاريتمية)', 'المتتاليات العددية', 'الإحصاء والاحتمالات', 'الأعداد المركبة والهندسة'];
+                options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
+            } else if (subject === 'العلوم الطبيعية') {
+                const options = ['تمرين استرجاع المعارف (التمرين الأول)', 'تمرين الاستدلال العلمي (التمرين الثاني)', 'تمرين المسعى العلمي (التمرين الثالث)'];
+                options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
+            } else if (subject === 'العلوم الفيزيائية') {
+                const options = ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
+                options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
+            }
+        }
+        updateCategoryOptions();
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedStudent = localStorage.getItem('bac_username');
             const savedAdmin = localStorage.getItem('bac_is_admin');
@@ -248,9 +275,20 @@
             }
         }
 
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         async function submitSolution() {
             const name = localStorage.getItem('bac_username') || document.getElementById('student-display-name').textContent;
-            const unit = document.getElementById('math-unit').value;
+            const subject = document.getElementById('subject-select').value;
+            const topic = document.getElementById('topic-select').value;
+            const category = document.getElementById('category-select').value;
             const year = document.getElementById('bac-year').value;
             const filesInput = document.getElementById('solution-images');
             const submitBtn = document.getElementById('submit-btn');
@@ -261,22 +299,21 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري رفع الصور...';
+            submitBtn.textContent = 'جاري إرسال الحل...';
 
             try {
-                if (storage && db) {
-                    let imageUrls = [];
-                    for (let i = 0; i < filesInput.files.length; i++) {
-                        const file = filesInput.files[i];
-                        const storageRef = storage.ref(`solutions/${Date.now()}_${file.name}`);
-                        const snapshot = await storageRef.put(file);
-                        const url = await snapshot.ref.getDownloadURL();
-                        imageUrls.push(url);
-                    }
+                let imageUrls = [];
+                for (let i = 0; i < filesInput.files.length; i++) {
+                    const base64Img = await fileToBase64(filesInput.files[i]);
+                    imageUrls.push(base64Img);
+                }
 
+                if (db) {
                     await db.collection("submissions").add({
                         studentName: name,
-                        unit: unit,
+                        subject: subject,
+                        topic: topic,
+                        category: category,
                         year: year,
                         images: imageUrls,
                         status: 'pending',
@@ -285,11 +322,11 @@
                     });
                 }
 
-                alert('تم إرسال الحل للمشرف محمد بنجاح!');
+                alert('تم إرسال الحل بنجاح للمشرف محمد!');
                 filesInput.value = '';
             } catch (error) {
                 console.error(error);
-                alert('حدث خطأ أثناء الرفع!');
+                alert('حدث خطأ، يرجى المحاولة بصورة ذات حجم أصغر!');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'إرسال الحل للمشرف للمراجعة ✅';
@@ -321,7 +358,7 @@
                     listEl.innerHTML += `
                         <div class="flex justify-between items-center bg-slate-950 p-3.5 rounded-xl border border-slate-800">
                             <span class="font-semibold text-white flex items-center gap-2">${medal} ${student}</span>
-                            <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">${scores[student]} تمارين</span>
+                            <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">${scores[student]} تمارين مقبولة</span>
                         </div>`;
                 });
             });
@@ -330,31 +367,14 @@
         function loadBacProgress() {
             if(!db) return;
             db.collection("submissions").onSnapshot((snapshot) => {
-                let solvedMap = {};
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (data.status === 'approved') {
-                        solvedMap[`${data.year}_${data.unit}`] = data.studentName;
-                    }
-                });
-
                 const container = document.getElementById('bac-status-list');
                 container.innerHTML = '';
 
-                for (let y = 2026; y >= 2009; y--) {
-                    let items = ['الدوال', 'المتتاليات', 'الاحتمالات', 'الأعداد المركبة'].map(u => {
-                        let isSolved = solvedMap[`${y}_${u}`];
-                        return `
-                            <div class="flex justify-between items-center bg-slate-950 p-2 rounded-lg text-xs">
-                                <span class="text-slate-300">${u}</span>
-                                ${isSolved ? `<span class="text-emerald-400 font-bold">✅ (${isSolved})</span>` : `<span class="text-slate-600">❌ غير محلول</span>`}
-                            </div>`;
-                    }).join('');
-
+                for (let y = 2026; y >= 2020; y--) {
                     container.innerHTML += `
                         <div class="border border-slate-800 rounded-xl p-3 bg-slate-900/50">
-                            <p class="font-bold text-amber-400 text-sm mb-2">بكالوريا ${y}</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">${items}</div>
+                            <p class="font-bold text-amber-400 text-sm mb-1">بكالوريا ${y}</p>
+                            <p class="text-xs text-slate-400">تتبع المشاركات المقبولة للموضوع الأول والثاني عبر لوحة الأدمن.</p>
                         </div>`;
                 }
             });
@@ -375,13 +395,17 @@
                     const data = docSnap.data();
                     if (data.status === 'pending') {
                         found = true;
-                        let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-16 h-16 object-cover rounded-lg border border-slate-700 hover:opacity-80 transition"></a>`).join('');
+                        let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-20 h-20 object-cover rounded-lg border border-slate-700 hover:opacity-80 transition"></a>`).join('');
 
                         listEl.innerHTML += `
                             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-lg">
                                 <div class="flex justify-between text-sm">
                                     <span class="font-bold text-emerald-400">المتنافس: ${data.studentName}</span>
-                                    <span class="text-slate-400">بكالوريا ${data.year} (${data.unit})</span>
+                                    <span class="text-amber-400 font-semibold">${data.subject || 'الرياضيات'}</span>
+                                </div>
+                                <div class="text-xs text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800 flex justify-between">
+                                    <span>📌 ${data.topic || 'الموضوع الأول'}</span>
+                                    <span>بكالوريا ${data.year} (${data.category || data.unit})</span>
                                 </div>
                                 <div>
                                     <span class="text-xs text-slate-400 block mb-1">صور الحل:</span>
