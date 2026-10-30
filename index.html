@@ -120,24 +120,28 @@
                     </div>
 
                     <div id="already-submitted-msg" class="hidden bg-slate-950 border border-amber-500/30 rounded-xl p-4 text-center space-y-2">
-                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد قمت مسبقاً بإرسال حل لهذا التمرين (وهو قيد المراجعة أو مقبول)!</p>
+                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد قمت مسبقاً بإرسال حل لهذا التمرين (قيد المراجعة أو مقبول)!</p>
                         <p class="text-slate-400 text-xs">يمكنك اختيار سنة أو مادة أخرى للمشاركة فيها.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- قسم التمارين المرفوضة وملاحظات المشرف للطالب -->
+            <!-- لوحة الصدارة والتنافس (مع نسبة إنجاز الحلول واسم كل طالب) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>🏆</span> لوحة الصدارة ونسبة الإنجاز</h3>
+                    <span id="total-approved-count" class="text-xs text-slate-400 font-semibold">إجمالي التمارين المقبولة: 0</span>
+                </div>
+                <div id="leaderboard-list" class="space-y-3">
+                    <p class="text-center text-slate-500 text-sm py-4">جاري تحميل الترتيب...</p>
+                </div>
+            </div>
+
+            <!-- قسم التمارين المرفوضة وملاحظات المشرف (أصبح تحت لوحة الصدارة) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>❌</span> التمارين المرفوضة (تحتاج تعديل)</h3>
                 <div id="rejected-list" class="space-y-3">
                     <p class="text-center text-slate-500 text-sm py-4">لا توجد تمارين مرفوضة. أحسنت!</p>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>🏆</span> لوحة الصدارة والتنافس</h3>
-                <div id="leaderboard-list" class="space-y-2">
-                    <p class="text-center text-slate-500 text-sm py-4">جاري تحميل الترتيب...</p>
                 </div>
             </div>
         </div>
@@ -191,6 +195,8 @@
 
         let db = null;
         let allSubmissionsCache = [];
+        // إجمالي عدد التمارين الإفتراضي في المنصة (مثلاً 18 سنة لكل مادة أو إجمالي التمارين المتاحة للمنافسة)
+        const TOTAL_AVAILABLE_EXERCISES = 54; 
 
         try {
             if (!firebase.apps.length) {
@@ -312,7 +318,6 @@
                     data.id = doc.id;
                     allSubmissionsCache.push(data);
 
-                    // تجميع التمارين المرفوضة الخاصة بهذا الطالب فقط لعرضها في قسم خاص
                     if (data.studentName === currentStudent && data.status === 'rejected') {
                         hasRejected = true;
                         let note = data.adminNote ? data.adminNote : 'لا توجد ملاحظة محددة.';
@@ -353,7 +358,6 @@
             const uploadForm = document.getElementById('upload-form-section');
             const alreadyMsg = document.getElementById('already-submitted-msg');
 
-            // السماح بالإرسال إذا لم يكن موجوداً أو إذا كان مرفوضاً (ليتمكن من إعادة الإرسال)
             const found = allSubmissionsCache.find(item => 
                 item.studentName === name &&
                 item.subject === subject &&
@@ -461,16 +465,22 @@
             }
         }
 
+        // لوحة الصدارة المحسنة مع نسبة الحل لكل طالب واسمه
         function loadLeaderboard() {
             if(!db) return;
             db.collection("submissions").onSnapshot((snapshot) => {
                 let scores = {};
+                let totalApproved = 0;
+
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     if (data.status === 'approved') {
                         scores[data.studentName] = (scores[data.studentName] || 0) + 1;
+                        totalApproved++;
                     }
                 });
+
+                document.getElementById('total-approved-count').textContent = `إجمالي التمارين المقبولة: ${totalApproved}`;
 
                 const listEl = document.getElementById('leaderboard-list');
                 listEl.innerHTML = '';
@@ -483,10 +493,25 @@
 
                 sorted.forEach((student, index) => {
                     let medal = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : '🔹'));
+                    let count = scores[student];
+                    // حساب نسبة الإنجاز بناءً على عدد التمارين المقبولة مقارنة بالإجمالي
+                    let percentage = Math.min(100, Math.round((count / TOTAL_AVAILABLE_EXERCISES) * 100));
+
                     listEl.innerHTML += `
-                        <div class="flex justify-between items-center bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-                            <span class="font-semibold text-white flex items-center gap-2">${medal} ${student}</span>
-                            <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">${scores[student]} تمارين مقبولة</span>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-white flex items-center gap-2">${medal} ${student}</span>
+                                <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">${count} تمارين مقبولة</span>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs text-slate-400 font-semibold">
+                                    <span>نسبة إنجاز وحل المواضيع</span>
+                                    <span class="text-emerald-400">${percentage}%</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                                    <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                                </div>
+                            </div>
                         </div>`;
                 });
             });
