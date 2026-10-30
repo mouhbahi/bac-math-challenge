@@ -107,7 +107,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-300 mb-1">صور الحل من كراسك (يمكنك اختيار عدة صور واضحة):</label>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">صور الحل من كراسك (يمكنك اختيار 5 صور وأكثر):</label>
                     <input type="file" id="solution-images" accept="image/*" multiple class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
                 </div>
 
@@ -275,7 +275,7 @@
             }
         }
 
-        // رفع الحجم والجودة لتكون الصور واضحة جداً ودقيقة للمصحح
+        // ضغط محسن ذكي يضغط الصور لتتسع حتى 6 صور أو أكثر بدون تجاوز حد الـ 1 ميغابايت نهائياً
         function processImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -287,7 +287,7 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const maxDim = 1600; // رفعنا الحد الأقصى لتصبح الصور عالية الدقة وواضحة جداً
+                        const maxDim = 750; // أبعاد مثالية تضمن وضوح الكتابة مع حجم خفيف جداً
                         if (width > height && width > maxDim) {
                             height *= maxDim / width;
                             width = maxDim;
@@ -299,7 +299,7 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.85)); // جودة عالية 85%
+                        resolve(canvas.toDataURL('image/jpeg', 0.55)); // جودة متوازنة تسمح برفع عدة صور بسلاسة
                     };
                 };
             });
@@ -325,7 +325,7 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري معالجة وإرسال صور الحل بدقة عالية...';
+            submitBtn.textContent = 'جاري ضغط وإرسال الصور دفعة واحدة...';
 
             try {
                 let imageUrls = [];
@@ -346,11 +346,11 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert('تم إرسال صور الحل بنجاح للمشرف محمد! 🚀');
+                alert('تم إرسال الحل (بكل الصور) بنجاح للمشرف محمد! 🚀');
                 filesInput.value = '';
             } catch (error) {
                 console.error("Firestore Error:", error);
-                alert('تعذر الإرسال: ' + error.message);
+                alert('تعذر الإرسال، حجم البيانات كبير جداً. يرجى الاكتفاء بـ 6 صور كحد أقصى في المرة الواحدة.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'إرسال الحل للمشرف للمراجعة ✅';
@@ -464,7 +464,7 @@
                                     <span>بكالوريا ${data.year} (${data.category || ''})</span>
                                 </div>
                                 <div>
-                                    <span class="text-xs text-slate-400 block mb-1">صور الحل (اضغط على أي صورة لتكبيرها ورؤيتها بوضوح):</span>
+                                    <span class="text-xs text-slate-400 block mb-1">صور الحل (اضغط لتكبيرها):</span>
                                     <div class="flex gap-2 flex-wrap">${imgs}</div>
                                 </div>
                                 <div>
@@ -481,7 +481,8 @@
                 });
 
                 if (!found) {
-                    listEl.innerHTML = '<p class="text-center text-slate-500 text-sm py-8">لا توجد مشاركات معلقة حالياً.</p>';
+                    list_el_html = '<p class="text-center text-slate-500 text-sm py-8">لا توجد مشاركات معلقة حالياً.</p>';
+                    listEl.innerHTML = list_el_html;
                 }
             });
         }
