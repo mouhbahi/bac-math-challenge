@@ -27,7 +27,7 @@
         💡 <span>"التفوق في العلوم والفيزياء والرياضيات يبدأ بممارسة تمارين المواضيع باليد يومياً!"</span>
     </div>
 
-    <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto">
+    <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto space-y-6">
 
         <!-- شاشة تسجيل الدخول -->
         <div id="login-screen" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
@@ -69,6 +69,7 @@
                 <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition">تسجيل الخروج</button>
             </div>
 
+            <!-- قسم إرسال الحلول -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                     <h3 class="text-lg font-bold text-white flex items-center gap-2"><span>📤</span> إرسال حل تمرين</h3>
@@ -88,7 +89,7 @@
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-300 mb-1">اختر الموضوع:</label>
-                    <select id="topic-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
+                    <select id="topic-select" onchange="checkExistingSubmission()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
                         <option value="الموضوع الأول">📄 الموضوع الأول</option>
                         <option value="الموضوع الثاني">📄 الموضوع الثاني</option>
                     </select>
@@ -96,24 +97,41 @@
 
                 <div>
                     <label id="category-label" class="block text-sm font-semibold text-slate-300 mb-1">المحور أو نوع التمرين:</label>
-                    <select id="category-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                    <select id="category-select" onchange="checkExistingSubmission()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
                     </select>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-300 mb-1">دورة البكالوريا:</label>
-                    <select id="bac-year" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                    <select id="bac-year" onchange="checkExistingSubmission()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold text-slate-300 mb-1">صور الحل من كراسك (يمكنك اختيار 5 صور وأكثر):</label>
-                    <input type="file" id="solution-images" accept="image/*" multiple class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
-                </div>
+                <div id="submission-container">
+                    <div id="upload-form-section" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-300 mb-1">صور الحل من كراسك (حتى 6 صور):</label>
+                            <input type="file" id="solution-images" accept="image/*" multiple class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
+                        </div>
 
-                <button id="submit-btn" onclick="submitSolution()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition">
-                    إرسال الحل للمشرف للمراجعة ✅
-                </button>
+                        <button id="submit-btn" onclick="submitSolution()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition">
+                            إرسال الحل للمشرف للمراجعة ✅
+                        </button>
+                    </div>
+
+                    <div id="already-submitted-msg" class="hidden bg-slate-950 border border-amber-500/30 rounded-xl p-4 text-center space-y-2">
+                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد قمت مسبقاً بإرسال حل لهذا التمرين (وهو قيد المراجعة أو مقبول)!</p>
+                        <p class="text-slate-400 text-xs">يمكنك اختيار سنة أو مادة أخرى للمشاركة فيها.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم التمارين المرفوضة وملاحظات المشرف للطالب -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>❌</span> التمارين المرفوضة (تحتاج تعديل)</h3>
+                <div id="rejected-list" class="space-y-3">
+                    <p class="text-center text-slate-500 text-sm py-4">لا توجد تمارين مرفوضة. أحسنت!</p>
+                </div>
             </div>
 
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
@@ -172,6 +190,8 @@
         };
 
         let db = null;
+        let allSubmissionsCache = [];
+
         try {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
@@ -204,6 +224,7 @@
                 const options = ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
                 options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
             }
+            checkExistingSubmission();
         }
         updateCategoryOptions();
 
@@ -222,6 +243,7 @@
                 if (db) {
                     loadLeaderboard();
                     loadBacProgress();
+                    listenSubmissionsCache();
                 }
             }
         });
@@ -271,11 +293,85 @@
                 if (db) {
                     loadLeaderboard();
                     loadBacProgress();
+                    listenSubmissionsCache();
                 }
             }
         }
 
-        // ضغط محسن ذكي يضغط الصور لتتسع حتى 6 صور أو أكثر بدون تجاوز حد الـ 1 ميغابايت نهائياً
+        function listenSubmissionsCache() {
+            if(!db) return;
+            db.collection("submissions").onSnapshot((snapshot) => {
+                allSubmissionsCache = [];
+                let rejectedContainer = document.getElementById('rejected-list');
+                rejectedContainer.innerHTML = '';
+                let hasRejected = false;
+                const currentStudent = localStorage.getItem('bac_username');
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    allSubmissionsCache.push(data);
+
+                    // تجميع التمارين المرفوضة الخاصة بهذا الطالب فقط لعرضها في قسم خاص
+                    if (data.studentName === currentStudent && data.status === 'rejected') {
+                        hasRejected = true;
+                        let note = data.adminNote ? data.adminNote : 'لا توجد ملاحظة محددة.';
+                        rejectedContainer.innerHTML += `
+                            <div class="bg-slate-950 border border-rose-500/30 rounded-xl p-4 space-y-2">
+                                <div class="flex justify-between items-center text-xs text-slate-400">
+                                    <span class="text-amber-400 font-bold">${data.subject} - ${data.topic}</span>
+                                    <span>بكالوريا ${data.year} (${data.category})</span>
+                                </div>
+                                <div class="bg-rose-950/30 border border-rose-800/40 p-3 rounded-lg text-rose-300 text-xs">
+                                    <span class="font-bold block mb-1">💬 ملاحظة المشرف محمد:</span>
+                                    ${note}
+                                </div>
+                                <button onclick="deleteAndRetry('${data.id}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-xs transition">
+                                    حذف وإعادة إرسال الحل المصحح 🔄
+                                </button>
+                            </div>`;
+                    }
+                });
+
+                if (!hasRejected) {
+                    rejectedContainer.innerHTML = '<p class="text-center text-slate-500 text-sm py-4">لا توجد تمارين مرفوضة. أحسنت!</p>';
+                }
+
+                checkExistingSubmission();
+            });
+        }
+
+        function checkExistingSubmission() {
+            const name = localStorage.getItem('bac_username');
+            if(!name) return;
+
+            const subject = document.getElementById('subject-select').value;
+            const topic = document.getElementById('topic-select').value;
+            const category = document.getElementById('category-select').value;
+            const year = document.getElementById('bac-year').value;
+
+            const uploadForm = document.getElementById('upload-form-section');
+            const alreadyMsg = document.getElementById('already-submitted-msg');
+
+            // السماح بالإرسال إذا لم يكن موجوداً أو إذا كان مرفوضاً (ليتمكن من إعادة الإرسال)
+            const found = allSubmissionsCache.find(item => 
+                item.studentName === name &&
+                item.subject === subject &&
+                item.topic === topic &&
+                item.category === category &&
+                item.year === year &&
+                item.status !== 'rejected'
+            );
+
+            if (found) {
+                uploadForm.classList.add('hidden');
+                alreadyMsg.classList.remove('hidden');
+            } else {
+                uploadForm.classList.remove('hidden');
+                alreadyMsg.classList.add('hidden');
+            }
+        }
+
         function processImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -287,7 +383,7 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const maxDim = 750; // أبعاد مثالية تضمن وضوح الكتابة مع حجم خفيف جداً
+                        const maxDim = 750;
                         if (width > height && width > maxDim) {
                             height *= maxDim / width;
                             width = maxDim;
@@ -299,14 +395,14 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.55)); // جودة متوازنة تسمح برفع عدة صور بسلاسة
+                        resolve(canvas.toDataURL('image/jpeg', 0.55));
                     };
                 };
             });
         }
 
         async function submitSolution() {
-            const name = localStorage.getItem('bac_username') || document.getElementById('student-display-name').textContent;
+            const name = localStorage.getItem('bac_username');
             const subject = document.getElementById('subject-select').value;
             const topic = document.getElementById('topic-select').value;
             const category = document.getElementById('category-select').value;
@@ -325,7 +421,7 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري ضغط وإرسال الصور دفعة واحدة...';
+            submitBtn.textContent = 'جاري معالجة وإرسال الحل...';
 
             try {
                 let imageUrls = [];
@@ -346,14 +442,22 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert('تم إرسال الحل (بكل الصور) بنجاح للمشرف محمد! 🚀');
+                alert('تم إرسال الحل بنجاح للمشرف محمد! 🚀');
                 filesInput.value = '';
             } catch (error) {
                 console.error("Firestore Error:", error);
-                alert('تعذر الإرسال، حجم البيانات كبير جداً. يرجى الاكتفاء بـ 6 صور كحد أقصى في المرة الواحدة.');
+                alert('تعذر الإرسال، يرجى تقليل عدد الصور.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'إرسال الحل للمشرف للمراجعة ✅';
+            }
+        }
+
+        async function deleteAndRetry(id) {
+            if(!db) return;
+            if(confirm('هل تريد حذف هذا الحل المرفوض وإعادة رفع حل جديد مكانه؟')) {
+                await db.collection("submissions").doc(id).delete();
+                alert('تم الحذف بنجاح، يمكنك الآن اختيار نفس التمرين وإعادة إرسال الحل الصحيح!');
             }
         }
 
@@ -468,8 +572,8 @@
                                     <div class="flex gap-2 flex-wrap">${imgs}</div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs text-slate-300 mb-1 font-semibold">ملاحظة للطالب:</label>
-                                    <input type="text" id="note-${docSnap.id}" placeholder="اكتب ملاحظتك هنا..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                                    <label class="block text-xs text-slate-300 mb-1 font-semibold">ملاحظة للطالب (سبب الرفض أو التوجيه):</label>
+                                    <input type="text" id="note-${docSnap.id}" placeholder="اكتب ملاحظتك هنا ليراها الطالب..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
                                 </div>
                                 <div class="flex gap-3 pt-2">
                                     <button onclick="review('${docSnap.id}', 'approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-sm transition">قبول ✅</button>
@@ -481,8 +585,7 @@
                 });
 
                 if (!found) {
-                    list_el_html = '<p class="text-center text-slate-500 text-sm py-8">لا توجد مشاركات معلقة حالياً.</p>';
-                    listEl.innerHTML = list_el_html;
+                    listEl.innerHTML = '<p class="text-center text-slate-500 text-sm py-8">لا توجد مشاركات معلقة حالياً.</p>';
                 }
             });
         }
