@@ -121,7 +121,6 @@
                 <div id="exam-form-content" class="space-y-3 opacity-50 pointer-events-none">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <select id="exam-subject-input" class="input-bg border rounded-xl p-3 text-xs font-bold focus:outline-none">
-                            <!-- تتم تعبئتها ديناميكياً حسب شعبة الطالب -->
                         </select>
                         <select id="exam-type-input" class="input-bg border rounded-xl p-3 text-xs font-bold focus:outline-none">
                             <option value="فرض الفصل الأول">فرض الفصل الأول</option>
@@ -149,7 +148,6 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">اختر المادة:</label>
                     <select id="subject-select" onchange="onSubjectChange()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none">
-                        <!-- تُعبأ ديناميكياً -->
                     </select>
                 </div>
 
@@ -241,7 +239,6 @@
                     <div>
                         <label class="block text-xs font-semibold mb-1 text-slate-300">المادة:</label>
                         <select id="map-subject-select" onchange="onMapSubjectChange()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
-                            <!-- تُعبأ ديناميكياً -->
                         </select>
                     </div>
                     <div id="map-stream-wrapper">
@@ -381,7 +378,7 @@
             yearSelect.appendChild(opt);
         }
 
-        // إعداد وتخصيص المواد المتاحة للطالب حسب شعبته
+        // إعداد المواد حسب شعبة الطالب مع ضمان إخفاء مادة العلوم لطالب الرياضيات
         function setupSubjectDropdowns() {
             const stream = localStorage.getItem('bac_user_stream') || 'experimental';
             const subjectSelect = document.getElementById('subject-select');
@@ -393,7 +390,6 @@
                 { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }
             ];
 
-            // إلغاء وإخفاء مادة علوم الطبيعة والحياة تماماً لطالب الرياضيات/التقني
             if (stream === 'experimental') {
                 subjectsList.push({ value: 'العلوم الطبيعية', text: '🧬 علوم الطبيعة والحياة' });
             }
@@ -411,33 +407,40 @@
         }
 
         function onSubjectChange() {
-            const subject = document.getElementById('subject-select').value;
+            const subjectSelect = document.getElementById('subject-select');
+            if(!subjectSelect) return;
+            const subject = subjectSelect.value;
             const streamContainer = document.getElementById('topic-stream-container');
             
-            // إظهار اختيار الشعبة حصراً لمادتي الرياضيات والفيزياء فقط، وإخفاؤها تماماً للعلوم الطبيعية
-            if (subject && (subject.includes('الرياضيات') || subject.includes('الفيزيائية'))) {
-                streamContainer.classList.remove('hidden');
+            // إظهار اختيار الشعبة حصراً لمادتي الرياضيات والفيزياء وإخفاؤها نهائياً لمادة العلوم الطبيعية
+            if (subject === 'الرياضيات' || subject === 'العلوم الفيزيائية') {
+                streamContainer.style.display = 'block';
             } else {
-                streamContainer.classList.add('hidden');
+                streamContainer.style.display = 'none';
                 document.getElementById('topic-stream-select').value = 'علوم تجريبية';
             }
             updateCategoryOptions();
         }
 
         function onMapSubjectChange() {
-            const subject = document.getElementById('map-subject-select').value;
+            const mapSubjectSelect = document.getElementById('map-subject-select');
+            if(!mapSubjectSelect) return;
+            const subject = mapSubjectSelect.value;
             const wrapper = document.getElementById('map-stream-wrapper');
-            if (subject && (subject.includes('الرياضيات') || subject.includes('الفيزيائية'))) {
-                wrapper.classList.remove('hidden');
+            
+            if (subject === 'الرياضيات' || subject === 'العلوم الفيزيائية') {
+                wrapper.style.display = 'block';
             } else {
-                wrapper.classList.add('hidden');
+                wrapper.style.display = 'none';
                 document.getElementById('map-stream-select').value = 'علوم تجريبية';
             }
             renderBacProgressMap();
         }
 
         function updateCategoryOptions() {
-            const subject = document.getElementById('subject-select').value;
+            const subjectSelect = document.getElementById('subject-select');
+            if(!subjectSelect) return;
+            const subject = subjectSelect.value;
             const categorySelect = document.getElementById('category-select');
             categorySelect.innerHTML = '';
             let options = [];
@@ -640,7 +643,7 @@
                         if(pendingStudentContainer && data.status === 'pending') {
                             hasPending = true;
                             let topicStr = data.topicStream || 'علوم تجريبية';
-                            let streamInfo = (data.subject && (data.subject.includes('الرياضيات') || data.subject.includes('الفيزيائية'))) ? ` (${topicStr})` : '';
+                            let streamInfo = (data.subject === 'الرياضيات' || data.subject === 'العلوم الفيزيائية') ? ` (${topicStr})` : '';
                             pendingStudentContainer.innerHTML += `
                                 <div class="input-bg border border-amber-500/40 rounded-xl p-3 space-y-1 text-xs">
                                     <div class="flex justify-between font-bold text-amber-400">
@@ -701,7 +704,7 @@
             if(!name || !document.getElementById('subject-select').value) return;
 
             const subject = document.getElementById('subject-select').value;
-            const isMathOrPhysics = subject.includes('الرياضيات') || subject.includes('الفيزيائية');
+            const isMathOrPhysics = (subject === 'الرياضيات' || subject === 'العلوم الفيزيائية');
             const subStream = isMathOrPhysics ? document.getElementById('topic-stream-select').value : 'علوم تجريبية';
 
             const found = allSubmissionsCache.find(item => {
@@ -752,7 +755,7 @@
                 for (let i = 0; i < filesInput.files.length; i++) imageUrls.push(await processHighQualityImage(filesInput.files[i]));
 
                 const subject = document.getElementById('subject-select').value;
-                const isMathOrPhysics = subject.includes('الرياضيات') || subject.includes('الفيزيائية');
+                const isMathOrPhysics = (subject === 'الرياضيات' || subject === 'العلوم الفيزيائية');
 
                 await db.collection("submissions").add({
                     studentName: name, 
@@ -894,7 +897,9 @@
         }
 
         function renderBacProgressMap() {
-            const selectedSubject = document.getElementById('map-subject-select').value;
+            const mapSubjectSelect = document.getElementById('map-subject-select');
+            if(!mapSubjectSelect) return;
+            const selectedSubject = mapSubjectSelect.value;
             const selectedStream = document.getElementById('map-stream-select').value;
             const container = document.getElementById('bac-status-list');
             container.innerHTML = '';
@@ -906,7 +911,7 @@
             allSubmissionsCache.forEach(item => {
                 if(item.studentName === currentStudent && item.subject === selectedSubject) {
                     let itemStream = item.topicStream || 'علوم تجريبية';
-                    let isMathOrPhysics = selectedSubject.includes('الرياضيات') || selectedSubject.includes('الفيزيائية');
+                    let isMathOrPhysics = (selectedSubject === 'الرياضيات' || selectedSubject === 'العلوم الفيزيائية');
                     let matchesStream = isMathOrPhysics ? (itemStream === selectedStream) : true;
 
                     if(matchesStream) {
@@ -950,7 +955,7 @@
                         </div>`;
                 });
 
-                let isMathOrPhysics = selectedSubject.includes('الرياضيات') || selectedSubject.includes('الفيزيائية');
+                let isMathOrPhysics = (selectedSubject === 'الرياضيات' || selectedSubject === 'العلوم الفيزيائية');
                 let streamLabel = isMathOrPhysics ? ` - شعبة ${selectedStream}` : '';
 
                 container.innerHTML += `
@@ -982,7 +987,7 @@
                     found = true;
                     const data = docSnap.data();
                     let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-24 h-24 object-cover rounded-lg border-2 border-emerald-500/60 hover:scale-105 transition cursor-pointer" title="اضغط لتكبير الصورة بدقة عالية"></a>`).join('');
-                    let tStreamTag = (data.subject && (data.subject.includes('الرياضيات') || data.subject.includes('الفيزيائية'))) ? ` [شعبة الموضوع: ${data.topicStream || 'علوم تجريبية'}]` : '';
+                    let tStreamTag = (data.subject === 'الرياضيات' || data.subject === 'العلوم الفيزيائية') ? ` [شعبة الموضوع: ${data.topicStream || 'علوم تجريبية'}]` : '';
                     
                     listEl.innerHTML += `
                         <div class="card-bg border rounded-2xl p-4 space-y-3 shadow-md">
