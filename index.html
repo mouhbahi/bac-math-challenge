@@ -57,7 +57,7 @@
         <div id="login-screen" class="card-bg border rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
             <div class="text-center mb-2">
                 <h2 class="text-2xl font-bold mb-2">مرحباً بك يا بطل البكالوريا 🏆</h2>
-                <p class="text-slate-300 text-sm">حل مواضيع الرياضيات والفيزياء لكل الشعب لجمع أكبر قدر من النقاط</p>
+                <p class="text-slate-300 text-sm">منصة احترافية لمتابعة حلول مواضيع البكالوريا بدقة عالية</p>
             </div>
 
             <div>
@@ -157,7 +157,7 @@
                     </select>
                 </div>
 
-                <!-- خيار شعبة الموضوع حصراً للرياضيات والفيزياء -->
+                <!-- خيار شعبة الموضوع يظهر حصراً للرياضيات والفيزياء -->
                 <div id="topic-stream-container">
                     <label class="block text-sm font-semibold mb-1">شعبة موضوع التمرين (خاص بالرياضيات والفيزياء):</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
@@ -244,13 +244,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold mb-1 text-slate-300">المادة:</label>
-                        <select id="map-subject-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
+                        <select id="map-subject-select" onchange="onMapSubjectChange()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
                             <option value="الرياضيات">📐 الرياضيات</option>
                             <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
                             <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
                         </select>
                     </div>
-                    <div>
+                    <div id="map-stream-wrapper">
                         <label class="block text-xs font-semibold mb-1 text-slate-300">عرض مواضيع شعبة:</label>
                         <select id="map-stream-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold text-amber-400">
                             <option value="علوم تجريبية">🧬 علوم تجريبية</option>
@@ -391,7 +391,7 @@
             const subject = document.getElementById('subject-select').value;
             const streamContainer = document.getElementById('topic-stream-container');
             
-            // إظهار اختيار الشعبة فقط للمادتين: الرياضيات والفيزياء
+            // إظهار اختيار الشعبة حصراً للرياضيات والفيزياء فقط وإخفاؤها للعلوم الطبيعية
             if (subject.includes('الرياضيات') || subject.includes('الفيزيائية')) {
                 streamContainer.classList.remove('hidden');
             } else {
@@ -399,6 +399,18 @@
                 document.getElementById('topic-stream-select').value = 'علوم تجريبية';
             }
             updateCategoryOptions();
+        }
+
+        function onMapSubjectChange() {
+            const subject = document.getElementById('map-subject-select').value;
+            const wrapper = document.getElementById('map-stream-wrapper');
+            if (subject.includes('الرياضيات') || subject.includes('الفيزيائية')) {
+                wrapper.classList.remove('hidden');
+            } else {
+                wrapper.classList.add('hidden');
+                document.getElementById('map-stream-select').value = 'علوم تجريبية';
+            }
+            renderBacProgressMap();
         }
 
         function updateCategoryOptions() {
@@ -604,10 +616,11 @@
                         if(pendingStudentContainer && data.status === 'pending') {
                             hasPending = true;
                             let topicStr = data.topicStream || 'علوم تجريبية';
+                            let streamInfo = (data.subject && (data.subject.includes('الرياضيات') || data.subject.includes('الفيزيائية'))) ? ` (${topicStr})` : '';
                             pendingStudentContainer.innerHTML += `
                                 <div class="input-bg border border-amber-500/40 rounded-xl p-3 space-y-1 text-xs">
                                     <div class="flex justify-between font-bold text-amber-400">
-                                        <span>📚 ${data.subject} - ${data.topic} (${topicStr})</span>
+                                        <span>📚 ${data.subject} - ${data.topic}${streamInfo}</span>
                                         <span>سنة ${data.year}</span>
                                     </div>
                                     <p class="text-slate-300">⚙️ التمرين: ${data.category}</p>
@@ -664,11 +677,16 @@
             if(!name || !document.getElementById('subject-select').value) return;
 
             const subStream = document.getElementById('topic-stream-select').value;
+            const subject = document.getElementById('subject-select').value;
+            const isMathOrPhysics = subject.includes('الرياضيات') || subject.includes('الفيزيائية');
+
             const found = allSubmissionsCache.find(item => {
                 let itemStream = item.topicStream || 'علوم تجريبية';
+                let matchesSubject = item.subject === subject;
+                let matchesStream = isMathOrPhysics ? (itemStream === subStream) : true;
                 return item.studentName === name &&
-                    item.subject === document.getElementById('subject-select').value &&
-                    itemStream === subStream &&
+                    matchesSubject &&
+                    matchesStream &&
                     item.topic === document.getElementById('topic-select').value &&
                     item.category === document.getElementById('category-select').value &&
                     item.year === document.getElementById('bac-year').value &&
@@ -727,7 +745,7 @@
             } catch (e) { alert('خطأ في الإرسال'); }
         }
 
-        // لوحة الصدارة الشاملة وإحصائيات كل مادة لكل طالب
+        // لوحة الصدارة وإحصائيات كل مادة لكل طالب
         function loadLeaderboard() {
             if(!db) return;
             db.collection("user_adjustments").get().then(adjSnap => {
@@ -864,7 +882,10 @@
             allSubmissionsCache.forEach(item => {
                 if(item.studentName === currentStudent && item.subject === selectedSubject) {
                     let itemStream = item.topicStream || 'علوم تجريبية';
-                    if(itemStream === selectedStream) {
+                    let isMathOrPhysics = selectedSubject.includes('الرياضيات') || selectedSubject.includes('الفيزيائية');
+                    let matchesStream = isMathOrPhysics ? (itemStream === selectedStream) : true;
+
+                    if(matchesStream) {
                         let key = `${item.year}_${item.topic}_${item.category}`;
                         if(item.status === 'approved' || item.score === 10) {
                             approvedMap[key] = { score: item.score || 10 };
@@ -905,9 +926,12 @@
                         </div>`;
                 });
 
+                let isMathOrPhysics = selectedSubject.includes('الرياضيات') || selectedSubject.includes('الفيزيائية');
+                let streamLabel = isMathOrPhysics ? ` - شعبة ${selectedStream}` : '';
+
                 container.innerHTML += `
                     <div class="border border-slate-800 rounded-xl p-3 card-bg space-y-2">
-                        <p class="font-bold text-emerald-400 text-sm">📅 دورة بكالوريا ${y} - شعبة ${selectedStream}</p>
+                        <p class="font-bold text-emerald-400 text-sm">📅 دورة بكالوريا ${y}${streamLabel}</p>
                         ${topicsHtml}
                     </div>`;
             }
@@ -934,7 +958,7 @@
                     found = true;
                     const data = docSnap.data();
                     let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-24 h-24 object-cover rounded-lg border-2 border-emerald-500/60 hover:scale-105 transition cursor-pointer" title="اضغط لتكبير الصورة بدقة عالية"></a>`).join('');
-                    let tStreamTag = data.topicStream ? ` [شعبة الموضوع: ${data.topicStream}]` : ' [شعبة الموضوع: علوم تجريبية]';
+                    let tStreamTag = (data.subject && (data.subject.includes('الرياضيات') || data.subject.includes('الفيزيائية'))) ? ` [شعبة الموضوع: ${data.topicStream || 'علوم تجريبية'}]` : '';
                     
                     listEl.innerHTML += `
                         <div class="card-bg border rounded-2xl p-4 space-y-3 shadow-md">
