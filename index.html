@@ -36,7 +36,7 @@
                 <span class="text-2xl">🎓</span>
                 <div>
                     <h1 class="text-base md:text-lg font-black text-amber-400">تحدي مواضيع البكالوريا</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">الرياضيات والفيزياء لجميع الشعب</p>
+                    <p class="text-[10px] text-slate-300 font-semibold">الرياضيات والفيزياء والعلوم لجميع الشعب</p>
                 </div>
             </div>
             
@@ -139,7 +139,7 @@
                 </div>
             </div>
 
-            <!-- قسم إرسال الحلول العادية (البكالوريات مع اختيار شعبة الموضوع) -->
+            <!-- قسم إرسال الحلول العادية -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                     <h3 class="text-lg font-bold flex items-center gap-2"><span>📤</span> إرسال حل تمرين بكالوريا (عالي الدقة)</h3>
@@ -150,16 +150,16 @@
                 
                 <div>
                     <label class="block text-sm font-semibold mb-1">اختر المادة:</label>
-                    <select id="subject-select" onchange="updateCategoryOptions()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none">
+                    <select id="subject-select" onchange="onSubjectChange()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none">
                         <option value="الرياضيات">📐 الرياضيات</option>
                         <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
                         <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
                     </select>
                 </div>
 
-                <!-- خيار شعبة موضوع البكالوريا -->
+                <!-- خيار شعبة الموضوع حصراً للرياضيات والفيزياء -->
                 <div id="topic-stream-container">
-                    <label class="block text-sm font-semibold mb-1">شعبة موضوع البكالوريا المستهدف:</label>
+                    <label class="block text-sm font-semibold mb-1">شعبة موضوع التمرين (خاص بالرياضيات والفيزياء):</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
                         <option value="علوم تجريبية">🧬 شعبة علوم تجريبية</option>
                         <option value="رياضيات">📐 شعبة رياضيات</option>
@@ -221,19 +221,19 @@
                 </div>
             </div>
 
-            <!-- لوحة الصدارة -->
+            <!-- لوحة الصدارة ونسب الحل لكل طالب ومادة -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-lg font-bold flex items-center gap-2"><span>🏆</span> لوحة الترتيب والنقاط</h3>
+                    <h3 class="text-lg font-bold flex items-center gap-2"><span>🏆</span> لوحة الترتيب ونسبة الحلول لكل مادة</h3>
                     <span id="total-points-label" class="text-xs text-amber-400 font-bold">مجموع نقاطك: 0 نقطة</span>
                 </div>
-                <div id="leaderboard-list" class="space-y-3">
+                <div id="leaderboard-list" class="space-y-4">
                     <p class="text-center text-slate-400 text-sm py-4">جاري تحميل لوحة الترتيب...</p>
                 </div>
             </div>
         </div>
 
-        <!-- خريطة إنجازي الخاصة مع اختيار شعبة الموضوع -->
+        <!-- خريطة إنجازي الخاصة -->
         <div id="bac-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="card-bg border w-full max-w-2xl rounded-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -387,6 +387,20 @@
             yearSelect.appendChild(opt);
         }
 
+        function onSubjectChange() {
+            const subject = document.getElementById('subject-select').value;
+            const streamContainer = document.getElementById('topic-stream-container');
+            
+            // إظهار اختيار الشعبة فقط للمادتين: الرياضيات والفيزياء
+            if (subject.includes('الرياضيات') || subject.includes('الفيزيائية')) {
+                streamContainer.classList.remove('hidden');
+            } else {
+                streamContainer.classList.add('hidden');
+                document.getElementById('topic-stream-select').value = 'علوم تجريبية';
+            }
+            updateCategoryOptions();
+        }
+
         function updateCategoryOptions() {
             const subject = document.getElementById('subject-select').value;
             const categorySelect = document.getElementById('category-select');
@@ -411,7 +425,7 @@
                 const stream = localStorage.getItem('bac_user_stream') || 'experimental';
                 document.getElementById('student-display-name').textContent = savedStudent;
                 document.getElementById('student-stream-tag').textContent = stream === 'math' ? '🎓 شعبة: رياضيات / تقني (Math x2)' : '🎓 شعبة: علوم تجريبية';
-                updateCategoryOptions();
+                onSubjectChange();
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('student-dashboard').classList.remove('hidden');
                 if (db) { loadLeaderboard(); listenSubmissionsCache(); listenExamLockSettings(); }
@@ -651,7 +665,7 @@
 
             const subStream = document.getElementById('topic-stream-select').value;
             const found = allSubmissionsCache.find(item => {
-                let itemStream = item.topicStream || 'علوم تجريبية'; // الحفاظ على التمارين القديمة تلقائياً
+                let itemStream = item.topicStream || 'علوم تجريبية';
                 return item.studentName === name &&
                     item.subject === document.getElementById('subject-select').value &&
                     itemStream === subStream &&
@@ -695,11 +709,14 @@
                 let imageUrls = [];
                 for (let i = 0; i < filesInput.files.length; i++) imageUrls.push(await processHighQualityImage(filesInput.files[i]));
 
+                const subject = document.getElementById('subject-select').value;
+                const isMathOrPhysics = subject.includes('الرياضيات') || subject.includes('الفيزيائية');
+
                 await db.collection("submissions").add({
                     studentName: name, 
                     studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
-                    subject: document.getElementById('subject-select').value, 
-                    topicStream: document.getElementById('topic-stream-select').value,
+                    subject: subject, 
+                    topicStream: isMathOrPhysics ? document.getElementById('topic-stream-select').value : 'علوم تجريبية',
                     topic: document.getElementById('topic-select').value,
                     category: document.getElementById('category-select').value, 
                     year: document.getElementById('bac-year').value,
@@ -710,16 +727,22 @@
             } catch (e) { alert('خطأ في الإرسال'); }
         }
 
+        // لوحة الصدارة الشاملة وإحصائيات كل مادة لكل طالب
         function loadLeaderboard() {
             if(!db) return;
             db.collection("user_adjustments").get().then(adjSnap => {
                 let customBonusMap = {};
                 adjSnap.forEach(doc => { customBonusMap[doc.id] = doc.data().bonusPoints || 0; });
 
-                let scoresMap = {}, userStreams = {}, userPointsMap = {};
+                let scoresMap = {}, subjectCountsMap = {}, userStreams = {}, userPointsMap = {};
+                
                 allSubmissionsCache.forEach((data) => {
                     let sName = data.studentName; if(!sName) return;
-                    if(!scoresMap[sName]) { scoresMap[sName] = 0; userPointsMap[sName] = customBonusMap[sName] || 0; }
+                    if(!scoresMap[sName]) { 
+                        scoresMap[sName] = 0; 
+                        userPointsMap[sName] = customBonusMap[sName] || 0; 
+                        subjectCountsMap[sName] = { 'الرياضيات': 0, 'العلوم الفيزيائية': 0, 'العلوم الطبيعية': 0 };
+                    }
                     if(data.studentStream) userStreams[sName] = data.studentStream;
 
                     let isMathStream = (userStreams[sName] === 'math' || data.studentStream === 'math');
@@ -730,11 +753,19 @@
                     else if (data.status === 'approved' || data.score === 10) {
                         scoresMap[sName]++;
                         userPointsMap[sName] += (isMathStream && isMathSubject) ? 20 : 10;
+                        if(data.subject) {
+                            if(data.subject.includes('الرياضيات')) subjectCountsMap[sName]['الرياضيات']++;
+                            else if(data.subject.includes('الفيزيائية')) subjectCountsMap[sName]['العلوم الفيزيائية']++;
+                            else if(data.subject.includes('الطبيعية')) subjectCountsMap[sName]['العلوم الطبيعية']++;
+                        }
                     }
                 });
 
                 Object.keys(customBonusMap).forEach(u => {
-                    if(!userPointsMap[u]) userPointsMap[u] = customBonusMap[u];
+                    if(!userPointsMap[u]) {
+                        userPointsMap[u] = customBonusMap[u];
+                        subjectCountsMap[u] = { 'الرياضيات': 0, 'العلوم الفيزيائية': 0, 'العلوم الطبيعية': 0 };
+                    }
                 });
 
                 let currentStudent = localStorage.getItem('bac_username');
@@ -753,19 +784,59 @@
                 sorted.forEach((student, index) => {
                     let pts = userPointsMap[student], count = scoresMap[student] || 0;
                     let stream = userStreams[student] || 'experimental';
-                    let percentage = Math.min(100, Number(((count / (stream === 'math' ? TOTAL_MATH : TOTAL_EXPERIMENTAL)) * 100).toFixed(1)));
+                    let maxTotal = stream === 'math' ? TOTAL_MATH : TOTAL_EXPERIMENTAL;
+                    let percentage = Math.min(100, Number(((count / maxTotal) * 100).toFixed(1)));
+
+                    let mathCount = subjectCountsMap[student]['الرياضيات'] || 0;
+                    let physCount = subjectCountsMap[student]['العلوم الفيزيائية'] || 0;
+                    let sciCount = subjectCountsMap[student]['العلوم الطبيعية'] || 0;
+
+                    let mathPct = Math.min(100, Number(((mathCount / 36) * 100).toFixed(0)));
+                    let physPct = Math.min(100, Number(((physCount / 36) * 100).toFixed(0)));
+                    let sciPct = stream === 'math' ? 0 : Math.min(100, Number(((sciCount / 36) * 100).toFixed(0)));
 
                     listEl.innerHTML += `
-                        <div class="input-bg p-4 rounded-xl border space-y-2">
+                        <div class="input-bg p-4 rounded-xl border space-y-3 shadow-lg">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <span class="font-bold flex items-center gap-2 text-sm">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🔹'} ${student}</span>
-                                    <span class="text-[10px] text-amber-400 font-semibold">${stream === 'math' ? 'رياضيات/تقني' : 'علوم تجريبية'} | ${count} تمارين تامة</span>
+                                    <span class="text-[10px] text-amber-400 font-semibold">${stream === 'math' ? 'رياضيات/تقني' : 'علوم تجريبية'} | إجمالي التمارين: ${count} (${percentage}%)</span>
                                 </div>
                                 <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-bold">⭐ ${pts} نقطة</span>
                             </div>
-                            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
-                                <div class="bg-emerald-500 h-full rounded-full" style="width: ${percentage}%"></div>
+                            
+                            <!-- إحصائيات الحلول لكل مادة عند الطالب -->
+                            <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 space-y-2 text-[11px]">
+                                <div>
+                                    <div class="flex justify-between text-sky-400 font-bold mb-1">
+                                        <span>📐 الرياضيات: ${mathCount} تمرين تم حله</span>
+                                        <span>${mathPct}%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+                                        <div class="bg-sky-500 h-full rounded-full" style="width: ${mathPct}%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-amber-400 font-bold mb-1">
+                                        <span>⚡ العلوم الفيزيائية: ${physCount} تمرين تم حله</span>
+                                        <span>${physPct}%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+                                        <div class="bg-amber-500 h-full rounded-full" style="width: ${physPct}%"></div>
+                                    </div>
+                                </div>
+
+                                ${stream !== 'math' ? `
+                                <div>
+                                    <div class="flex justify-between text-emerald-400 font-bold mb-1">
+                                        <span>🧬 العلوم الطبيعية: ${sciCount} تمرين تم حله</span>
+                                        <span>${sciPct}%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+                                        <div class="bg-emerald-500 h-full rounded-full" style="width: ${sciPct}%"></div>
+                                    </div>
+                                </div>` : ''}
                             </div>
                         </div>`;
                 });
@@ -780,7 +851,6 @@
             }
         }
 
-        // خريطة الإنجاز الذكية بدعم اختيار شعبة المواضيع دون ضياع الإنجاز القديم
         function renderBacProgressMap() {
             const selectedSubject = document.getElementById('map-subject-select').value;
             const selectedStream = document.getElementById('map-stream-select').value;
@@ -793,7 +863,7 @@
 
             allSubmissionsCache.forEach(item => {
                 if(item.studentName === currentStudent && item.subject === selectedSubject) {
-                    let itemStream = item.topicStream || 'علوم تجريبية'; // توافق تام مع البيانات القديمة
+                    let itemStream = item.topicStream || 'علوم تجريبية';
                     if(itemStream === selectedStream) {
                         let key = `${item.year}_${item.topic}_${item.category}`;
                         if(item.status === 'approved' || item.score === 10) {
