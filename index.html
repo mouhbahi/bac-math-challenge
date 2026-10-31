@@ -157,7 +157,7 @@
                     </select>
                 </div>
 
-                <!-- خيار شعبة الموضوع يظهر حصراً للرياضيات والفيزياء -->
+                <!-- خيار شعبة الموضوع يظهر حصراً للرياضيات والفيزياء ويختفي تماماً للعلوم الطبيعية -->
                 <div id="topic-stream-container">
                     <label class="block text-sm font-semibold mb-1">شعبة موضوع التمرين (خاص بالرياضيات والفيزياء):</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
@@ -391,7 +391,7 @@
             const subject = document.getElementById('subject-select').value;
             const streamContainer = document.getElementById('topic-stream-container');
             
-            // إظهار اختيار الشعبة حصراً للرياضيات والفيزياء فقط وإخفاؤها للعلوم الطبيعية
+            // إظهار اختيار الشعبة حصراً للرياضيات والفيزياء، وإخفاؤها تماماً للعلوم الطبيعية
             if (subject.includes('الرياضيات') || subject.includes('الفيزيائية')) {
                 streamContainer.classList.remove('hidden');
             } else {
@@ -676,9 +676,9 @@
             const name = localStorage.getItem('bac_username');
             if(!name || !document.getElementById('subject-select').value) return;
 
-            const subStream = document.getElementById('topic-stream-select').value;
             const subject = document.getElementById('subject-select').value;
             const isMathOrPhysics = subject.includes('الرياضيات') || subject.includes('الفيزيائية');
+            const subStream = isMathOrPhysics ? document.getElementById('topic-stream-select').value : 'علوم تجريبية';
 
             const found = allSubmissionsCache.find(item => {
                 let itemStream = item.topicStream || 'علوم تجريبية';
