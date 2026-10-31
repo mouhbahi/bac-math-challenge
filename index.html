@@ -139,7 +139,7 @@
                 </div>
             </div>
 
-            <!-- قسم إرسال الحلول العادية (البكالوريات مع اختيار الشعبة) -->
+            <!-- قسم إرسال الحلول العادية (البكالوريات مع اختيار شعبة الموضوع) -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                     <h3 class="text-lg font-bold flex items-center gap-2"><span>📤</span> إرسال حل تمرين بكالوريا (عالي الدقة)</h3>
@@ -157,7 +157,7 @@
                     </select>
                 </div>
 
-                <!-- خيار شعبة الموضوع للرياضيات والفيزياء لحلول أكثر -->
+                <!-- خيار شعبة موضوع البكالوريا -->
                 <div id="topic-stream-container">
                     <label class="block text-sm font-semibold mb-1">شعبة موضوع البكالوريا المستهدف:</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
@@ -200,7 +200,7 @@
                     </div>
 
                     <div id="already-submitted-msg" class="hidden input-bg border border-amber-500/30 rounded-xl p-4 text-center space-y-2">
-                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد حصلت على العلامة الكاملة (10/10) في هذا التمرين والشعبة مسبقاً!</p>
+                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد حصلت على العلامة الكاملة (10/10) في هذا التمرين لهذه الشعبة مسبقاً!</p>
                     </div>
                 </div>
             </div>
@@ -233,21 +233,33 @@
             </div>
         </div>
 
-        <!-- خريطة إنجازي الخاصة -->
+        <!-- خريطة إنجازي الخاصة مع اختيار شعبة الموضوع -->
         <div id="bac-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="card-bg border w-full max-w-2xl rounded-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-lg font-bold text-emerald-400">📊 خريطة إنجازي الخاصة (المحلولة من طرفك)</h3>
+                    <h3 class="text-lg font-bold text-emerald-400">📊 خريطة إنجازي الخاصة</h3>
                     <button type="button" onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white text-lg font-bold px-3 py-1 bg-slate-800 rounded-lg cursor-pointer">✕</button>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-300">اختر المادة لعرض تفاصيل إنجازك:</label>
-                    <select id="map-subject-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
-                        <option value="الرياضيات">📐 الرياضيات</option>
-                        <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
-                        <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
-                    </select>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-300">المادة:</label>
+                        <select id="map-subject-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
+                            <option value="الرياضيات">📐 الرياضيات</option>
+                            <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
+                            <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-300">عرض مواضيع شعبة:</label>
+                        <select id="map-stream-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold text-amber-400">
+                            <option value="علوم تجريبية">🧬 علوم تجريبية</option>
+                            <option value="رياضيات">📐 رياضيات</option>
+                            <option value="تقني رياضي">⚙️ تقني رياضي</option>
+                        </select>
+                    </div>
                 </div>
+
                 <div id="bac-status-list" class="space-y-3"></div>
             </div>
         </div>
@@ -577,11 +589,11 @@
                     if (data.studentName === currentStudent) {
                         if(pendingStudentContainer && data.status === 'pending') {
                             hasPending = true;
-                            let streamBadge = data.topicStream ? ` [شعبة: ${data.topicStream}]` : '';
+                            let topicStr = data.topicStream || 'علوم تجريبية';
                             pendingStudentContainer.innerHTML += `
                                 <div class="input-bg border border-amber-500/40 rounded-xl p-3 space-y-1 text-xs">
                                     <div class="flex justify-between font-bold text-amber-400">
-                                        <span>📚 ${data.subject} - ${data.topic}${streamBadge}</span>
+                                        <span>📚 ${data.subject} - ${data.topic} (${topicStr})</span>
                                         <span>سنة ${data.year}</span>
                                     </div>
                                     <p class="text-slate-300">⚙️ التمرين: ${data.category}</p>
@@ -638,15 +650,16 @@
             if(!name || !document.getElementById('subject-select').value) return;
 
             const subStream = document.getElementById('topic-stream-select').value;
-            const found = allSubmissionsCache.find(item => 
-                item.studentName === name &&
-                item.subject === document.getElementById('subject-select').value &&
-                item.topicStream === subStream &&
-                item.topic === document.getElementById('topic-select').value &&
-                item.category === document.getElementById('category-select').value &&
-                item.year === document.getElementById('bac-year').value &&
-                (item.status === 'approved' || item.score === 10)
-            );
+            const found = allSubmissionsCache.find(item => {
+                let itemStream = item.topicStream || 'علوم تجريبية'; // الحفاظ على التمارين القديمة تلقائياً
+                return item.studentName === name &&
+                    item.subject === document.getElementById('subject-select').value &&
+                    itemStream === subStream &&
+                    item.topic === document.getElementById('topic-select').value &&
+                    item.category === document.getElementById('category-select').value &&
+                    item.year === document.getElementById('bac-year').value &&
+                    (item.status === 'approved' || item.score === 10);
+            });
 
             document.getElementById('upload-form-section').classList.toggle('hidden', !!found);
             document.getElementById('already-submitted-msg').classList.toggle('hidden', !found);
@@ -767,8 +780,10 @@
             }
         }
 
+        // خريطة الإنجاز الذكية بدعم اختيار شعبة المواضيع دون ضياع الإنجاز القديم
         function renderBacProgressMap() {
             const selectedSubject = document.getElementById('map-subject-select').value;
+            const selectedStream = document.getElementById('map-stream-select').value;
             const container = document.getElementById('bac-status-list');
             container.innerHTML = '';
 
@@ -778,11 +793,14 @@
 
             allSubmissionsCache.forEach(item => {
                 if(item.studentName === currentStudent && item.subject === selectedSubject) {
-                    let key = `${item.year}_${item.topicStream || 'علوم تجريبية'}_${item.topic}_${item.category}`;
-                    if(item.status === 'approved' || item.score === 10) {
-                        approvedMap[key] = { score: item.score || 10, stream: item.topicStream || 'علوم تجريبية' };
-                    } else if(item.status === 'pending' || item.status === 'pending_challenge') {
-                        pendingMap[key] = true;
+                    let itemStream = item.topicStream || 'علوم تجريبية'; // توافق تام مع البيانات القديمة
+                    if(itemStream === selectedStream) {
+                        let key = `${item.year}_${item.topic}_${item.category}`;
+                        if(item.status === 'approved' || item.score === 10) {
+                            approvedMap[key] = { score: item.score || 10 };
+                        } else if(item.status === 'pending' || item.status === 'pending_challenge') {
+                            pendingMap[key] = true;
+                        }
                     }
                 }
             });
@@ -797,27 +815,18 @@
 
                     let catsHtml = '';
                     categories.forEach(cat => {
-                        // عرض كل شعبة للموضوع
-                        ['علوم تجريبية', 'رياضيات', 'تقني رياضي'].forEach(tStream => {
-                            let key = `${y}_${tStream}_${top}_${cat}`;
-                            let badge = '';
-                            if(approvedMap[key]) {
-                                badge = `<span class="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold">✅ محلول (${tStream} - ${approvedMap[key].score}/10)</span>`;
-                            } else if(pendingMap[key]) {
-                                badge = `<span class="bg-amber-950 text-amber-300 border border-amber-800 text-[10px] px-2 py-0.5 rounded font-bold">⏳ قيد المراجعة (${tStream})</span>`;
-                            } else {
-                                // نعرض خيار بسيط أو نتجاهل غير المحول لتكون الخريطة نظيفة، أو نظهرها كـ لم تحل
-                            }
+                        let key = `${y}_${top}_${cat}`;
+                        let badge = '';
+                        if(approvedMap[key]) {
+                            badge = `<span class="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2.5 py-0.5 rounded font-bold">✅ محلول (${approvedMap[key].score}/10)</span>`;
+                        } else if(pendingMap[key]) {
+                            badge = `<span class="bg-amber-950 text-amber-300 border border-amber-800 text-[10px] px-2.5 py-0.5 rounded font-bold">⏳ قيد المراجعة</span>`;
+                        } else {
+                            badge = `<span class="bg-slate-800 text-slate-400 text-[10px] px-2.5 py-0.5 rounded font-semibold">❌ لم تحله بعد</span>`;
+                        }
 
-                            if(approvedMap[key] || pendingMap[key]) {
-                                catsHtml += `<div class="flex justify-between items-center text-xs py-1 border-b border-slate-800/50"><span>🔹 ${cat}</span> ${badge}</div>`;
-                            }
-                        });
+                        catsHtml += `<div class="flex justify-between items-center text-xs py-1 border-b border-slate-800/50"><span>🔹 ${cat}</span> ${badge}</div>`;
                     });
-
-                    if(catsHtml === '') {
-                        catsHtml = `<p class="text-[11px] text-slate-500 py-1">لم تقم بحل أي تمرين في هذا الموضوع بعد.</p>`;
-                    }
 
                     topicsHtml += `
                         <div class="mt-2 p-3 input-bg rounded-xl border border-slate-800 space-y-2">
@@ -828,7 +837,7 @@
 
                 container.innerHTML += `
                     <div class="border border-slate-800 rounded-xl p-3 card-bg space-y-2">
-                        <p class="font-bold text-emerald-400 text-sm">📅 دورة بكالوريا ${y}</p>
+                        <p class="font-bold text-emerald-400 text-sm">📅 دورة بكالوريا ${y} - شعبة ${selectedStream}</p>
                         ${topicsHtml}
                     </div>`;
             }
@@ -855,7 +864,7 @@
                     found = true;
                     const data = docSnap.data();
                     let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-24 h-24 object-cover rounded-lg border-2 border-emerald-500/60 hover:scale-105 transition cursor-pointer" title="اضغط لتكبير الصورة بدقة عالية"></a>`).join('');
-                    let tStreamTag = data.topicStream ? ` [شعبة الموضوع: ${data.topicStream}]` : '';
+                    let tStreamTag = data.topicStream ? ` [شعبة الموضوع: ${data.topicStream}]` : ' [شعبة الموضوع: علوم تجريبية]';
                     
                     listEl.innerHTML += `
                         <div class="card-bg border rounded-2xl p-4 space-y-3 shadow-md">
