@@ -101,7 +101,7 @@
                     <p id="student-stream-tag" class="text-[11px] text-amber-400 mt-0.5 font-semibold"></p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="forceResetStream()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-2 rounded-xl hover:bg-amber-500/25 transition font-bold cursor-pointer" title="تحديث الشعبة إذا ظهرت لك مشكلة">تحديث الشعبة 🔄</button>
+                    <button onclick="forceResetStream()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-2 rounded-xl hover:bg-amber-500/25 transition font-bold cursor-pointer">تحديث الشعبة 🔄</button>
                     <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
                 </div>
             </div>
@@ -421,14 +421,14 @@
             const streamContainer = document.getElementById('topic-stream-container');
             const streamSelect = document.getElementById('topic-stream-select');
             
-            // إذا كانت المادة علوم الطبيعة والحياة، نخفي خانة الشعبة تماماً ونفرضها "علوم تجريبية"
+            // إخفاء حقل شعبة الموضوع نهائياً وبشكل قاطع إذا كانت المادة علوم الطبيعة والحياة
             if (subject === 'العلوم الطبيعية') {
-                streamContainer.style.display = 'none';
+                streamContainer.style.setProperty('display', 'none', 'important');
                 streamSelect.value = 'علوم تجريبية';
             } else if (subject === 'الرياضيات' || subject === 'العلوم الفيزيائية') {
-                streamContainer.style.display = 'block';
+                streamContainer.style.setProperty('display', 'block', 'important');
             } else {
-                streamContainer.style.display = 'none';
+                streamContainer.style.setProperty('display', 'none', 'important');
             }
             updateCategoryOptions();
         }
@@ -441,12 +441,12 @@
             const mapStreamSelect = document.getElementById('map-stream-select');
             
             if (subject === 'العلوم الطبيعية') {
-                wrapper.style.display = 'none';
+                wrapper.style.setProperty('display', 'none', 'important');
                 mapStreamSelect.value = 'علوم تجريبية';
             } else if (subject === 'الرياضيات' || subject === 'العلوم الفيزيائية') {
-                wrapper.style.display = 'block';
+                wrapper.style.setProperty('display', 'block', 'important');
             } else {
-                wrapper.style.display = 'none';
+                wrapper.style.setProperty('display', 'none', 'important');
             }
             renderBacProgressMap();
         }
@@ -1219,11 +1219,6 @@
                 alert(`تم الحذف بنجاح!`);
                 loadAdminUsersList();
             }
-        }
-
-        async function reviewSubmission(id) {
-            const scoreVal = parseInt(default`score-${id}`.value) || 0;
-            // ... بقية كود التقييم
         }
 
         async function reviewSubmission(id) {
