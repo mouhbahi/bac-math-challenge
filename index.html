@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي مواضيع البكالوريا - النسخة الاحترافية</title>
+    <title>تحدي مواضيع البكالوريا - النسخة الاحترافية بدقة عالية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; transition: background-color 0.3s, color 0.3s; }
         
-        /* الثيمات الاحترافية المحدثة */
         body.theme-default { background-color: #030712; color: #f8fafc; }
         body.theme-purple { background-color: #1e1b4b; color: #f5f3ff; }
-        /* ثيم الأزرق والسماوي المحدث */
         body.theme-blue { background-color: #0f172a; color: #e0f2fe; }
         body.theme-gold { background-color: #0c0a09; color: #fef3c7; }
 
@@ -45,10 +43,10 @@
             <!-- خيارات الثيمات -->
             <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs">
                 <span class="text-[10px] text-slate-300 hidden sm:inline px-1">الثيم:</span>
-                <button onclick="setTheme('default')" title="زمردي داكن" class="w-5 h-5 rounded-full bg-emerald-600 border border-white/30 hover:scale-110 transition"></button>
-                <button onclick="setTheme('purple')" title="بنفسجي ملكي" class="w-5 h-5 rounded-full bg-indigo-600 border border-white/30 hover:scale-110 transition"></button>
-                <button onclick="setTheme('blue')" title="أزرق وسماوي" class="w-5 h-5 rounded-full bg-sky-400 border border-white/30 hover:scale-110 transition"></button>
-                <button onclick="setTheme('gold')" title="ذهبي فاخر" class="w-5 h-5 rounded-full bg-amber-500 border border-white/30 hover:scale-110 transition"></button>
+                <button onclick="setTheme('default')" title="زمردي داكن" class="w-5 h-5 rounded-full bg-emerald-600 border border-white/30 hover:scale-110 transition cursor-pointer"></button>
+                <button onclick="setTheme('purple')" title="بنفسجي ملكي" class="w-5 h-5 rounded-full bg-indigo-600 border border-white/30 hover:scale-110 transition cursor-pointer"></button>
+                <button onclick="setTheme('blue')" title="أزرق وسماوي" class="w-5 h-5 rounded-full bg-sky-400 border border-white/30 hover:scale-110 transition cursor-pointer"></button>
+                <button onclick="setTheme('gold')" title="ذهبي فاخر" class="w-5 h-5 rounded-full bg-amber-500 border border-white/30 hover:scale-110 transition cursor-pointer"></button>
             </div>
         </div>
     </header>
@@ -58,8 +56,8 @@
         <!-- شاشة تسجيل الدخول -->
         <div id="login-screen" class="card-bg border rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
             <div class="text-center mb-2">
-                <h2 class="text-2xl font-bold mb-2">مرحباً بك يا بطل البكالوريا</h2>
-                <p class="text-slate-300 text-sm">ادخل لتبدأ التحدي وحل المواضيع وجمع النقاط</p>
+                <h2 class="text-2xl font-bold mb-2">مرحباً بك يا بطل البكالوريا 🏆</h2>
+                <p class="text-slate-300 text-sm">ادخل لتبدأ التحدي وحل المواضيع وجمع النقاط بدقة عالية</p>
             </div>
 
             <div>
@@ -89,7 +87,7 @@
                 <input type="password" id="admin-pin" placeholder="أدخل كلمة السر الخاصة بك" class="w-full input-bg border rounded-xl p-3.5 focus:outline-none">
             </div>
 
-            <button type="button" onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg transition">
+            <button type="button" onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg transition cursor-pointer">
                 دخول إلى المنصة 🚀
             </button>
         </div>
@@ -102,12 +100,12 @@
                     <h3 id="student-display-name" class="text-xl font-bold text-emerald-400"></h3>
                     <p id="student-stream-tag" class="text-[11px] text-amber-400 mt-0.5 font-semibold"></p>
                 </div>
-                <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition font-bold">تسجيل الخروج</button>
+                <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
             </div>
 
             <!-- قسم التحديات النشطة -->
             <div class="card-bg border border-amber-500/40 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>🔥</span> تحديات الأدمن النشطة</h3>
+                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>🔥</span> تحديات الأدمن النشطة (صور بدقة عالية 📷)</h3>
                 <div id="student-challenges-container" class="space-y-4">
                     <p class="text-center text-slate-400 text-sm py-2">لا توجد تحديات مرسلة حالياً.</p>
                 </div>
@@ -144,8 +142,8 @@
             <!-- قسم إرسال الحلول العادية (البكالوريات) -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-lg font-bold flex items-center gap-2"><span>📤</span> إرسال حل تمرين بكالوريا</h3>
-                    <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg hover:bg-amber-500/20 transition font-bold">
+                    <h3 class="text-lg font-bold flex items-center gap-2"><span>📤</span> إرسال حل تمرين بكالوريا (عالي الدقة)</h3>
+                    <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg hover:bg-amber-500/25 transition font-bold cursor-pointer">
                         📊 خريطة البكالوريات
                     </button>
                 </div>
@@ -179,22 +177,22 @@
                 <div id="submission-container">
                     <div id="upload-form-section" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (حتى 6 صور):</label>
-                            <input type="file" id="solution-images" accept="image/*" multiple class="w-full input-bg border rounded-xl p-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white">
+                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (بدقة عالية - حتى 6 صور):</label>
+                            <input type="file" id="solution-images" accept="image/*" multiple class="w-full input-bg border rounded-xl p-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
                         </div>
 
-                        <button id="submit-btn" onclick="submitSolution()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg transition">
+                        <button id="submit-btn" onclick="submitSolution()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg transition cursor-pointer">
                             إرسال الحل للمشرف للمراجعة ✅
                         </button>
                     </div>
 
                     <div id="already-submitted-msg" class="hidden input-bg border border-amber-500/30 rounded-xl p-4 text-center space-y-2">
-                        <p class="text-amber-400 font-bold text-sm">⚠️ لقدحصلت على العلامة الكاملة (10/10) في هذا التمرين مسبقاً!</p>
+                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد حصلت على العلامة الكاملة (10/10) في هذا التمرين مسبقاً!</p>
                     </div>
                 </div>
             </div>
 
-            <!-- قسم التمارين التي تحتاج إعادة محاولة (المرفوضة من الأدمن) -->
+            <!-- قسم التمارين التي تحتاج إعادة محاولة -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>🔄</span> تمارين تحتاج إعادة محاولة / تصحيح</h3>
                 <div id="retry-list" class="space-y-3">
@@ -221,7 +219,6 @@
                     <h3 class="text-lg font-bold text-emerald-400">📊 خريطة البكالوريات الشاملة</h3>
                     <button type="button" onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white text-lg font-bold px-3 py-1 bg-slate-800 rounded-lg cursor-pointer">✕</button>
                 </div>
-                <!-- اختيار المادة لاستعراض الخريطة -->
                 <div>
                     <label class="block text-xs font-semibold mb-1 text-slate-300">اختر المادة لعرض تفاصيل المواضيع:</label>
                     <select id="map-subject-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
@@ -239,18 +236,18 @@
             <div class="card-bg border rounded-2xl p-6 shadow-xl flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-bold text-emerald-400">🛠️ لوحة الأدمن والتحكم الكامل (محمد)</h3>
-                    <p class="text-xs text-slate-300">إدارة الحلول، الفروض، التعديل المباشر للنقاط والأسماء</p>
+                    <p class="text-xs text-slate-300">إدارة الحلول بدقة عالية، الفروض، التعديل المباشر للنقاط والأسماء</p>
                 </div>
-                <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/20 transition font-bold">تسجيل الخروج</button>
+                <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
             </div>
 
             <!-- تبديل أقسام الأدمن -->
             <div class="flex gap-1 border-b border-slate-700 pb-3 overflow-x-auto">
-                <button onclick="switchAdminTab('pending')" id="tab-pending" class="flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">التقييمات 📥</button>
-                <button onclick="switchAdminTab('chal-review')" id="tab-chal-review" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">حلول التحديات 🔥</button>
-                <button onclick="switchAdminTab('exams')" id="tab-exams" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">الفروض 📝</button>
-                <button onclick="switchAdminTab('challenge')" id="tab-challenge" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">إرسال تحدي 🎯</button>
-                <button onclick="switchAdminTab('users')" id="tab-users" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap">إدارة الطلاب النقاط 👥</button>
+                <button onclick="switchAdminTab('pending')" id="tab-pending" class="flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">التقييمات 📥</button>
+                <button onclick="switchAdminTab('chal-review')" id="tab-chal-review" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">حلول التحديات 🔥</button>
+                <button onclick="switchAdminTab('exams')" id="tab-exams" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">الفروض 📝</button>
+                <button onclick="switchAdminTab('challenge')" id="tab-challenge" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">إرسال تحدي 🎯</button>
+                <button onclick="switchAdminTab('users')" id="tab-users" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">إدارة الطلاب النقاط 👥</button>
             </div>
 
             <!-- 1. قسم حلول البكالوريات المعلقة -->
@@ -271,7 +268,7 @@
                             <h4 class="font-bold text-emerald-400 text-sm">🔒 حالة قسم تصريح الفروض عند الطلاب</h4>
                             <p class="text-[11px] text-slate-300">السماح للطلاب بإرسال علاماتهم أو قفل القسم</p>
                         </div>
-                        <button id="toggle-exam-lock-btn" onclick="toggleExamLock()" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-rose-600 text-white">
+                        <button id="toggle-exam-lock-btn" onclick="toggleExamLock()" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-rose-600 text-white cursor-pointer">
                             مغلق حالياً (اضغط للفتح) 🔓
                         </button>
                     </div>
@@ -289,13 +286,13 @@
                         <input type="text" id="chal-title" placeholder="عنوان التحدي..." class="w-full input-bg border rounded-xl p-3 text-xs font-semibold">
                     </div>
                     <div>
-                        <textarea id="chal-desc" rows="3" placeholder="نص المسألة..." class="w-full input-bg border rounded-xl p-3 text-xs font-semibold"></textarea>
+                        <textarea id="chal-desc" rows="3" placeholder="نص المسألة أو التمرين..." class="w-full input-bg border rounded-xl p-3 text-xs font-semibold"></textarea>
                     </div>
                     <div>
                         <input type="number" id="chal-points" value="25" class="w-full input-bg border rounded-xl p-3 text-xs text-amber-400 font-bold text-center">
                     </div>
-                    <button onclick="publishChallenge()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl text-xs transition">
-                        نشر التحدي 🚀
+                    <button onclick="publishChallenge()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl text-xs transition cursor-pointer">
+                        نشر التحدي بدقة عالية للطلاب 🚀
                     </button>
                 </div>
             </div>
@@ -310,6 +307,10 @@
         </div>
 
     </main>
+
+    <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-900 mt-8">
+        تحدي مواد البكالوريا - النسخة الاحترافية بدقة عالية © 2026
+    </footer>
 
     <script>
         const firebaseConfig = {
@@ -425,7 +426,7 @@
                         badge.className = 'text-[10px] px-2.5 py-1 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
                         formContent.classList.remove('opacity-50', 'pointer-events-none');
                         submitBtn.disabled = false;
-                        submitBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition';
+                        submitBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition cursor-pointer';
                     } else {
                         badge.textContent = 'مغلق حالياً 🔒';
                         badge.className = 'text-[10px] px-2.5 py-1 rounded-full font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
@@ -438,7 +439,7 @@
                 const adminBtn = document.getElementById('toggle-exam-lock-btn');
                 if(adminBtn) {
                     adminBtn.textContent = isExamOpen ? 'مفتوح للطلاب (اضغط للقفل) 🔒' : 'مغلق حالياً (اضغط للفتح) 🔓';
-                    adminBtn.className = isExamOpen ? 'px-4 py-2 rounded-xl text-xs font-bold transition bg-emerald-600 text-white' : 'px-4 py-2 rounded-xl text-xs font-bold transition bg-rose-600 text-white';
+                    adminBtn.className = isExamOpen ? 'px-4 py-2 rounded-xl text-xs font-bold transition bg-emerald-600 text-white cursor-pointer' : 'px-4 py-2 rounded-xl text-xs font-bold transition bg-rose-600 text-white cursor-pointer';
                 }
             });
         }
@@ -477,9 +478,12 @@
                                 </div>
                                 <p class="text-xs text-slate-300 bg-slate-900/50 p-3 rounded-lg border border-slate-700">${data.description}</p>
                                 <div class="space-y-3 pt-2">
-                                    <textarea id="chal-text-${chalId}" rows="2" placeholder="اكتب إجابتك بالكيبورد..." class="w-full input-bg border rounded-lg p-2.5 text-xs"></textarea>
-                                    <input type="file" id="chal-file-${chalId}" accept="image/*" multiple class="w-full input-bg border rounded-lg p-2 text-xs">
-                                    <button onclick="submitChallengeSolution('${chalId}', '${data.title}', ${data.points})" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-lg text-xs transition">إرسال الإجابة 📤</button>
+                                    <textarea id="chal-text-${chalId}" rows="2" placeholder="اكتب إجابتك بالكيبورد (اختياري)..." class="w-full input-bg border rounded-lg p-2.5 text-xs"></textarea>
+                                    <div>
+                                        <label class="block text-[11px] text-slate-300 mb-1 font-semibold">📷 ارفع صورة الحل بدقة عالية جداً:</label>
+                                        <input type="file" id="chal-file-${chalId}" accept="image/*" multiple class="w-full input-bg border rounded-lg p-2 text-xs cursor-pointer">
+                                    </div>
+                                    <button onclick="submitChallengeSolution('${chalId}', '${data.title}', ${data.points})" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-lg text-xs transition cursor-pointer">إرسال إجابة التحدي 📤</button>
                                 </div>
                             </div>`;
                     });
@@ -495,13 +499,13 @@
             const textAnswer = document.getElementById(`chal-text-${chalId}`).value.trim();
             const filesInput = document.getElementById(`chal-file-${chalId}`);
 
-            if (!textAnswer && (!filesInput.files || filesInput.files.length === 0)) return alert('اكتب الإجابة أو ارفق صورة!');
+            if (!textAnswer && (!filesInput.files || filesInput.files.length === 0)) return alert('اكتب الإجابة أو ارفق صورة واضحة بدقة عالية!');
 
             try {
                 let imageUrls = [];
                 if (filesInput.files) {
                     for (let i = 0; i < filesInput.files.length; i++) {
-                        imageUrls.push(await processImage(filesInput.files[i]));
+                        imageUrls.push(await processHighQualityImage(filesInput.files[i]));
                     }
                 }
                 await db.collection("submissions").add({
@@ -510,7 +514,7 @@
                     status: 'pending_challenge', points: chalPoints, type: 'challenge_solution',
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert('تم الإرسال بنجاح! 🚀');
+                alert('تم إرسال إجابة التحدي بدقة عالية بنجاح! 🚀');
             } catch(e) { alert(e.message); }
         }
 
@@ -562,8 +566,8 @@
                                     <span class="font-bold block mb-1">💬 ملاحظة الأدمن محمد:</span>
                                     ${note}
                                 </div>
-                                <button onclick="deleteAndRetry('${data.id}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-xs transition">
-                                    حذف وإعادة إرسال الحل المصحح 🔄
+                                <button onclick="deleteAndRetry('${data.id}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-xs transition cursor-pointer">
+                                    حذف وإعادة إرسال الحل المصحح بدقة عالية 🔄
                                 </button>
                             </div>`;
                     }
@@ -604,19 +608,23 @@
             document.getElementById('already-submitted-msg').classList.toggle('hidden', !found);
         }
 
-        function processImage(file) {
+        // دالة معالجة الصور بدقة عالية جداً لتظهر واضحة بدون تشويش
+        function processHighQualityImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader(); reader.readAsDataURL(file);
                 reader.onload = (e) => {
                     const img = new Image(); img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height, max = 750;
+                        let w = img.width, h = img.height, max = 1400; // رفع الحد الأقصى للدقة لتكون واضحة جداً
                         if (w > h && w > max) { h *= max / w; w = max; }
                         else if (h > max) { w *= max / h; h = max; }
                         canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', 0.55));
+                        const ctx = canvas.getContext('2d');
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', 0.85)); // جودة عالية 85%
                     };
                 };
             });
@@ -629,7 +637,7 @@
 
             try {
                 let imageUrls = [];
-                for (let i = 0; i < filesInput.files.length; i++) imageUrls.push(await processImage(filesInput.files[i]));
+                for (let i = 0; i < filesInput.files.length; i++) imageUrls.push(await processHighQualityImage(filesInput.files[i]));
 
                 await db.collection("submissions").add({
                     studentName: name, studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
@@ -637,7 +645,7 @@
                     category: document.getElementById('category-select').value, year: document.getElementById('bac-year').value,
                     images: imageUrls, status: 'pending', score: 0, adminNote: '', timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert('تم إرسال الحل للمشرف! 🚀');
+                alert('تم إرسال الحل بدقة عالية للمشرف! 🚀');
                 filesInput.value = '';
             } catch (e) { alert('خطأ في الإرسال'); }
         }
@@ -704,7 +712,6 @@
             });
         }
 
-        // فتح وغلق نافذة الخريطة مع إصلاح زر X
         function toggleBacProgressModal() { 
             const modal = document.getElementById('bac-modal');
             modal.classList.toggle('hidden');
@@ -726,7 +733,7 @@
                     let key = `${item.year}_${item.topic}_${item.category}`;
                     if(item.status === 'approved' || item.score === 10) {
                         approvedMap[key] = { student: item.studentName, score: item.score || 10 };
-                    } else if(item.status === 'pending') {
+                    } else if(item.status === 'pending' || item.status === 'pending_challenge') {
                         pendingMap[key] = { student: item.studentName };
                     }
                 }
@@ -773,7 +780,7 @@
         function switchAdminTab(tab) {
             ['pending', 'chal-review', 'exams', 'challenge', 'users'].forEach(t => {
                 document.getElementById(`admin-${t}-section`).classList.toggle('hidden', t !== tab);
-                document.getElementById(`tab-${t}`).className = t === tab ? "flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap" : "flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap";
+                document.getElementById(`tab-${t}`).className = t === tab ? "flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer" : "flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer";
             });
             if(tab === 'chal-review') loadAdminChalSubmissions();
             if(tab === 'exams') loadAdminExamsList();
@@ -790,7 +797,7 @@
                 snapshot.forEach((docSnap) => {
                     found = true;
                     const data = docSnap.data();
-                    let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-20 h-20 object-cover rounded-lg border border-slate-700"></a>`).join('');
+                    let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-24 h-24 object-cover rounded-lg border-2 border-emerald-500/60 hover:scale-105 transition cursor-pointer" title="اضغط لتكبير الصورة بدقة عالية"></a>`).join('');
                     
                     listEl.innerHTML += `
                         <div class="card-bg border rounded-2xl p-4 space-y-3 shadow-md">
@@ -800,12 +807,15 @@
                                 <span class="text-sky-400 font-bold">⚙️ التمرين: ${data.category}</span>
                                 <span class="text-slate-300">السنة: ${data.year} | الطالب: <b>${data.studentName}</b></span>
                             </div>
-                            <div class="flex gap-2 flex-wrap">${imgs}</div>
+                            <div>
+                                <span class="text-[11px] text-slate-400 block mb-1">صور الحل (عالية الدقة - اضغط لتكبيرها):</span>
+                                <div class="flex gap-2 flex-wrap">${imgs}</div>
+                            </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <input type="number" id="score-${docSnap.id}" value="10" min="0" max="10" class="input-bg border p-2 text-xs rounded-xl text-center font-bold">
-                                <input type="text" id="note-${docSnap.id}" placeholder="ملاحظتك..." class="input-bg border p-2 text-xs rounded-xl font-semibold">
+                                <input type="text" id="note-${docSnap.id}" placeholder="ملاحظتك للطالب..." class="input-bg border p-2 text-xs rounded-xl font-semibold">
                             </div>
-                            <button onclick="reviewSubmission('${docSnap.id}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition">اعتماد التقييم ✅</button>
+                            <button onclick="reviewSubmission('${docSnap.id}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition cursor-pointer">اعتماد التقييم ✅</button>
                         </div>`;
                 });
                 if(!found) listEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-6">لا توجد حلول معلقة حالياً.</p>';
@@ -820,15 +830,15 @@
                 snapshot.forEach((docSnap) => {
                     found = true;
                     const data = docSnap.data();
-                    let imgs = data.images ? data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-16 h-16 object-cover rounded"></a>`).join('') : '';
+                    let imgs = data.images ? data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-20 h-20 object-cover rounded-lg border-2 border-amber-500/60 hover:scale-105 transition cursor-pointer" title="اضغط لتكبير الصورة بدقة عالية"></a>`).join('') : '';
                     listEl.innerHTML += `
                         <div class="input-bg border rounded-xl p-3 space-y-2 text-xs">
-                            <div class="flex justify-between font-bold"><span class="text-emerald-400">${data.studentName}</span><span class="text-amber-400">${data.topic} (+${data.points} نقطة)</span></div>
+                            <div class="flex justify-between font-bold"><span class="text-emerald-400 text-sm">${data.studentName}</span><span class="text-amber-400">${data.topic} (+${data.points} نقطة)</span></div>
                             ${data.textAnswer ? `<p class="p-2 bg-slate-900 rounded text-slate-200">✍️ ${data.textAnswer}</p>` : ''}
-                            <div class="flex gap-1">${imgs}</div>
-                            <div class="flex gap-2">
-                                <button onclick="approveChallenge('${docSnap.id}')" class="flex-1 bg-emerald-600 text-white font-bold py-1.5 rounded-lg">مصادقة وقبول ✅</button>
-                                <button onclick="deleteSubmission('${docSnap.id}')" class="bg-rose-900/40 text-rose-300 px-3 rounded-lg">رفض</button>
+                            ${imgs ? `<div><span class="text-slate-400 block mb-1 font-semibold">📷 صور الحل عالية الدقة:</span><div class="flex gap-2 flex-wrap">${imgs}</div></div>` : ''}
+                            <div class="flex gap-2 pt-2">
+                                <button onclick="approveChallenge('${docSnap.id}')" class="flex-1 bg-emerald-600 text-white font-bold py-2 rounded-lg transition cursor-pointer">مصادقة وقبول الحل ✅</button>
+                                <button onclick="deleteSubmission('${docSnap.id}')" class="bg-rose-900/40 text-rose-300 px-3 rounded-lg transition cursor-pointer">رفض</button>
                             </div>
                         </div>`;
                 });
@@ -867,8 +877,8 @@
                                 </div>
                             </div>
                             <div class="flex gap-2 pt-1">
-                                <button onclick="approveExamScore('${docSnap.id}')" class="flex-1 bg-emerald-600 text-white font-bold py-1.5 rounded-lg">اعتماد النقطة والمادة ✅</button>
-                                <button onclick="deleteSubmission('${docSnap.id}')" class="bg-rose-900/40 text-rose-300 px-3 rounded-lg">حذف</button>
+                                <button onclick="approveExamScore('${docSnap.id}')" class="flex-1 bg-emerald-600 text-white font-bold py-1.5 rounded-lg cursor-pointer">اعتماد النقطة والمادة ✅</button>
+                                <button onclick="deleteSubmission('${docSnap.id}')" class="bg-rose-900/40 text-rose-300 px-3 rounded-lg cursor-pointer">حذف</button>
                             </div>
                         </div>`;
                 });
@@ -888,7 +898,9 @@
             const desc = document.getElementById('chal-desc').value.trim();
             if(!title || !desc) return alert('أدخل بيانات التحدي!');
             await db.collection("challenges").add({ title, description: desc, points: parseInt(document.getElementById('chal-points').value) || 25, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            alert('تم النشر! 🚀');
+            alert('تم نشر التحدي بدقة عالية لجميع الطلاب! 🎯');
+            document.getElementById('chal-title').value = '';
+            document.getElementById('chal-desc').value = '';
         }
 
         function loadAdminUsersList() {
@@ -915,19 +927,19 @@
                             <div class="input-bg border rounded-xl p-3 space-y-2 text-xs">
                                 <div class="flex justify-between items-center">
                                     <span class="font-bold text-sm text-amber-400">${u}</span>
-                                    <button onclick="renameUser('${u}')" class="bg-sky-600/20 text-sky-400 border border-sky-500/30 px-2 py-1 rounded-lg font-bold">تعديل الاسم ✏️</button>
+                                    <button onclick="renameUser('${u}')" class="bg-sky-600/20 text-sky-400 border border-sky-500/30 px-2 py-1 rounded-lg font-bold cursor-pointer">تعديل الاسم ✏️</button>
                                 </div>
                                 <div class="flex items-center justify-between border-t border-slate-700/60 pt-2 gap-2">
                                     <span class="text-slate-300">النقاط الإضافية (تعديل يدوي):</span>
                                     <div class="flex items-center gap-1">
-                                        <button onclick="adjustBonusPoints('${u}', -5)" class="bg-rose-600 text-white font-bold w-7 h-7 rounded-lg">-5</button>
-                                        <button onclick="adjustBonusPoints('${u}', -1)" class="bg-rose-600/70 text-white font-bold w-7 h-7 rounded-lg">-1</button>
+                                        <button onclick="adjustBonusPoints('${u}', -5)" class="bg-rose-600 text-white font-bold w-7 h-7 rounded-lg cursor-pointer">-5</button>
+                                        <button onclick="adjustBonusPoints('${u}', -1)" class="bg-rose-600/70 text-white font-bold w-7 h-7 rounded-lg cursor-pointer">-1</button>
                                         <input type="number" id="user-bonus-${u}" value="${currentBonus}" class="w-16 input-bg border rounded p-1 text-center font-bold text-emerald-400">
-                                        <button onclick="adjustBonusPoints('${u}', 1)" class="bg-emerald-600/70 text-white font-bold w-7 h-7 rounded-lg">+1</button>
-                                        <button onclick="adjustBonusPoints('${u}', 5)" class="bg-emerald-600 text-white font-bold w-7 h-7 rounded-lg">+5</button>
+                                        <button onclick="adjustBonusPoints('${u}', 1)" class="bg-emerald-600/70 text-white font-bold w-7 h-7 rounded-lg cursor-pointer">+1</button>
+                                        <button onclick="adjustBonusPoints('${u}', 5)" class="bg-emerald-600 text-white font-bold w-7 h-7 rounded-lg cursor-pointer">+5</button>
                                     </div>
-                                    <button onclick="saveBonusPoints('${u}')" class="bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg">حفظ 💾</button>
-                                    <button onclick="deleteUserCompletely('${u}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-lg font-bold">حذف 🗑️</button>
+                                    <button onclick="saveBonusPoints('${u}')" class="bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg cursor-pointer">حفظ 💾</button>
+                                    <button onclick="deleteUserCompletely('${u}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-lg font-bold cursor-pointer">حذف 🗑️</button>
                                 </div>
                             </div>`;
                     });
