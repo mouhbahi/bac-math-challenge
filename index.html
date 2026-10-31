@@ -36,7 +36,7 @@
                 <span class="text-2xl">🎓</span>
                 <div>
                     <h1 class="text-base md:text-lg font-black text-amber-400">تحدي مواضيع البكالوريا</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">الرياضيات والفيزياء والعلوم لجميع الشعب</p>
+                    <p class="text-[10px] text-slate-300 font-semibold">منصة متابعة وإنجاز تمارين البكالوريا</p>
                 </div>
             </div>
             
@@ -121,9 +121,7 @@
                 <div id="exam-form-content" class="space-y-3 opacity-50 pointer-events-none">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <select id="exam-subject-input" class="input-bg border rounded-xl p-3 text-xs font-bold focus:outline-none">
-                            <option value="الرياضيات">📐 الرياضيات</option>
-                            <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
-                            <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
+                            <!-- تتم تعبئتها ديناميكياً حسب شعبة الطالب -->
                         </select>
                         <select id="exam-type-input" class="input-bg border rounded-xl p-3 text-xs font-bold focus:outline-none">
                             <option value="فرض الفصل الأول">فرض الفصل الأول</option>
@@ -151,13 +149,11 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">اختر المادة:</label>
                     <select id="subject-select" onchange="onSubjectChange()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none">
-                        <option value="الرياضيات">📐 الرياضيات</option>
-                        <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
-                        <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
+                        <!-- تُعبأ ديناميكياً -->
                     </select>
                 </div>
 
-                <!-- خيار شعبة الموضوع يظهر حصراً للرياضيات والفيزياء ويختفي تماماً للعلوم الطبيعية -->
+                <!-- خيار شعبة الموضوع يظهر حصراً للرياضيات والفيزياء -->
                 <div id="topic-stream-container">
                     <label class="block text-sm font-semibold mb-1">شعبة موضوع التمرين (خاص بالرياضيات والفيزياء):</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
@@ -245,9 +241,7 @@
                     <div>
                         <label class="block text-xs font-semibold mb-1 text-slate-300">المادة:</label>
                         <select id="map-subject-select" onchange="onMapSubjectChange()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
-                            <option value="الرياضيات">📐 الرياضيات</option>
-                            <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
-                            <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
+                            <!-- تُعبأ ديناميكياً -->
                         </select>
                     </div>
                     <div id="map-stream-wrapper">
@@ -387,12 +381,41 @@
             yearSelect.appendChild(opt);
         }
 
+        // إعداد وتخصيص المواد المتاحة للطالب حسب شعبته
+        function setupSubjectDropdowns() {
+            const stream = localStorage.getItem('bac_user_stream') || 'experimental';
+            const subjectSelect = document.getElementById('subject-select');
+            const mapSubjectSelect = document.getElementById('map-subject-select');
+            const examSubjectInput = document.getElementById('exam-subject-input');
+
+            let subjectsList = [
+                { value: 'الرياضيات', text: '📐 الرياضيات' },
+                { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }
+            ];
+
+            // إلغاء وإخفاء مادة علوم الطبيعة والحياة تماماً لطالب الرياضيات/التقني
+            if (stream === 'experimental') {
+                subjectsList.push({ value: 'العلوم الطبيعية', text: '🧬 علوم الطبيعة والحياة' });
+            }
+
+            [subjectSelect, mapSubjectSelect, examSubjectInput].forEach(selectEl => {
+                if(!selectEl) return;
+                selectEl.innerHTML = '';
+                subjectsList.forEach(subj => {
+                    selectEl.innerHTML += `<option value="${subj.value}">${subj.text}</option>`;
+                });
+            });
+
+            onSubjectChange();
+            if(mapSubjectSelect) onMapSubjectChange();
+        }
+
         function onSubjectChange() {
             const subject = document.getElementById('subject-select').value;
             const streamContainer = document.getElementById('topic-stream-container');
             
-            // إظهار اختيار الشعبة حصراً للرياضيات والفيزياء، وإخفاؤها تماماً للعلوم الطبيعية
-            if (subject.includes('الرياضيات') || subject.includes('الفيزيائية')) {
+            // إظهار اختيار الشعبة حصراً لمادتي الرياضيات والفيزياء فقط، وإخفاؤها تماماً للعلوم الطبيعية
+            if (subject && (subject.includes('الرياضيات') || subject.includes('الفيزيائية'))) {
                 streamContainer.classList.remove('hidden');
             } else {
                 streamContainer.classList.add('hidden');
@@ -404,7 +427,7 @@
         function onMapSubjectChange() {
             const subject = document.getElementById('map-subject-select').value;
             const wrapper = document.getElementById('map-stream-wrapper');
-            if (subject.includes('الرياضيات') || subject.includes('الفيزيائية')) {
+            if (subject && (subject.includes('الرياضيات') || subject.includes('الفيزيائية'))) {
                 wrapper.classList.remove('hidden');
             } else {
                 wrapper.classList.add('hidden');
@@ -437,7 +460,8 @@
                 const stream = localStorage.getItem('bac_user_stream') || 'experimental';
                 document.getElementById('student-display-name').textContent = savedStudent;
                 document.getElementById('student-stream-tag').textContent = stream === 'math' ? '🎓 شعبة: رياضيات / تقني (Math x2)' : '🎓 شعبة: علوم تجريبية';
-                onSubjectChange();
+                
+                setupSubjectDropdowns();
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('student-dashboard').classList.remove('hidden');
                 if (db) { loadLeaderboard(); listenSubmissionsCache(); listenExamLockSettings(); }
