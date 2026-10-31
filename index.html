@@ -36,7 +36,7 @@
                 <span class="text-2xl">🎓</span>
                 <div>
                     <h1 class="text-base md:text-lg font-black text-amber-400">تحدي مواضيع البكالوريا</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">علوم تجريبية & رياضيات</p>
+                    <p class="text-[10px] text-slate-300 font-semibold">الرياضيات والفيزياء لجميع الشعب</p>
                 </div>
             </div>
             
@@ -57,7 +57,7 @@
         <div id="login-screen" class="card-bg border rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
             <div class="text-center mb-2">
                 <h2 class="text-2xl font-bold mb-2">مرحباً بك يا بطل البكالوريا 🏆</h2>
-                <p class="text-slate-300 text-sm">ادخل لتبدأ التحدي وحل المواضيع وجمع النقاط بدقة عالية</p>
+                <p class="text-slate-300 text-sm">حل مواضيع الرياضيات والفيزياء لكل الشعب لجمع أكبر قدر من النقاط</p>
             </div>
 
             <div>
@@ -74,7 +74,7 @@
                     <input type="text" id="username-input" placeholder="اكتب اسمك هنا..." class="w-full input-bg border rounded-xl p-3.5 focus:outline-none font-semibold">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-2">شعبتك:</label>
+                    <label class="block text-sm font-semibold mb-2">شعبتك الأصلية:</label>
                     <select id="user-stream" class="w-full input-bg border rounded-xl p-3.5 font-bold focus:outline-none text-emerald-400">
                         <option value="experimental">🧬 علوم تجريبية</option>
                         <option value="math">📐 رياضيات / تقني رياضي (Math x2)</option>
@@ -139,18 +139,31 @@
                 </div>
             </div>
 
-            <!-- قسم إرسال الحلول العادية (البكالوريات) -->
+            <!-- قسم إرسال الحلول العادية (البكالوريات مع اختيار الشعبة) -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                     <h3 class="text-lg font-bold flex items-center gap-2"><span>📤</span> إرسال حل تمرين بكالوريا (عالي الدقة)</h3>
                     <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg hover:bg-amber-500/25 transition font-bold cursor-pointer">
-                        📊 خريطة البكالوريات
+                        📊 خريطة إنجازي الخاصة
                     </button>
                 </div>
                 
                 <div>
                     <label class="block text-sm font-semibold mb-1">اختر المادة:</label>
                     <select id="subject-select" onchange="updateCategoryOptions()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none">
+                        <option value="الرياضيات">📐 الرياضيات</option>
+                        <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
+                        <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
+                    </select>
+                </div>
+
+                <!-- خيار شعبة الموضوع للرياضيات والفيزياء لحلول أكثر -->
+                <div id="topic-stream-container">
+                    <label class="block text-sm font-semibold mb-1">شعبة موضوع البكالوريا المستهدف:</label>
+                    <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
+                        <option value="علوم تجريبية">🧬 شعبة علوم تجريبية</option>
+                        <option value="رياضيات">📐 شعبة رياضيات</option>
+                        <option value="تقني رياضي">⚙️ شعبة تقني رياضي</option>
                     </select>
                 </div>
 
@@ -187,14 +200,22 @@
                     </div>
 
                     <div id="already-submitted-msg" class="hidden input-bg border border-amber-500/30 rounded-xl p-4 text-center space-y-2">
-                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد حصلت على العلامة الكاملة (10/10) في هذا التمرين مسبقاً!</p>
+                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد حصلت على العلامة الكاملة (10/10) في هذا التمرين والشعبة مسبقاً!</p>
                     </div>
                 </div>
             </div>
 
+            <!-- قسم التمارين قيد المراجعة -->
+            <div class="card-bg border border-amber-500/40 rounded-2xl p-6 shadow-xl space-y-4">
+                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>⏳</span> تمارين قيد المراجعة (في انتظار الأدمن)</h3>
+                <div id="pending-student-list" class="space-y-3">
+                    <p class="text-center text-slate-400 text-sm py-2">لا توجد تمارين قيد المراجعة حالياً.</p>
+                </div>
+            </div>
+
             <!-- قسم التمارين التي تحتاج إعادة محاولة -->
-            <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>🔄</span> تمارين تحتاج إعادة محاولة / تصحيح</h3>
+            <div class="card-bg border border-rose-500/40 rounded-2xl p-6 shadow-xl space-y-4">
+                <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>🔄</span> تمارين مرفوضة أو تحتاج تصحيح</h3>
                 <div id="retry-list" class="space-y-3">
                     <p class="text-center text-slate-400 text-sm py-2">لا توجد تمارين تحتاج إعادة محاولة. ممتاز!</p>
                 </div>
@@ -212,15 +233,15 @@
             </div>
         </div>
 
-        <!-- خريطة البكالوريات المتقدمة -->
+        <!-- خريطة إنجازي الخاصة -->
         <div id="bac-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="card-bg border w-full max-w-2xl rounded-2xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-lg font-bold text-emerald-400">📊 خريطة البكالوريات الشاملة</h3>
+                    <h3 class="text-lg font-bold text-emerald-400">📊 خريطة إنجازي الخاصة (المحلولة من طرفك)</h3>
                     <button type="button" onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white text-lg font-bold px-3 py-1 bg-slate-800 rounded-lg cursor-pointer">✕</button>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-300">اختر المادة لعرض تفاصيل المواضيع:</label>
+                    <label class="block text-xs font-semibold mb-1 text-slate-300">اختر المادة لعرض تفاصيل إنجازك:</label>
                     <select id="map-subject-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
                         <option value="الرياضيات">📐 الرياضيات</option>
                         <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
@@ -236,7 +257,7 @@
             <div class="card-bg border rounded-2xl p-6 shadow-xl flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-bold text-emerald-400">🛠️ لوحة الأدمن والتحكم الكامل (محمد)</h3>
-                    <p class="text-xs text-slate-300">إرسال التحديات بصورة، إدارة الفروض، وتعديل النقاط</p>
+                    <p class="text-xs text-slate-300">إرسال التحديات، إدارة الفروض، وتعديل النقاط</p>
                 </div>
                 <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
             </div>
@@ -278,7 +299,7 @@
                 </div>
             </div>
 
-            <!-- 4. قسم إرسال تحدي جديد (مع دعم رفع صورة نص التمرين) -->
+            <!-- 4. قسم إرسال تحدي جديد -->
             <div class="space-y-4 hidden" id="admin-challenge-section">
                 <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
                     <h4 class="font-bold text-amber-400 text-sm">🎯 نشر تحدي أو مسابقة جديدة (مع صورة نص التمرين)</h4>
@@ -354,15 +375,6 @@
             yearSelect.appendChild(opt);
         }
 
-        function populateSubjects() {
-            const stream = localStorage.getItem('bac_user_stream') || 'experimental';
-            const subjectSelect = document.getElementById('subject-select');
-            subjectSelect.innerHTML = (stream === 'math') ? 
-                `<option value="الرياضيات">📐 الرياضيات (Math x2)</option><option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>` :
-                `<option value="الرياضيات">📐 الرياضيات</option><option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option><option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>`;
-            updateCategoryOptions();
-        }
-
         function updateCategoryOptions() {
             const subject = document.getElementById('subject-select').value;
             const categorySelect = document.getElementById('category-select');
@@ -387,7 +399,7 @@
                 const stream = localStorage.getItem('bac_user_stream') || 'experimental';
                 document.getElementById('student-display-name').textContent = savedStudent;
                 document.getElementById('student-stream-tag').textContent = stream === 'math' ? '🎓 شعبة: رياضيات / تقني (Math x2)' : '🎓 شعبة: علوم تجريبية';
-                populateSubjects();
+                updateCategoryOptions();
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('student-dashboard').classList.remove('hidden');
                 if (db) { loadLeaderboard(); listenSubmissionsCache(); listenExamLockSettings(); }
@@ -552,36 +564,59 @@
             db.collection("submissions").onSnapshot((snapshot) => {
                 allSubmissionsCache = [];
                 let retryContainer = document.getElementById('retry-list');
+                let pendingStudentContainer = document.getElementById('pending-student-list');
                 if(retryContainer) retryContainer.innerHTML = '';
+                if(pendingStudentContainer) pendingStudentContainer.innerHTML = '';
                 let hasRetry = false;
+                let hasPending = false;
 
                 snapshot.forEach((doc) => {
                     const data = doc.data(); data.id = doc.id;
                     allSubmissionsCache.push(data);
 
-                    if (retryContainer && data.studentName === currentStudent && (data.status === 'retry' || (data.score !== undefined && data.score < 10 && data.type !== 'exam_declaration' && data.type !== 'challenge_solution'))) {
-                        hasRetry = true;
-                        let note = data.adminNote ? data.adminNote : 'يرجى تصحيح الخطأ والحصول على العلامة الكاملة 10/10.';
-                        let scoreText = data.score !== undefined ? `التقييم: ${data.score}/10` : 'يحتاج تصحيح';
-                        retryContainer.innerHTML += `
-                            <div class="input-bg border border-rose-500/30 rounded-xl p-4 space-y-2">
-                                <div class="flex justify-between items-center text-xs text-slate-300">
-                                    <span class="text-amber-400 font-bold">${data.subject} - ${data.topic} (${data.category})</span>
-                                    <span class="text-rose-400 font-bold">${scoreText}</span>
-                                </div>
-                                <div class="bg-rose-950/30 border border-rose-800/40 p-3 rounded-lg text-rose-300 text-xs font-semibold">
-                                    <span class="font-bold block mb-1">💬 ملاحظة الأدمن محمد:</span>
-                                    ${note}
-                                </div>
-                                <button onclick="deleteAndRetry('${data.id}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-xs transition cursor-pointer">
-                                    حذف وإعادة إرسال الحل المصحح بدقة عالية 🔄
-                                </button>
-                            </div>`;
+                    if (data.studentName === currentStudent) {
+                        if(pendingStudentContainer && data.status === 'pending') {
+                            hasPending = true;
+                            let streamBadge = data.topicStream ? ` [شعبة: ${data.topicStream}]` : '';
+                            pendingStudentContainer.innerHTML += `
+                                <div class="input-bg border border-amber-500/40 rounded-xl p-3 space-y-1 text-xs">
+                                    <div class="flex justify-between font-bold text-amber-400">
+                                        <span>📚 ${data.subject} - ${data.topic}${streamBadge}</span>
+                                        <span>سنة ${data.year}</span>
+                                    </div>
+                                    <p class="text-slate-300">⚙️ التمرين: ${data.category}</p>
+                                    <p class="text-[11px] text-amber-300 font-semibold">⏳ الحل مرسل وفي انتظار مراجعة الأدمن محمد...</p>
+                                </div>`;
+                        }
+
+                        if (retryContainer && (data.status === 'retry' || (data.score !== undefined && data.score < 10 && data.type !== 'exam_declaration' && data.type !== 'challenge_solution'))) {
+                            hasRetry = true;
+                            let note = data.adminNote ? data.adminNote : 'يرجى تصحيح الخطأ والحصول على العلامة الكاملة 10/10.';
+                            let scoreText = data.score !== undefined ? `التقييم: ${data.score}/10` : 'يحتاج تصحيح';
+                            retryContainer.innerHTML += `
+                                <div class="input-bg border border-rose-500/30 rounded-xl p-4 space-y-2">
+                                    <div class="flex justify-between items-center text-xs text-slate-300">
+                                        <span class="text-amber-400 font-bold">${data.subject} - ${data.topic} (${data.category})</span>
+                                        <span class="text-rose-400 font-bold">${scoreText}</span>
+                                    </div>
+                                    <div class="bg-rose-950/30 border border-rose-800/40 p-3 rounded-lg text-rose-300 text-xs font-semibold">
+                                        <span class="font-bold block mb-1">💬 ملاحظة الأدمن محمد:</span>
+                                        ${note}
+                                    </div>
+                                    <button onclick="deleteAndRetry('${data.id}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-xs transition cursor-pointer">
+                                        حذف وإعادة إرسال الحل المصحح بدقة عالية 🔄
+                                    </button>
+                                </div>`;
+                        }
                     }
                 });
 
+                if (pendingStudentContainer && !hasPending) {
+                    pendingStudentContainer.innerHTML = '<p class="text-center text-slate-400 text-sm py-2">لا توجد تمارين قيد المراجعة حالياً.</p>';
+                }
+
                 if (retryContainer && !hasRetry) {
-                    retryContainer.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">لا توجد تمارين تحتاج إعادة محاولة. ممتاز!</p>';
+                    retryContainer.innerHTML = '<p class="text-center text-slate-400 text-sm py-2">لا توجد تمارين تحتاج إعادة محاولة. ممتاز!</p>';
                 }
 
                 checkExistingSubmission();
@@ -602,9 +637,11 @@
             const name = localStorage.getItem('bac_username');
             if(!name || !document.getElementById('subject-select').value) return;
 
+            const subStream = document.getElementById('topic-stream-select').value;
             const found = allSubmissionsCache.find(item => 
                 item.studentName === name &&
                 item.subject === document.getElementById('subject-select').value &&
+                item.topicStream === subStream &&
                 item.topic === document.getElementById('topic-select').value &&
                 item.category === document.getElementById('category-select').value &&
                 item.year === document.getElementById('bac-year').value &&
@@ -646,9 +683,13 @@
                 for (let i = 0; i < filesInput.files.length; i++) imageUrls.push(await processHighQualityImage(filesInput.files[i]));
 
                 await db.collection("submissions").add({
-                    studentName: name, studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
-                    subject: document.getElementById('subject-select').value, topic: document.getElementById('topic-select').value,
-                    category: document.getElementById('category-select').value, year: document.getElementById('bac-year').value,
+                    studentName: name, 
+                    studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
+                    subject: document.getElementById('subject-select').value, 
+                    topicStream: document.getElementById('topic-stream-select').value,
+                    topic: document.getElementById('topic-select').value,
+                    category: document.getElementById('category-select').value, 
+                    year: document.getElementById('bac-year').value,
                     images: imageUrls, status: 'pending', score: 0, adminNote: '', timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 alert('تم إرسال الحل بدقة عالية للمشرف! 🚀');
@@ -731,16 +772,17 @@
             const container = document.getElementById('bac-status-list');
             container.innerHTML = '';
 
+            const currentStudent = localStorage.getItem('bac_username');
             let approvedMap = {};
             let pendingMap = {};
 
             allSubmissionsCache.forEach(item => {
-                if(item.subject === selectedSubject) {
-                    let key = `${item.year}_${item.topic}_${item.category}`;
+                if(item.studentName === currentStudent && item.subject === selectedSubject) {
+                    let key = `${item.year}_${item.topicStream || 'علوم تجريبية'}_${item.topic}_${item.category}`;
                     if(item.status === 'approved' || item.score === 10) {
-                        approvedMap[key] = { student: item.studentName, score: item.score || 10 };
+                        approvedMap[key] = { score: item.score || 10, stream: item.topicStream || 'علوم تجريبية' };
                     } else if(item.status === 'pending' || item.status === 'pending_challenge') {
-                        pendingMap[key] = { student: item.studentName };
+                        pendingMap[key] = true;
                     }
                 }
             });
@@ -755,18 +797,27 @@
 
                     let catsHtml = '';
                     categories.forEach(cat => {
-                        let key = `${y}_${top}_${cat}`;
-                        let badge = '';
-                        if(approvedMap[key]) {
-                            badge = `<span class="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold">✅ محلول (${approvedMap[key].student} - ${approvedMap[key].score}/10)</span>`;
-                        } else if(pendingMap[key]) {
-                            badge = `<span class="bg-amber-950 text-amber-300 border border-amber-800 text-[10px] px-2 py-0.5 rounded font-bold">⏳ قيد المراجعة (${pendingMap[key].student})</span>`;
-                        } else {
-                            badge = `<span class="bg-slate-800 text-slate-400 text-[10px] px-2 py-0.5 rounded font-semibold">❌ لم يُحل بعد</span>`;
-                        }
+                        // عرض كل شعبة للموضوع
+                        ['علوم تجريبية', 'رياضيات', 'تقني رياضي'].forEach(tStream => {
+                            let key = `${y}_${tStream}_${top}_${cat}`;
+                            let badge = '';
+                            if(approvedMap[key]) {
+                                badge = `<span class="bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold">✅ محلول (${tStream} - ${approvedMap[key].score}/10)</span>`;
+                            } else if(pendingMap[key]) {
+                                badge = `<span class="bg-amber-950 text-amber-300 border border-amber-800 text-[10px] px-2 py-0.5 rounded font-bold">⏳ قيد المراجعة (${tStream})</span>`;
+                            } else {
+                                // نعرض خيار بسيط أو نتجاهل غير المحول لتكون الخريطة نظيفة، أو نظهرها كـ لم تحل
+                            }
 
-                        catsHtml += `<div class="flex justify-between items-center text-xs py-1 border-b border-slate-800/50"><span>🔹 ${cat}</span> ${badge}</div>`;
+                            if(approvedMap[key] || pendingMap[key]) {
+                                catsHtml += `<div class="flex justify-between items-center text-xs py-1 border-b border-slate-800/50"><span>🔹 ${cat}</span> ${badge}</div>`;
+                            }
+                        });
                     });
+
+                    if(catsHtml === '') {
+                        catsHtml = `<p class="text-[11px] text-slate-500 py-1">لم تقم بحل أي تمرين في هذا الموضوع بعد.</p>`;
+                    }
 
                     topicsHtml += `
                         <div class="mt-2 p-3 input-bg rounded-xl border border-slate-800 space-y-2">
@@ -804,11 +855,12 @@
                     found = true;
                     const data = docSnap.data();
                     let imgs = data.images.map(img => `<a href="${img}" target="_blank"><img src="${img}" class="w-24 h-24 object-cover rounded-lg border-2 border-emerald-500/60 hover:scale-105 transition cursor-pointer" title="اضغط لتكبير الصورة بدقة عالية"></a>`).join('');
+                    let tStreamTag = data.topicStream ? ` [شعبة الموضوع: ${data.topicStream}]` : '';
                     
                     listEl.innerHTML += `
                         <div class="card-bg border rounded-2xl p-4 space-y-3 shadow-md">
                             <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 flex flex-wrap justify-between items-center text-xs gap-2">
-                                <span class="text-amber-400 font-bold">📚 المادة: ${data.subject}</span>
+                                <span class="text-amber-400 font-bold">📚 المادة: ${data.subject}${tStreamTag}</span>
                                 <span class="text-emerald-400 font-bold">📌 الموضوع: ${data.topic}</span>
                                 <span class="text-sky-400 font-bold">⚙️ التمرين: ${data.category}</span>
                                 <span class="text-slate-300">السنة: ${data.year} | الطالب: <b>${data.studentName}</b></span>
@@ -899,7 +951,6 @@
             alert('تم اعتماد نقطة الفرض والمادة بنجاح! 🎉');
         }
 
-        // نشر تحدي جديد مع صورة نص التمرين بدقة عالية
         async function publishChallenge() {
             const title = document.getElementById('chal-title').value.trim();
             const desc = document.getElementById('chal-desc').value.trim();
