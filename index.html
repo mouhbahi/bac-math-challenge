@@ -154,11 +154,9 @@
                     </select>
                 </div>
 
-                <!-- خيار شعبة الموضوع (يظهر للرياضيات والفيزياء) -->
                 <div id="topic-stream-container" class="hidden" style="display: none !important;">
                     <label id="topic-stream-label" class="block text-sm font-semibold mb-1">شعبة موضوع التمرين:</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
-                        <!-- تتعبأ ديناميكياً حسب المادة -->
                     </select>
                 </div>
 
@@ -200,19 +198,11 @@
                 </div>
             </div>
 
-            <!-- قسم التمارين قيد المراجعة -->
-            <div class="card-bg border border-amber-500/40 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>⏳</span> تمارين قيد المراجعة (في انتظار الأدمن)</h3>
-                <div id="pending-student-list" class="space-y-3">
-                    <p class="text-center text-slate-400 text-sm py-2">لا توجد تمارين قيد المراجعة حالياً.</p>
-                </div>
-            </div>
-
-            <!-- قسم التمارين التي تحتاج إعادة محاولة -->
-            <div class="card-bg border border-rose-500/40 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-rose-400 flex items-center gap-2"><span>🔄</span> تمارين مرفوضة أو تحتاج تصحيح</h3>
-                <div id="retry-list" class="space-y-3">
-                    <p class="text-center text-slate-400 text-sm py-2">لا توجد تمارين تحتاج إعادة محاولة. ممتاز!</p>
+            <!-- قسم حلولك المرسلة الموحد (قيد المراجعة، المقبولة، والمرفوضة مع الملاحظات وزر الإلغاء) -->
+            <div class="card-bg border border-slate-700 rounded-2xl p-6 shadow-xl space-y-4">
+                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>📂</span> حلولك المرسلة (حالة المراجعة والتقييم)</h3>
+                <div id="student-submissions-list" class="space-y-3">
+                    <p class="text-center text-slate-400 text-sm py-2">لا توجد حلول مرسلة حالياً.</p>
                 </div>
             </div>
 
@@ -245,7 +235,6 @@
                     <div id="map-stream-wrapper" class="hidden" style="display: none !important;">
                         <label id="map-stream-label" class="block text-xs font-semibold mb-1 text-slate-300">عرض مواضيع شعبة:</label>
                         <select id="map-stream-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold text-amber-400">
-                            <!-- تتعبأ ديناميكياً -->
                         </select>
                     </div>
                 </div>
@@ -454,7 +443,7 @@
                 mapStreamSelect.innerHTML = `
                     <option value="علوم تجريبية">🧬 علوم تجريبية</option>
                     <option value="رياضيات">📐 رياضيات</option>
-                    <option value="تقني رياضي">⚙️ تقني رياضي</option>
+                    <option value="تقني رياضي">⚙️ شعبة تقني رياضي</option>
                 `;
             } else if (subject === 'العلوم الفيزيائية') {
                 wrapper.style.setProperty('display', 'block', 'important');
@@ -661,48 +650,59 @@
             const currentStudent = localStorage.getItem('bac_username');
             db.collection("submissions").onSnapshot((snapshot) => {
                 allSubmissionsCache = [];
-                let retryContainer = document.getElementById('retry-list');
-                let pendingStudentContainer = document.getElementById('pending-student-list');
-                if(retryContainer) retryContainer.innerHTML = '';
-                if(pendingStudentContainer) pendingStudentContainer.innerHTML = '';
-                let hasRetry = false;
-                let hasPending = false;
+                let studentSubmissionsContainer = document.getElementById('student-submissions-list');
+                if(studentSubmissionsContainer) studentSubmissionsContainer.innerHTML = '';
+                let hasSubmissions = false;
 
                 snapshot.forEach((doc) => {
                     const data = doc.data(); data.id = doc.id;
                     allSubmissionsCache.push(data);
 
                     if (data.studentName === currentStudent) {
-                        if(pendingStudentContainer && data.status === 'pending') {
-                            hasPending = true;
-                            let topicStr = data.topicStream || 'علوم تجريبية';
-                            let streamInfo = (data.subject === 'الرياضيات' || data.subject === 'العلوم الفيزيائية') ? ` (${topicStr})` : '';
-                            pendingStudentContainer.innerHTML += `
-                                <div class="input-bg border border-amber-500/40 rounded-xl p-3 space-y-1 text-xs">
+                        hasSubmissions = true;
+                        let topicStr = data.topicStream || 'علوم تجريبية';
+                        let streamInfo = (data.subject === 'الرياضيات' || data.subject === 'العلوم الفيزيائية') ? ` (${topicStr})` : '';
+                        
+                        // تصميم خانة الحلول المرسلة الموحدة حسب الحالة (قيد المراجعة، مقبولة، مرفوضة)
+                        if(data.status === 'pending' || data.status === 'pending_challenge') {
+                            studentSubmissionsContainer.innerHTML += `
+                                <div class="input-bg border border-amber-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
                                     <div class="flex justify-between font-bold text-amber-400">
                                         <span>📚 ${data.subject} - ${data.topic}${streamInfo}</span>
-                                        <span>سنة ${data.year}</span>
+                                        <span class="bg-amber-500/20 px-2 py-0.5 rounded text-amber-300">قيد المراجعة ⏳</span>
                                     </div>
-                                    <p class="text-slate-300">⚙️ التمرين: ${data.category}</p>
-                                    <p class="text-[11px] text-amber-300 font-semibold">⏳ الحل مرسل وفي انتظار مراجعة الأدمن محمد...</p>
+                                    <p class="text-slate-300">⚙️ التمرين: ${data.category} | السنة: ${data.year}</p>
+                                    <div class="flex gap-2 pt-1">
+                                        <button onclick="cancelSubmission('${data.id}')" class="w-full bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 border border-rose-500/30 font-bold py-2 rounded-lg transition cursor-pointer">
+                                            إلغاء الإرسال ❌
+                                        </button>
+                                    </div>
                                 </div>`;
-                        }
-
-                        if (retryContainer && (data.status === 'retry' || (data.score !== undefined && data.score < 10 && data.type !== 'exam_declaration' && data.type !== 'challenge_solution'))) {
-                            hasRetry = true;
-                            let note = data.adminNote ? data.adminNote : 'يرجى تصحيح الخطأ والحصول على العلامة الكاملة 10/10.';
-                            let scoreText = data.score !== undefined ? `التقييم: ${data.score}/10` : 'يحتاج تصحيح';
-                            retryContainer.innerHTML += `
-                                <div class="input-bg border border-rose-500/30 rounded-xl p-4 space-y-2">
-                                    <div class="flex justify-between items-center text-xs text-slate-300">
-                                        <span class="text-amber-400 font-bold">${data.subject} - ${data.topic} (${data.category})</span>
-                                        <span class="text-rose-400 font-bold">${scoreText}</span>
+                        } else if(data.status === 'approved' || data.score === 10 || data.status === 'approved_challenge' || data.status === 'approved_exam') {
+                            let scoreDisplay = data.score !== undefined ? `${data.score}/10` : 'مقبول ✅';
+                            studentSubmissionsContainer.innerHTML += `
+                                <div class="input-bg border border-emerald-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
+                                    <div class="flex justify-between font-bold text-emerald-400">
+                                        <span>📚 ${data.subject} - ${data.topic}${streamInfo}</span>
+                                        <span class="bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-300">مقبول (${scoreDisplay}) ✅</span>
                                     </div>
-                                    <div class="bg-rose-950/30 border border-rose-800/40 p-3 rounded-lg text-rose-300 text-xs font-semibold">
+                                    <p class="text-slate-300">⚙️ التمرين: ${data.category} | السنة: ${data.year}</p>
+                                    ${data.adminNote ? `<div class="bg-emerald-950/30 border border-emerald-800/40 p-2.5 rounded text-emerald-200"><span class="font-bold block mb-0.5">💬 ملاحظة الأدمن:</span>${data.adminNote}</div>` : ''}
+                                </div>`;
+                        } else if(data.status === 'retry' || (data.score !== undefined && data.score < 10 && data.type !== 'exam_declaration')) {
+                            let note = data.adminNote ? data.adminNote : 'يرجى تصحيح الخطأ وإعادة المحاولة.';
+                            let scoreText = data.score !== undefined ? `العلامة: ${data.score}/10` : 'يحتاج تصحيح';
+                            studentSubmissionsContainer.innerHTML += `
+                                <div class="input-bg border border-rose-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="text-amber-400 font-bold">${data.subject} - ${data.topic}${streamInfo} (${data.category})</span>
+                                        <span class="bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">${scoreText} ❌</span>
+                                    </div>
+                                    <div class="bg-rose-950/30 border border-rose-800/40 p-3 rounded-lg text-rose-300 font-semibold">
                                         <span class="font-bold block mb-1">💬 ملاحظة الأدمن محمد:</span>
                                         ${note}
                                     </div>
-                                    <button onclick="deleteAndRetry('${data.id}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-xs transition cursor-pointer">
+                                    <button onclick="deleteAndRetry('${data.id}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg transition cursor-pointer">
                                         حذف وإعادة إرسال الحل المصحح بدقة عالية 🔄
                                     </button>
                                 </div>`;
@@ -710,18 +710,22 @@
                     }
                 });
 
-                if (pendingStudentContainer && !hasPending) {
-                    pendingStudentContainer.innerHTML = '<p class="text-center text-slate-400 text-sm py-2">لا توجد تمارين قيد المراجعة حالياً.</p>';
-                }
-
-                if (retryContainer && !hasRetry) {
-                    retryContainer.innerHTML = '<p class="text-center text-slate-400 text-sm py-2">لا توجد تمارين تحتاج إعادة محاولة. ممتاز!</p>';
+                if (studentSubmissionsContainer && !hasSubmissions) {
+                    studentSubmissionsContainer.innerHTML = '<p class="text-center text-slate-400 text-sm py-2">لا توجد حلول مرسلة حالياً.</p>';
                 }
 
                 checkExistingSubmission();
                 loadLeaderboard();
                 listenCustomChallenges();
             });
+        }
+
+        async function cancelSubmission(id) {
+            if(!db) return;
+            if(confirm('هل أنت متأكد من إلغاء إرسال هذا الحل وسحبه؟')) {
+                await db.collection("submissions").doc(id).delete();
+                alert('تم إلغاء الإرسال بنجاح!');
+            }
         }
 
         async function deleteAndRetry(id) {
