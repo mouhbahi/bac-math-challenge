@@ -29,9 +29,6 @@
 </head>
 <body class="theme-default min-h-screen flex flex-col justify-between">
 
-    <!-- نظام الإشعارات المنبثقة -->
-    <div id="toast-container" class="fixed top-20 left-4 right-4 md:left-auto md:right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
-
     <!-- الهيدر -->
     <header class="bg-slate-900/90 border-b border-slate-800 py-3 px-4 md:px-6 shadow-xl backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-4xl mx-auto flex justify-between items-center gap-2">
@@ -201,7 +198,7 @@
                 </div>
             </div>
 
-            <!-- قسم حلولك المرسلة الموحد (مع إمكانية الحذف والإشعارات) -->
+            <!-- قسم حلولك المرسلة الموحد -->
             <div class="card-bg border border-slate-700 rounded-2xl p-6 shadow-xl space-y-4">
                 <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>📂</span> حلولك المرسلة (حالة المراجعة والتقييم)</h3>
                 <div id="student-submissions-list" class="space-y-3">
@@ -209,7 +206,7 @@
                 </div>
             </div>
 
-            <!-- لوحة الصدارة وننسب الحل الدقيقة لكل مادة -->
+            <!-- لوحة الصدارة ونسب الإنجاز الدقيقة -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                     <h3 class="text-lg font-bold flex items-center gap-2"><span>🏆</span> لوحة الترتيب ونسبة الإنجاز الحقيقية</h3>
@@ -345,31 +342,18 @@
         let db = null;
         let allSubmissionsCache = [];
         let isExamOpen = false;
-        let notifiedSubmissions = new Set();
 
-        // إجمالي التمارين الدقيق من 2009 إلى 2026 (18 سنة × 2 موضوعين)
-        const TOTAL_MATH_SUBJECT = 144; // 4 تمارين لكل موضوع × 36 موضوع
-        const TOTAL_PHYSICS_SUBJECT = 108; // 3 تمارين لكل موضوع × 36 موضوع
-        const TOTAL_SCIENCE_SUBJECT = 108; // 3 تمارين لكل موضوع × 36 موضوع
+        const TOTAL_MATH_SUBJECT = 144; 
+        const TOTAL_PHYSICS_SUBJECT = 108; 
+        const TOTAL_SCIENCE_SUBJECT = 108; 
 
-        const TOTAL_EXPERIMENTAL = TOTAL_MATH_SUBJECT + TOTAL_PHYSICS_SUBJECT + TOTAL_SCIENCE_SUBJECT; // 360 تمرين
-        const TOTAL_MATH = TOTAL_MATH_SUBJECT + TOTAL_PHYSICS_SUBJECT; // 252 تمرين
+        const TOTAL_EXPERIMENTAL = TOTAL_MATH_SUBJECT + TOTAL_PHYSICS_SUBJECT + TOTAL_SCIENCE_SUBJECT; 
+        const TOTAL_MATH = TOTAL_MATH_SUBJECT + TOTAL_PHYSICS_SUBJECT; 
 
         try {
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
         } catch(e) { console.error(e); }
-
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            if(!container) return;
-            const toast = document.createElement('div');
-            const bgClass = type === 'success' ? 'bg-emerald-900/90 border-emerald-500 text-emerald-200' : (type === 'error' ? 'bg-rose-900/90 border-rose-500 text-rose-200' : 'bg-amber-900/90 border-amber-500 text-amber-200');
-            toast.className = `p-4 rounded-xl border shadow-2xl backdrop-blur-md text-xs font-bold transition transform translate-y-0 opacity-100 pointer-events-auto flex justify-between items-center ${bgClass}`;
-            toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()" class="mr-2 text-white font-bold">✕</button>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 6000);
-        }
 
         function setTheme(theme) {
             document.body.className = `theme-${theme} min-h-screen flex flex-col justify-between`;
@@ -683,19 +667,6 @@
                         let topicStr = data.topicStream || 'علوم تجريبية';
                         let streamInfo = (data.subject === 'الرياضيات' || data.subject === 'العلوم الفيزيائية') ? ` (${topicStr})` : '';
                         
-                        // إرسال إشعار للمستخدم إذا تغيرت حالة التقييم
-                        if(data.status !== 'pending' && data.status !== 'pending_challenge' && data.status !== 'pending_exam') {
-                            if(!notifiedSubmissions.has(data.id)) {
-                                if(data.status === 'approved' || data.score === 10 || data.status === 'approved_challenge' || data.status === 'approved_exam') {
-                                    showToast(`🎉 تم قبولك في: ${data.subject} - ${data.topic}! التقييم: ${data.score || 10}/10`, 'success');
-                                } else if(data.status === 'retry') {
-                                    showToast(`❌ تم طلب إعادة تمرين: ${data.subject} - ${data.topic}. ملاحظة الأدمن: ${data.adminNote || 'يرجى التصحيح'}`, 'error');
-                                }
-                                notifiedSubmissions.add(data.id);
-                            }
-                        }
-
-                        // تصميم خانة الحلول المرسلة الموحدة مع زر الحذف والإلغاء
                         if(data.status === 'pending' || data.status === 'pending_challenge') {
                             studentSubmissionsContainer.innerHTML += `
                                 <div class="input-bg border border-amber-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
@@ -764,7 +735,7 @@
             if(!db) return;
             if(confirm('هل أنت متأكد من إلغاء إرسال هذا الحل وسحبه؟')) {
                 await db.collection("submissions").doc(id).delete();
-                showToast('تم إلغاء الإرسال بنجاح!', 'info');
+                alert('تم إلغاء الإرسال بنجاح!');
             }
         }
 
@@ -772,7 +743,6 @@
             if(!db) return;
             if(confirm('هل تريد إزالة هذا التمرين من قائمة حلولك لتنظيف الشاشة؟')) {
                 await db.collection("submissions").doc(id).delete();
-                showToast('تمت الإزالة بنجاح!', 'info');
             }
         }
 
@@ -852,12 +822,11 @@
                     year: document.getElementById('bac-year').value,
                     images: imageUrls, status: 'pending', score: 0, adminNote: '', timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                showToast('تم إرسال الحل بدقة عالية للمشرف! 🚀', 'success');
+                alert('تم إرسال الحل بدقة عالية للمشرف! 🚀');
                 filesInput.value = '';
             } catch (e) { alert('خطأ في الإرسال'); }
         }
 
-        // لوحة الصدارة وإحصائيات كل مادة الدقيقة (من 2009 إلى 2026)
         function loadLeaderboard() {
             if(!db) return;
             db.collection("user_adjustments").get().then(adjSnap => {
@@ -935,7 +904,6 @@
                                 <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-bold">⭐ ${pts} نقطة</span>
                             </div>
                             
-                            <!-- إحصائيات الحلول الدقيقة لكل مادة -->
                             <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 space-y-2 text-[11px]">
                                 <div>
                                     <div class="flex justify-between text-sky-400 font-bold mb-1">
