@@ -29,6 +29,9 @@
 </head>
 <body class="theme-default min-h-screen flex flex-col justify-between">
 
+    <!-- نظام الإشعارات المنبثقة -->
+    <div id="toast-container" class="fixed top-20 left-4 right-4 md:left-auto md:right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
+
     <!-- الهيدر -->
     <header class="bg-slate-900/90 border-b border-slate-800 py-3 px-4 md:px-6 shadow-xl backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-4xl mx-auto flex justify-between items-center gap-2">
@@ -198,7 +201,7 @@
                 </div>
             </div>
 
-            <!-- قسم حلولك المرسلة الموحد (قيد المراجعة، المقبولة، والمرفوضة مع الملاحظات وزر الإلغاء) -->
+            <!-- قسم حلولك المرسلة الموحد (مع إمكانية الحذف والإشعارات) -->
             <div class="card-bg border border-slate-700 rounded-2xl p-6 shadow-xl space-y-4">
                 <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>📂</span> حلولك المرسلة (حالة المراجعة والتقييم)</h3>
                 <div id="student-submissions-list" class="space-y-3">
@@ -206,10 +209,10 @@
                 </div>
             </div>
 
-            <!-- لوحة الصدارة ونسب الحل لكل طالب ومادة -->
+            <!-- لوحة الصدارة وننسب الحل الدقيقة لكل مادة -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-lg font-bold flex items-center gap-2"><span>🏆</span> لوحة الترتيب ونسبة الحلول لكل مادة</h3>
+                    <h3 class="text-lg font-bold flex items-center gap-2"><span>🏆</span> لوحة الترتيب ونسبة الإنجاز الحقيقية</h3>
                     <span id="total-points-label" class="text-xs text-amber-400 font-bold">مجموع نقاطك: 0 نقطة</span>
                 </div>
                 <div id="leaderboard-list" class="space-y-4">
@@ -342,14 +345,31 @@
         let db = null;
         let allSubmissionsCache = [];
         let isExamOpen = false;
+        let notifiedSubmissions = new Set();
 
-        const TOTAL_EXPERIMENTAL = 108; 
-        const TOTAL_MATH = 72;
+        // إجمالي التمارين الدقيق من 2009 إلى 2026 (18 سنة × 2 موضوعين)
+        const TOTAL_MATH_SUBJECT = 144; // 4 تمارين لكل موضوع × 36 موضوع
+        const TOTAL_PHYSICS_SUBJECT = 108; // 3 تمارين لكل موضوع × 36 موضوع
+        const TOTAL_SCIENCE_SUBJECT = 108; // 3 تمارين لكل موضوع × 36 موضوع
+
+        const TOTAL_EXPERIMENTAL = TOTAL_MATH_SUBJECT + TOTAL_PHYSICS_SUBJECT + TOTAL_SCIENCE_SUBJECT; // 360 تمرين
+        const TOTAL_MATH = TOTAL_MATH_SUBJECT + TOTAL_PHYSICS_SUBJECT; // 252 تمرين
 
         try {
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
         } catch(e) { console.error(e); }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-900/90 border-emerald-500 text-emerald-200' : (type === 'error' ? 'bg-rose-900/90 border-rose-500 text-rose-200' : 'bg-amber-900/90 border-amber-500 text-amber-200');
+            toast.className = `p-4 rounded-xl border shadow-2xl backdrop-blur-md text-xs font-bold transition transform translate-y-0 opacity-100 pointer-events-auto flex justify-between items-center ${bgClass}`;
+            toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()" class="mr-2 text-white font-bold">✕</button>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 6000);
+        }
 
         function setTheme(theme) {
             document.body.className = `theme-${theme} min-h-screen flex flex-col justify-between`;
@@ -663,7 +683,19 @@
                         let topicStr = data.topicStream || 'علوم تجريبية';
                         let streamInfo = (data.subject === 'الرياضيات' || data.subject === 'العلوم الفيزيائية') ? ` (${topicStr})` : '';
                         
-                        // تصميم خانة الحلول المرسلة الموحدة حسب الحالة (قيد المراجعة، مقبولة، مرفوضة)
+                        // إرسال إشعار للمستخدم إذا تغيرت حالة التقييم
+                        if(data.status !== 'pending' && data.status !== 'pending_challenge' && data.status !== 'pending_exam') {
+                            if(!notifiedSubmissions.has(data.id)) {
+                                if(data.status === 'approved' || data.score === 10 || data.status === 'approved_challenge' || data.status === 'approved_exam') {
+                                    showToast(`🎉 تم قبولك في: ${data.subject} - ${data.topic}! التقييم: ${data.score || 10}/10`, 'success');
+                                } else if(data.status === 'retry') {
+                                    showToast(`❌ تم طلب إعادة تمرين: ${data.subject} - ${data.topic}. ملاحظة الأدمن: ${data.adminNote || 'يرجى التصحيح'}`, 'error');
+                                }
+                                notifiedSubmissions.add(data.id);
+                            }
+                        }
+
+                        // تصميم خانة الحلول المرسلة الموحدة مع زر الحذف والإلغاء
                         if(data.status === 'pending' || data.status === 'pending_challenge') {
                             studentSubmissionsContainer.innerHTML += `
                                 <div class="input-bg border border-amber-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
@@ -674,7 +706,7 @@
                                     <p class="text-slate-300">⚙️ التمرين: ${data.category} | السنة: ${data.year}</p>
                                     <div class="flex gap-2 pt-1">
                                         <button onclick="cancelSubmission('${data.id}')" class="w-full bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 border border-rose-500/30 font-bold py-2 rounded-lg transition cursor-pointer">
-                                            إلغاء الإرسال ❌
+                                            إلغاء الإرسال وسحب الحل ❌
                                         </button>
                                     </div>
                                 </div>`;
@@ -688,6 +720,9 @@
                                     </div>
                                     <p class="text-slate-300">⚙️ التمرين: ${data.category} | السنة: ${data.year}</p>
                                     ${data.adminNote ? `<div class="bg-emerald-950/30 border border-emerald-800/40 p-2.5 rounded text-emerald-200"><span class="font-bold block mb-0.5">💬 ملاحظة الأدمن:</span>${data.adminNote}</div>` : ''}
+                                    <button onclick="removeSubmissionFromList('${data.id}')" class="w-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold py-1.5 rounded-lg transition text-[11px] cursor-pointer mt-1">
+                                        إزالة من القائمة 🗑️
+                                    </button>
                                 </div>`;
                         } else if(data.status === 'retry' || (data.score !== undefined && data.score < 10 && data.type !== 'exam_declaration')) {
                             let note = data.adminNote ? data.adminNote : 'يرجى تصحيح الخطأ وإعادة المحاولة.';
@@ -702,9 +737,14 @@
                                         <span class="font-bold block mb-1">💬 ملاحظة الأدمن محمد:</span>
                                         ${note}
                                     </div>
-                                    <button onclick="deleteAndRetry('${data.id}')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg transition cursor-pointer">
-                                        حذف وإعادة إرسال الحل المصحح بدقة عالية 🔄
-                                    </button>
+                                    <div class="flex gap-2 pt-1">
+                                        <button onclick="deleteAndRetry('${data.id}')" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg transition cursor-pointer">
+                                            إعادة إرسال الحل المصحح 🔄
+                                        </button>
+                                        <button onclick="removeSubmissionFromList('${data.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 rounded-lg transition text-[11px] cursor-pointer">
+                                            إزالة 🗑️
+                                        </button>
+                                    </div>
                                 </div>`;
                         }
                     }
@@ -724,7 +764,15 @@
             if(!db) return;
             if(confirm('هل أنت متأكد من إلغاء إرسال هذا الحل وسحبه؟')) {
                 await db.collection("submissions").doc(id).delete();
-                alert('تم إلغاء الإرسال بنجاح!');
+                showToast('تم إلغاء الإرسال بنجاح!', 'info');
+            }
+        }
+
+        async function removeSubmissionFromList(id) {
+            if(!db) return;
+            if(confirm('هل تريد إزالة هذا التمرين من قائمة حلولك لتنظيف الشاشة؟')) {
+                await db.collection("submissions").doc(id).delete();
+                showToast('تمت الإزالة بنجاح!', 'info');
             }
         }
 
@@ -804,12 +852,12 @@
                     year: document.getElementById('bac-year').value,
                     images: imageUrls, status: 'pending', score: 0, adminNote: '', timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert('تم إرسال الحل بدقة عالية للمشرف! 🚀');
+                showToast('تم إرسال الحل بدقة عالية للمشرف! 🚀', 'success');
                 filesInput.value = '';
             } catch (e) { alert('خطأ في الإرسال'); }
         }
 
-        // لوحة الصدارة وإحصائيات كل مادة لكل طالب
+        // لوحة الصدارة وإحصائيات كل مادة الدقيقة (من 2009 إلى 2026)
         function loadLeaderboard() {
             if(!db) return;
             db.collection("user_adjustments").get().then(adjSnap => {
@@ -873,25 +921,25 @@
                     let physCount = subjectCountsMap[student]['العلوم الفيزيائية'] || 0;
                     let sciCount = subjectCountsMap[student]['العلوم الطبيعية'] || 0;
 
-                    let mathPct = Math.min(100, Number(((mathCount / 36) * 100).toFixed(0)));
-                    let physPct = Math.min(100, Number(((physCount / 36) * 100).toFixed(0)));
-                    let sciPct = stream === 'math' ? 0 : Math.min(100, Number(((sciCount / 36) * 100).toFixed(0)));
+                    let mathPct = Math.min(100, Number(((mathCount / TOTAL_MATH_SUBJECT) * 100).toFixed(1)));
+                    let physPct = Math.min(100, Number(((physCount / TOTAL_PHYSICS_SUBJECT) * 100).toFixed(1)));
+                    let sciPct = stream === 'math' ? 0 : Math.min(100, Number(((sciCount / TOTAL_SCIENCE_SUBJECT) * 100).toFixed(1)));
 
                     listEl.innerHTML += `
                         <div class="input-bg p-4 rounded-xl border space-y-3 shadow-lg">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <span class="font-bold flex items-center gap-2 text-sm">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🔹'} ${student}</span>
-                                    <span class="text-[10px] text-amber-400 font-semibold">${stream === 'math' ? 'رياضيات/تقني' : 'علوم تجريبية'} | إجمالي التمارين: ${count} (${percentage}%)</span>
+                                    <span class="text-[10px] text-amber-400 font-semibold">${stream === 'math' ? 'رياضيات/تقني' : 'علوم تجريبية'} | إجمالي التمارين: ${count}/${maxTotal} (${percentage}%)</span>
                                 </div>
                                 <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-bold">⭐ ${pts} نقطة</span>
                             </div>
                             
-                            <!-- إحصائيات الحلول لكل مادة عند الطالب -->
+                            <!-- إحصائيات الحلول الدقيقة لكل مادة -->
                             <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 space-y-2 text-[11px]">
                                 <div>
                                     <div class="flex justify-between text-sky-400 font-bold mb-1">
-                                        <span>📐 الرياضيات: ${mathCount} تمرين تم حله</span>
+                                        <span>📐 الرياضيات: ${mathCount}/${TOTAL_MATH_SUBJECT} تمرين تم حله</span>
                                         <span>${mathPct}%</span>
                                     </div>
                                     <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
@@ -901,7 +949,7 @@
 
                                 <div>
                                     <div class="flex justify-between text-amber-400 font-bold mb-1">
-                                        <span>⚡ العلوم الفيزيائية: ${physCount} تمرين تم حله</span>
+                                        <span>⚡ العلوم الفيزيائية: ${physCount}/${TOTAL_PHYSICS_SUBJECT} تمرين تم حله</span>
                                         <span>${physPct}%</span>
                                     </div>
                                     <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
@@ -912,7 +960,7 @@
                                 ${stream !== 'math' ? `
                                 <div>
                                     <div class="flex justify-between text-emerald-400 font-bold mb-1">
-                                        <span>🧬 العلوم الطبيعية: ${sciCount} تمرين تم حله</span>
+                                        <span>🧬 العلوم الطبيعية: ${sciCount}/${TOTAL_SCIENCE_SUBJECT} تمرين تم حله</span>
                                         <span>${sciPct}%</span>
                                     </div>
                                     <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
