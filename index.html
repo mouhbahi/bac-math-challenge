@@ -154,13 +154,11 @@
                     </select>
                 </div>
 
-                <!-- خيار شعبة الموضوع يظهر حصراً للرياضيات والفيزياء ويختفي تماماً للعلوم -->
-                <div id="topic-stream-container">
-                    <label class="block text-sm font-semibold mb-1">شعبة موضوع التمرين (خاص بالرياضيات والفيزياء):</label>
+                <!-- خيار شعبة الموضوع (يظهر للرياضيات والفيزياء) -->
+                <div id="topic-stream-container" class="hidden" style="display: none !important;">
+                    <label id="topic-stream-label" class="block text-sm font-semibold mb-1">شعبة موضوع التمرين:</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
-                        <option value="علوم تجريبية">🧬 شعبة علوم تجريبية</option>
-                        <option value="رياضيات">📐 شعبة رياضيات</option>
-                        <option value="تقني رياضي">⚙️ شعبة تقني رياضي</option>
+                        <!-- تتعبأ ديناميكياً حسب المادة -->
                     </select>
                 </div>
 
@@ -244,12 +242,10 @@
                         <select id="map-subject-select" onchange="onMapSubjectChange()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold">
                         </select>
                     </div>
-                    <div id="map-stream-wrapper">
-                        <label class="block text-xs font-semibold mb-1 text-slate-300">عرض مواضيع شعبة:</label>
+                    <div id="map-stream-wrapper" class="hidden" style="display: none !important;">
+                        <label id="map-stream-label" class="block text-xs font-semibold mb-1 text-slate-300">عرض مواضيع شعبة:</label>
                         <select id="map-stream-select" onchange="renderBacProgressMap()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold text-amber-400">
-                            <option value="علوم تجريبية">🧬 علوم تجريبية</option>
-                            <option value="رياضيات">📐 رياضيات</option>
-                            <option value="تقني رياضي">⚙️ تقني رياضي</option>
+                            <!-- تتعبأ ديناميكياً -->
                         </select>
                     </div>
                 </div>
@@ -420,15 +416,26 @@
             const subject = subjectSelect.value;
             const streamContainer = document.getElementById('topic-stream-container');
             const streamSelect = document.getElementById('topic-stream-select');
+            const streamLabel = document.getElementById('topic-stream-label');
             
-            // إخفاء حقل شعبة الموضوع نهائياً وبشكل قاطع إذا كانت المادة علوم الطبيعة والحياة
-            if (subject === 'العلوم الطبيعية') {
-                streamContainer.style.setProperty('display', 'none', 'important');
-                streamSelect.value = 'علوم تجريبية';
-            } else if (subject === 'الرياضيات' || subject === 'العلوم الفيزيائية') {
+            if (subject === 'الرياضيات') {
                 streamContainer.style.setProperty('display', 'block', 'important');
+                streamLabel.textContent = 'شعبة موضوع التمرين (خاص بالرياضيات):';
+                streamSelect.innerHTML = `
+                    <option value="علوم تجريبية">🧬 شعبة علوم تجريبية</option>
+                    <option value="رياضيات">📐 شعبة رياضيات</option>
+                    <option value="تقني رياضي">⚙️ شعبة تقني رياضي</option>
+                `;
+            } else if (subject === 'العلوم الفيزيائية') {
+                streamContainer.style.setProperty('display', 'block', 'important');
+                streamLabel.textContent = 'شعبة موضوع التمرين (خاص بالفيزياء):';
+                streamSelect.innerHTML = `
+                    <option value="علوم تجريبية">🧬 شعبة علوم تجريبية</option>
+                    <option value="رياضيات وتقني رياضي (مدمج)">📐 رياضيات والتقني رياضي (مدمج)</option>
+                `;
             } else {
                 streamContainer.style.setProperty('display', 'none', 'important');
+                streamSelect.value = 'علوم تجريبية';
             }
             updateCategoryOptions();
         }
@@ -439,14 +446,26 @@
             const subject = mapSubjectSelect.value;
             const wrapper = document.getElementById('map-stream-wrapper');
             const mapStreamSelect = document.getElementById('map-stream-select');
+            const mapStreamLabel = document.getElementById('map-stream-label');
             
-            if (subject === 'العلوم الطبيعية') {
-                wrapper.style.setProperty('display', 'none', 'important');
-                mapStreamSelect.value = 'علوم تجريبية';
-            } else if (subject === 'الرياضيات' || subject === 'العلوم الفيزيائية') {
+            if (subject === 'الرياضيات') {
                 wrapper.style.setProperty('display', 'block', 'important');
+                mapStreamLabel.textContent = 'عرض مواضيع شعبة:';
+                mapStreamSelect.innerHTML = `
+                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
+                    <option value="رياضيات">📐 رياضيات</option>
+                    <option value="تقني رياضي">⚙️ تقني رياضي</option>
+                `;
+            } else if (subject === 'العلوم الفيزيائية') {
+                wrapper.style.setProperty('display', 'block', 'important');
+                mapStreamLabel.textContent = 'عرض مواضيع شعبة:';
+                mapStreamSelect.innerHTML = `
+                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
+                    <option value="رياضيات وتقني رياضي (مدمج)">📐 رياضيات والتقني رياضي (مدمج)</option>
+                `;
             } else {
                 wrapper.style.setProperty('display', 'none', 'important');
+                mapStreamSelect.value = 'علوم تجريبية';
             }
             renderBacProgressMap();
         }
