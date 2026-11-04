@@ -100,8 +100,7 @@
                     <h3 id="student-display-name" class="text-xl font-bold text-emerald-400"></h3>
                     <p id="student-stream-tag" class="text-[11px] text-amber-400 mt-0.5 font-semibold"></p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="forceResetStream()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-2 rounded-xl hover:bg-amber-500/25 transition font-bold cursor-pointer">تحديث الشعبة 🔄</button>
+                <div>
                     <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
                 </div>
             </div>
@@ -368,12 +367,6 @@
             const opt = document.createElement('option');
             opt.value = y; opt.textContent = `بكالوريا ${y}`;
             yearSelect.appendChild(opt);
-        }
-
-        function forceResetStream() {
-            localStorage.setItem('bac_user_stream', 'experimental');
-            alert('تم ضبط شعبتك تلقائياً إلى: علوم تجريبية بنجاح! سيتم تحديث الصفحة.');
-            location.reload();
         }
 
         function setupSubjectDropdowns() {
