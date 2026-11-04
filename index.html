@@ -656,60 +656,63 @@
                     allSubmissionsCache.push(data);
 
                     if (data.studentName === currentStudent) {
-                        hasSubmissions = true;
-                        let topicStr = data.topicStream || 'علوم تجريبية';
-                        let streamInfo = (data.subject === 'الرياضيات' || data.subject === 'العلوم الفيزيائية') ? ` (${topicStr})` : '';
-                        
-                        if(data.status === 'pending' || data.status === 'pending_challenge') {
-                            studentSubmissionsContainer.innerHTML += `
-                                <div class="input-bg border border-amber-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
-                                    <div class="flex justify-between font-bold text-amber-400">
-                                        <span>📚 ${data.subject} - ${data.topic}${streamInfo}</span>
-                                        <span class="bg-amber-500/20 px-2 py-0.5 rounded text-amber-300">قيد المراجعة ⏳</span>
-                                    </div>
-                                    <p class="text-slate-300">⚙️ التمرين: ${data.category} | السنة: ${data.year}</p>
-                                    <div class="flex gap-2 pt-1">
-                                        <button onclick="cancelSubmission('${data.id}')" class="w-full bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 border border-rose-500/30 font-bold py-2 rounded-lg transition cursor-pointer">
-                                            إلغاء الإرسال وسحب الحل ❌
+                        // إذا كان الطالب قد أزال التمرين من قائمته بصرياً، فلا نعرضه في "حلولك المرسلة" ولكن نحتفظ به في الكاش لحساب النقاط والخرائط
+                        if(!data.hideForStudent) {
+                            hasSubmissions = true;
+                            let topicStr = data.topicStream || 'علوم تجريبية';
+                            let streamInfo = (data.subject === 'الرياضيات' || data.subject === 'العلوم الفيزيائية') ? ` (${topicStr})` : '';
+                            
+                            if(data.status === 'pending' || data.status === 'pending_challenge') {
+                                studentSubmissionsContainer.innerHTML += `
+                                    <div class="input-bg border border-amber-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
+                                        <div class="flex justify-between font-bold text-amber-400">
+                                            <span>📚 ${data.subject} - ${data.topic}${streamInfo}</span>
+                                            <span class="bg-amber-500/20 px-2 py-0.5 rounded text-amber-300">قيد المراجعة ⏳</span>
+                                        </div>
+                                        <p class="text-slate-300">⚙️ التمرين: ${data.category} | السنة: ${data.year}</p>
+                                        <div class="flex gap-2 pt-1">
+                                            <button onclick="cancelSubmission('${data.id}')" class="w-full bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 border border-rose-500/30 font-bold py-2 rounded-lg transition cursor-pointer">
+                                                إلغاء الإرسال وسحب الحل ❌
+                                            </button>
+                                        </div>
+                                    </div>`;
+                            } else if(data.status === 'approved' || data.score === 10 || data.status === 'approved_challenge' || data.status === 'approved_exam') {
+                                let scoreDisplay = data.score !== undefined ? `${data.score}/10` : 'مقبول ✅';
+                                studentSubmissionsContainer.innerHTML += `
+                                    <div class="input-bg border border-emerald-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
+                                        <div class="flex justify-between font-bold text-emerald-400">
+                                            <span>📚 ${data.subject} - ${data.topic}${streamInfo}</span>
+                                            <span class="bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-300">مقبول (${scoreDisplay}) ✅</span>
+                                        </div>
+                                        <p class="text-slate-300">⚙️ التمرين: ${data.category} | السنة: ${data.year}</p>
+                                        ${data.adminNote ? `<div class="bg-emerald-950/30 border border-emerald-800/40 p-2.5 rounded text-emerald-200"><span class="font-bold block mb-0.5">💬 ملاحظة الأدمن:</span>${data.adminNote}</div>` : ''}
+                                        <button onclick="hideSubmissionForStudent('${data.id}')" class="w-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold py-1.5 rounded-lg transition text-[11px] cursor-pointer mt-1">
+                                            إزالة من القائمة (مع الاحتفاظ بالنقطة) 🗑️
                                         </button>
-                                    </div>
-                                </div>`;
-                        } else if(data.status === 'approved' || data.score === 10 || data.status === 'approved_challenge' || data.status === 'approved_exam') {
-                            let scoreDisplay = data.score !== undefined ? `${data.score}/10` : 'مقبول ✅';
-                            studentSubmissionsContainer.innerHTML += `
-                                <div class="input-bg border border-emerald-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
-                                    <div class="flex justify-between font-bold text-emerald-400">
-                                        <span>📚 ${data.subject} - ${data.topic}${streamInfo}</span>
-                                        <span class="bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-300">مقبول (${scoreDisplay}) ✅</span>
-                                    </div>
-                                    <p class="text-slate-300">⚙️ التمرين: ${data.category} | السنة: ${data.year}</p>
-                                    ${data.adminNote ? `<div class="bg-emerald-950/30 border border-emerald-800/40 p-2.5 rounded text-emerald-200"><span class="font-bold block mb-0.5">💬 ملاحظة الأدمن:</span>${data.adminNote}</div>` : ''}
-                                    <button onclick="removeSubmissionFromList('${data.id}')" class="w-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold py-1.5 rounded-lg transition text-[11px] cursor-pointer mt-1">
-                                        إزالة من القائمة 🗑️
-                                    </button>
-                                </div>`;
-                        } else if(data.status === 'retry' || (data.score !== undefined && data.score < 10 && data.type !== 'exam_declaration')) {
-                            let note = data.adminNote ? data.adminNote : 'يرجى تصحيح الخطأ وإعادة المحاولة.';
-                            let scoreText = data.score !== undefined ? `العلامة: ${data.score}/10` : 'يحتاج تصحيح';
-                            studentSubmissionsContainer.innerHTML += `
-                                <div class="input-bg border border-rose-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
-                                    <div class="flex justify-between items-center text-xs">
-                                        <span class="text-amber-400 font-bold">${data.subject} - ${data.topic}${streamInfo} (${data.category})</span>
-                                        <span class="bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">${scoreText} ❌</span>
-                                    </div>
-                                    <div class="bg-rose-950/30 border border-rose-800/40 p-3 rounded-lg text-rose-300 font-semibold">
-                                        <span class="font-bold block mb-1">💬 ملاحظة الأدمن محمد:</span>
-                                        ${note}
-                                    </div>
-                                    <div class="flex gap-2 pt-1">
-                                        <button onclick="deleteAndRetry('${data.id}')" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg transition cursor-pointer">
-                                            إعادة إرسال الحل المصحح 🔄
-                                        </button>
-                                        <button onclick="removeSubmissionFromList('${data.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 rounded-lg transition text-[11px] cursor-pointer">
-                                            إزالة 🗑️
-                                        </button>
-                                    </div>
-                                </div>`;
+                                    </div>`;
+                            } else if(data.status === 'retry' || (data.score !== undefined && data.score < 10 && data.type !== 'exam_declaration')) {
+                                let note = data.adminNote ? data.adminNote : 'يرجى تصحيح الخطأ وإعادة المحاولة.';
+                                let scoreText = data.score !== undefined ? `العلامة: ${data.score}/10` : 'يحتاج تصحيح';
+                                studentSubmissionsContainer.innerHTML += `
+                                    <div class="input-bg border border-rose-500/40 rounded-xl p-4 space-y-2 text-xs shadow">
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="text-amber-400 font-bold">${data.subject} - ${data.topic}${streamInfo} (${data.category})</span>
+                                            <span class="bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">${scoreText} ❌</span>
+                                        </div>
+                                        <div class="bg-rose-950/30 border border-rose-800/40 p-3 rounded-lg text-rose-300 font-semibold">
+                                            <span class="font-bold block mb-1">💬 ملاحظة الأدمن محمد:</span>
+                                            ${note}
+                                        </div>
+                                        <div class="flex gap-2 pt-1">
+                                            <button onclick="deleteAndRetry('${data.id}')" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg transition cursor-pointer">
+                                                إعادة إرسال الحل المصحح 🔄
+                                            </button>
+                                            <button onclick="hideSubmissionForStudent('${data.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 rounded-lg transition text-[11px] cursor-pointer">
+                                                إزالة 🗑️
+                                            </button>
+                                        </div>
+                                    </div>`;
+                            }
                         }
                     }
                 });
@@ -732,10 +735,10 @@
             }
         }
 
-        async function removeSubmissionFromList(id) {
+        async function hideSubmissionForStudent(id) {
             if(!db) return;
-            if(confirm('هل تريد إزالة هذا التمرين من قائمة حلولك لتنظيف الشاشة؟')) {
-                await db.collection("submissions").doc(id).delete();
+            if(confirm('هل تريد إزالة هذا التمرين من قائمة حلولك المرئية لتنظيف الشاشة؟ (ستبقى نقاطك وإنجازك محفوظة)')) {
+                await db.collection("submissions").doc(id).update({ hideForStudent: true });
             }
         }
 
