@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي مواضيع البكالوريا - النسخة الاحترافية بالذكاء الاصطناعي</title>
+    <title>تحدي مواضيع البكالوريا - النسخة المتكاملة بالذكاء الاصطناعي</title>
     <link rel="icon" href="https://images.emojiterra.com/google/android-11/512px/1f393.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@
                 <span class="text-2xl">🎓</span>
                 <div>
                     <h1 class="text-base md:text-lg font-black text-amber-400">تحدي مواضيع البكالوريا 🤖</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">منصة التصحيح الذكي والمتابعة</p>
+                    <p class="text-[10px] text-slate-300 font-semibold">منصة التصحيح الذكي والمتابعة الشاملة</p>
                 </div>
             </div>
             
@@ -124,6 +124,14 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">اختر المادة:</label>
                     <select id="subject-select" onchange="onSubjectChange()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none">
+                    </select>
+                </div>
+
+                <div id="topic-stream-container" class="hidden">
+                    <label class="block text-sm font-semibold mb-1">شعبة موضوع التمرين:</label>
+                    <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
+                        <option value="العلوم التجريبية">🧬 مواضيع شعبة علوم تجريبية</option>
+                        <option value="الرياضيات والتقني الرياضي">📐 مواضيع شعبة رياضيات وتقني رياضي</option>
                     </select>
                 </div>
 
@@ -239,14 +247,29 @@
 
     </main>
 
-    <!-- Modal Progress -->
+    <!-- Modal Progress (الخريطة القديمة بتصميمها المنظم) -->
     <div id="bac-progress-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="card-bg border rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <div class="card-bg border rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                 <h3 class="text-lg font-bold text-amber-400">📊 خريطة إنجازي لمواضيع البكالوريا</h3>
-                <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+                <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white font-bold text-lg cursor-pointer">✕</button>
             </div>
-            <div id="progress-content-list" class="space-y-3 text-xs"></div>
+            
+            <div class="grid grid-cols-2 gap-3 text-center">
+                <div class="input-bg border p-3 rounded-xl">
+                    <p class="text-[10px] text-slate-400">التمارين المكتملة (10/10)</p>
+                    <p id="modal-stat-completed" class="text-xl font-black text-emerald-400">0</p>
+                </div>
+                <div class="input-bg border p-3 rounded-xl">
+                    <p class="text-[10px] text-slate-400">مجموع النقاط المحققة</p>
+                    <p id="modal-stat-points" class="text-xl font-black text-amber-400">0</p>
+                </div>
+            </div>
+
+            <div class="space-y-2 pt-2">
+                <h4 class="text-xs font-bold text-slate-300">سجل الحلول والإنجازات المفصلة:</h4>
+                <div id="progress-content-list" class="space-y-2 text-xs"></div>
+            </div>
         </div>
     </div>
 
@@ -263,6 +286,7 @@
 
         let db = null;
         let allSubmissionsCache = [];
+        let completedChallengesCache = JSON.parse(localStorage.getItem('bac_completed_challenges') || '[]');
         let defaultApiKeys = ["AQ.Ab8RN6K3s0h9TgvYu7WZDrtFLPH4S0jGi_K4FHru53gw5s1c2w"];
 
         try {
@@ -348,6 +372,7 @@
                 const year = document.getElementById('bac-year').value;
                 const topic = document.getElementById('topic-select').value;
                 const category = document.getElementById('category-select').value;
+                const topicStream = document.getElementById('topic-stream-container').style.display !== 'none' ? document.getElementById('topic-stream-select').value : '';
 
                 const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls);
 
@@ -356,6 +381,7 @@
                     studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
                     subject: subject,
                     topic: topic,
+                    topicStream: topicStream,
                     category: category,
                     year: year,
                     images: imageUrls,
@@ -390,8 +416,22 @@
         function onSubjectChange() {
             const subject = document.getElementById('subject-select').value;
             const categorySelect = document.getElementById('category-select');
+            const topicStreamContainer = document.getElementById('topic-stream-container');
+            
             categorySelect.innerHTML = '';
-            let options = subject.includes('الرياضيات') ? ['الدوال (العددية، الأسية، اللوغاريتمية)', 'المتتاليات العددية', 'الإحصاء والاحتمالات', 'الأعداد المركبة والهندسة'] : ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
+            let options = [];
+
+            if (subject.includes('الرياضيات')) {
+                options = ['الدوال (العددية، الأسية، اللوغاريتمية)', 'المتتاليات العددية', 'الإحصاء والاحتمالات', 'الأعداد المركبة والهندسة'];
+                topicStreamContainer.style.display = 'block';
+            } else if (subject.includes('الفيزيائية')) {
+                options = ['الميكانيك', 'الكهرباء', 'التطور الكيميائي', 'المتابعة الزمنية', 'أحماض وأسس', 'النووي'];
+                topicStreamContainer.style.display = 'block';
+            } else {
+                options = ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
+                topicStreamContainer.style.display = 'none';
+            }
+
             options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
             checkExistingSubmission();
         }
@@ -479,11 +519,11 @@
                     listEl.innerHTML += `
                         <div class="input-bg border ${colorClass} rounded-xl p-4 space-y-2 text-xs">
                             <div class="flex justify-between font-bold">
-                                    <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
-                                    <span class="${d.score === 10 ? 'text-emerald-400' : 'text-rose-400'}">${d.score}/10</span>
-                                </div>
-                                <p class="text-slate-300 font-semibold">${d.adminNote}</p>
-                                <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1 rounded">إزالة من القائمة 🗑️</button>
+                                <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
+                                <span class="${d.score === 10 ? 'text-emerald-400' : 'text-rose-400'}">${d.score}/10</span>
+                            </div>
+                            <p class="text-slate-300 font-semibold">${d.adminNote}</p>
+                            <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1 rounded">إزالة من القائمة 🗑️</button>
                         </div>`;
                 });
 
@@ -494,17 +534,45 @@
             db.collection("challenges").onSnapshot((snapshot) => {
                 let chalEl = document.getElementById('student-challenges-container');
                 chalEl.innerHTML = '';
+                let activeChallengesCount = 0;
+
                 snapshot.forEach(doc => {
+                    let cId = doc.id;
                     let c = doc.data();
-                    chalEl.innerHTML += `<div class="bg-slate-900 border border-amber-500/30 rounded-xl p-4 space-y-2 text-xs"><h4 class="font-bold text-amber-400">${c.title}</h4><p class="text-slate-300">${c.description}</p></div>`;
+                    
+                    // التحقق مما إذا كان التحدي قد تم حله مسبقاً ليتم إخفاؤه من النافذة
+                    if (!completedChallengesCache.includes(cId)) {
+                        activeChallengesCount++;
+                        chalEl.innerHTML += `
+                            <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-4 space-y-2 text-xs flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-amber-400">${c.title}</h4>
+                                    <p class="text-slate-300">${c.description}</p>
+                                </div>
+                                <button onclick="completeChallenge('${cId}')" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-2 rounded-lg shrink-0 cursor-pointer">إتمام ✅</button>
+                            </div>`;
+                    }
                 });
+
+                if (activeChallengesCount === 0) {
+                    chalEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-2">لا توجد تحديات نشطة حالياً. أتممتها كلها ببطولة! 🔥</p>';
+                }
             });
+        }
+
+        function completeChallenge(challengeId) {
+            if (!completedChallengesCache.includes(challengeId)) {
+                completedChallengesCache.push(challengeId);
+                localStorage.setItem('bac_completed_challenges', JSON.stringify(completedChallengesCache));
+                // إعادة تحميل سريعة لتحديث الشاشة وإخفاء التحدي المحلول
+                location.reload();
+            }
         }
 
         function renderLeaderboard(userScoresMap) {
             let lbEl = document.getElementById('leaderboard-list');
             let sorted = Object.entries(userScoresMap).sort((a,b) => b[1] - a[1]);
-            lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-2">لا توجد نقاط مسجلة بعد.</p>' : '';
+            lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-4">لا توجد نقاط مسجلة بعد.</p>' : '';
             sorted.forEach(([name, pts], index) => {
                 lbEl.innerHTML += `
                     <div class="flex justify-between items-center input-bg border rounded-xl p-3 text-xs">
@@ -527,10 +595,19 @@
             let contentEl = document.getElementById('progress-content-list');
             contentEl.innerHTML = '';
             
-            let completedCount = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10).length;
-            contentEl.innerHTML += `<div class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-400 font-bold text-center mb-3">مجموع التمارين المكتملة بعلامة كاملة: ${completedCount} تمارين</div>`;
+            let completedList = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10);
+            let totalPoints = completedList.length * (currentStudent === 'محمد' ? 20 : 10);
             
-            allSubmissionsCache.filter(s => s.studentName === currentStudent).forEach(s => {
+            document.getElementById('modal-stat-completed').textContent = completedList.length;
+            document.getElementById('modal-stat-points').textContent = totalPoints;
+            
+            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent);
+            if (studentSubmissions.length === 0) {
+                contentEl.innerHTML = '<p class="text-center text-slate-400 text-xs py-4">لم تقم بإرسال أي حلول بعد.</p>';
+                return;
+            }
+
+            studentSubmissions.forEach(s => {
                 contentEl.innerHTML += `
                     <div class="input-bg border border-slate-700 p-3 rounded-xl flex justify-between items-center">
                         <div>
