@@ -245,15 +245,35 @@
 
     </main>
 
-    <!-- Modal Progress (خريطة الإنجاز الشاملة) -->
+    <!-- Modal Progress (خريطة الإنجاز بتصميمها الكلاسيكي المريح) -->
     <div id="bac-progress-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="card-bg border rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="text-lg font-bold text-amber-400">📊 خريطة إنجازي الشاملة لمواضيع البكالوريا</h3>
+                <h3 class="text-lg font-bold text-amber-400">📊 خريطة إنجازي لمواضيع البكالوريا</h3>
                 <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white font-bold text-lg cursor-pointer">✕</button>
             </div>
             
-            <div class="grid grid-cols-2 gap-3 text-center">
+            <!-- أزرار اختيار المادة والشعبة في أعلى الخريطة -->
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-semibold mb-1 text-slate-300">اختر المادة:</label>
+                    <select id="map-subject-select" onchange="renderBacProgressContent()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold focus:outline-none text-amber-400">
+                        <option value="الرياضيات">📐 الرياضيات</option>
+                        <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
+                        <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold mb-1 text-slate-300">اختر الشعبة:</label>
+                    <select id="map-stream-select" onchange="renderBacProgressContent()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold focus:outline-none text-emerald-400">
+                        <option value="علوم تجريبية">🧬 علوم تجريبية</option>
+                        <option value="رياضيات">📐 رياضيات</option>
+                        <option value="تقني رياضي">⚙️ تقني رياضي</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-center pt-2">
                 <div class="input-bg border p-3 rounded-xl">
                     <p class="text-[10px] text-slate-400">التمارين المكتملة (10/10)</p>
                     <p id="modal-stat-completed" class="text-xl font-black text-emerald-400">0</p>
@@ -264,9 +284,10 @@
                 </div>
             </div>
 
-            <div class="space-y-2 pt-2">
-                <h4 class="text-xs font-bold text-slate-300">سجل جميع المواضيع والإنجازات:</h4>
-                <div id="progress-content-list" class="space-y-2 text-xs"></div>
+            <!-- تسلسل مواضيع المادة من 2009 إلى 2026 -->
+            <div class="space-y-3 pt-2">
+                <h4 class="text-xs font-bold text-slate-300">تسلسل المواضيع (من 2026 إلى 2009):</h4>
+                <div id="progress-content-list" class="space-y-3 text-xs"></div>
             </div>
         </div>
     </div>
@@ -371,7 +392,7 @@
                 const topic = document.getElementById('topic-select').value;
                 const category = document.getElementById('category-select').value;
                 const topicStreamEl = document.getElementById('topic-stream-select');
-                const topicStream = topicStreamEl.parentElement.style.display !== 'none' ? topicStreamEl.value : (localStorage.getItem('bac_user_stream') === 'math' ? 'رياضيات وتقني رياضي' : 'علوم تجريبية');
+                const topicStream = topicStreamEl.parentElement.style.display !== 'none' ? topicStreamEl.value : 'علوم تجريبية';
 
                 const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls);
 
@@ -414,7 +435,6 @@
 
         function onSubjectChange() {
             const subject = document.getElementById('subject-select').value;
-            const studentStream = localStorage.getItem('bac_user_stream') || 'experimental';
             const categorySelect = document.getElementById('category-select');
             const topicStreamContainer = document.getElementById('topic-stream-container');
             const topicStreamSelect = document.getElementById('topic-stream-select');
@@ -425,27 +445,22 @@
             if (subject === 'الرياضيات') {
                 topicStreamContainer.style.display = 'block';
                 topicStreamSelect.innerHTML = `
-                    <option value="علوم تجريبية">🧬 شعبة علوم تجريبية</option>
-                    <option value="رياضيات">📐 شعبة رياضيات</option>
-                    <option value="تقني رياضي">⚙️ شعبة تقني رياضي</option>
+                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
+                    <option value="رياضيات">📐 رياضيات</option>
+                    <option value="تقني رياضي">⚙️ تقني رياضي</option>
                 `;
                 options = ['الدوال (العددية، الأسية، اللوغاريتمية)', 'المتتاليات العددية', 'الإحصاء والاحتمالات', 'الأعداد المركبة والهندسة'];
             } else if (subject === 'العلوم الفيزيائية') {
                 topicStreamContainer.style.display = 'block';
-                if (studentStream === 'experimental') {
-                    topicStreamSelect.innerHTML = `
-                        <option value="علوم تجريبية ورياضيات وتقني رياضي">🧬 علوم تجريبية / رياضيات / تقني رياضي (موحد)</option>
-                    `;
-                } else {
-                    topicStreamSelect.innerHTML = `
-                        <option value="رياضيات وتقني رياضي">📐 رياضيات وتقني رياضي</option>
-                    `;
-                }
+                topicStreamSelect.innerHTML = `
+                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
+                    <option value="رياضيات وتقني رياضي">📐 رياضيات وتقني رياضي</option>
+                `;
                 options = ['الميكانيك', 'الكهرباء', 'التطور الكيميائي', 'المتابعة الزمنية', 'أحماض وأسس', 'النووي'];
             } else {
-                // علوم الطبيعة والحياة (خاصة بالعلوم فقط ولا تظهر لجماعة الرياضي)
+                // العلوم الطبيعية (خاصة بالعلوم فقط)
                 topicStreamContainer.style.display = 'none';
-                options = ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
+                options = ['استرجاع المعارف', 'استدلال علمي', 'مسعى علمي'];
             }
 
             options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
@@ -608,50 +623,47 @@
 
         function renderBacProgressContent() {
             const currentStudent = localStorage.getItem('bac_username');
-            const studentStream = localStorage.getItem('bac_user_stream') || 'experimental';
+            const selectedSubject = document.getElementById('map-subject-select').value;
+            const selectedStream = document.getElementById('map-stream-select').value;
             let contentEl = document.getElementById('progress-content-list');
             contentEl.innerHTML = '';
             
-            let subjectsList = ['الرياضيات', 'العلوم الفيزيائية'];
-            if (studentStream === 'experimental') subjectsList.push('العلوم الطبيعية');
-
-            let yearsList = [2026, 2025, 2024, 2023, 2022];
+            let yearsList = [];
+            for (let y = 2026; y >= 2009; y--) yearsList.push(y);
             let topicsList = ['الموضوع الأول', 'الموضوع الثاني'];
 
             let completedCount = 0;
-            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent);
+            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.subject === selectedSubject && s.topicStream === selectedStream);
 
-            subjectsList.forEach(subj => {
-                yearsList.forEach(yr => {
-                    topicsList.forEach(top => {
-                        let foundSub = studentSubmissions.find(s => s.subject === subj && s.year == yr && s.topic === top && s.score === 10);
-                        
-                        if (foundSub) {
-                            completedCount++;
-                            contentEl.innerHTML += `
-                                <div class="input-bg border border-emerald-500/40 p-3 rounded-xl flex justify-between items-center">
-                                    <div>
-                                        <p class="font-bold text-emerald-400">📚 ${subj} - دورة ${yr} (${top})</p>
-                                        <p class="text-[10px] text-slate-300">الشعبة: ${foundSub.topicStream || 'علوم تجريبية'} - المحور: ${foundSub.category}</p>
-                                    </div>
-                                    <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (10/10) ✅</span>
-                                </div>`;
-                        } else {
-                            contentEl.innerHTML += `
-                                <div class="input-bg border border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-80">
-                                    <div>
-                                        <p class="font-bold text-slate-300">📚 ${subj} - دورة ${yr} (${top})</p>
-                                        <p class="text-[10px] text-rose-400 font-semibold">لم يتم الحل بعد ⏳</p>
-                                    </div>
-                                    <span class="font-bold text-slate-400 text-[11px] bg-slate-900 px-2 py-1 rounded border border-slate-700">قيد الانتظار</span>
-                                </div>`;
-                        }
-                    });
+            yearsList.forEach(yr => {
+                topicsList.forEach(top => {
+                    let foundSub = studentSubmissions.find(s => s.year == yr && s.topic === top && s.score === 10);
+                    
+                    if (foundSub) {
+                        completedCount++;
+                        contentEl.innerHTML += `
+                            <div class="input-bg border border-emerald-500/40 p-3 rounded-xl flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-emerald-400">📅 دورة بكالوريا ${yr} - ${top}</p>
+                                    <p class="text-[10px] text-slate-300">المحور: ${foundSub.category}</p>
+                                </div>
+                                <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (10/10) ✅</span>
+                            </div>`;
+                    } else {
+                        contentEl.innerHTML += `
+                            <div class="input-bg border border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-80">
+                                <div>
+                                    <p class="font-bold text-slate-300">📅 دورة بكالوريا ${yr} - ${top}</p>
+                                    <p class="text-[10px] text-rose-400 font-semibold">لم يتم الحل بعد ⏳</p>
+                                </div>
+                                <span class="font-bold text-slate-400 text-[11px] bg-slate-900 px-2 py-1 rounded border border-slate-700">قيد الانتظار</span>
+                            </div>`;
+                    }
                 });
             });
 
-            let totalPoints = completedCount * (currentStudent === 'محمد' ? 20 : 10);
-            document.getElementById('modal-stat-completed').textContent = completedCount;
+            let totalPoints = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10).length * (currentStudent === 'محمد' ? 20 : 10);
+            document.getElementById('modal-stat-completed').textContent = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10).length;
             document.getElementById('modal-stat-points').textContent = totalPoints;
         }
 
