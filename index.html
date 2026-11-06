@@ -116,8 +116,8 @@
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                     <h3 class="text-lg font-bold flex items-center gap-2"><span>📤</span> إرسال حل تمرين (تصحيح ذكي AI 🤖)</h3>
-                    <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg hover:bg-amber-500/25 transition font-bold cursor-pointer">
-                        📊 خريطة إنجازي
+                    <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3.5 py-2 rounded-xl hover:bg-amber-500/25 transition font-bold cursor-pointer shadow-lg flex items-center gap-1">
+                        <span>📊 خريطة إنجازي الخاصة</span>
                     </button>
                 </div>
                 
@@ -127,11 +127,9 @@
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold mb-1">شعبة المواضيع:</label>
+                <div id="topic-stream-container">
+                    <label class="block text-sm font-semibold mb-1">شعبة موضوع البكالوريا المستهدف:</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
-                        <option value="علوم تجريبية">🧬 مواضيع شعبة علوم تجريبية</option>
-                        <option value="رياضيات وتقني رياضي">📐 مواضيع شعبة رياضيات وتقني رياضي</option>
                     </select>
                 </div>
 
@@ -372,7 +370,8 @@
                 const year = document.getElementById('bac-year').value;
                 const topic = document.getElementById('topic-select').value;
                 const category = document.getElementById('category-select').value;
-                const topicStream = document.getElementById('topic-stream-select').value;
+                const topicStreamEl = document.getElementById('topic-stream-select');
+                const topicStream = topicStreamEl.parentElement.style.display !== 'none' ? topicStreamEl.value : (localStorage.getItem('bac_user_stream') === 'math' ? 'رياضيات وتقني رياضي' : 'علوم تجريبية');
 
                 const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls);
 
@@ -405,11 +404,7 @@
         function setupSubjectDropdowns() {
             const stream = localStorage.getItem('bac_user_stream') || 'experimental';
             const subjectSelect = document.getElementById('subject-select');
-            let subjectsList = [
-                { value: 'الرياضيات', text: '📐 الرياضيات (علوم تجريبية)' }, 
-                { value: 'الرياضيات (رياضي وتقني رياضي)', text: '📐 الرياضيات (رياضي / تقني رياضي)' },
-                { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }
-            ];
+            let subjectsList = [{ value: 'الرياضيات', text: '📐 الرياضيات' }, { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }];
             if (stream === 'experimental') subjectsList.push({ value: 'العلوم الطبيعية', text: '🧬 علوم الطبيعة والحياة' });
 
             subjectSelect.innerHTML = '';
@@ -419,15 +414,37 @@
 
         function onSubjectChange() {
             const subject = document.getElementById('subject-select').value;
+            const studentStream = localStorage.getItem('bac_user_stream') || 'experimental';
             const categorySelect = document.getElementById('category-select');
+            const topicStreamContainer = document.getElementById('topic-stream-container');
+            const topicStreamSelect = document.getElementById('topic-stream-select');
+            
             categorySelect.innerHTML = '';
             let options = [];
 
-            if (subject.includes('الرياضيات')) {
+            if (subject === 'الرياضيات') {
+                topicStreamContainer.style.display = 'block';
+                topicStreamSelect.innerHTML = `
+                    <option value="علوم تجريبية">🧬 شعبة علوم تجريبية</option>
+                    <option value="رياضيات">📐 شعبة رياضيات</option>
+                    <option value="تقني رياضي">⚙️ شعبة تقني رياضي</option>
+                `;
                 options = ['الدوال (العددية، الأسية، اللوغاريتمية)', 'المتتاليات العددية', 'الإحصاء والاحتمالات', 'الأعداد المركبة والهندسة'];
-            } else if (subject.includes('الفيزيائية')) {
+            } else if (subject === 'العلوم الفيزيائية') {
+                topicStreamContainer.style.display = 'block';
+                if (studentStream === 'experimental') {
+                    topicStreamSelect.innerHTML = `
+                        <option value="علوم تجريبية ورياضيات وتقني رياضي">🧬 علوم تجريبية / رياضيات / تقني رياضي (موحد)</option>
+                    `;
+                } else {
+                    topicStreamSelect.innerHTML = `
+                        <option value="رياضيات وتقني رياضي">📐 رياضيات وتقني رياضي</option>
+                    `;
+                }
                 options = ['الميكانيك', 'الكهرباء', 'التطور الكيميائي', 'المتابعة الزمنية', 'أحماض وأسس', 'النووي'];
             } else {
+                // علوم الطبيعة والحياة (خاصة بالعلوم فقط ولا تظهر لجماعة الرياضي)
+                topicStreamContainer.style.display = 'none';
                 options = ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
             }
 
@@ -441,7 +458,8 @@
             const year = document.getElementById('bac-year').value;
             const topic = document.getElementById('topic-select').value;
             const category = document.getElementById('category-select').value;
-            const topicStream = document.getElementById('topic-stream-select').value;
+            const topicStreamEl = document.getElementById('topic-stream-select');
+            const topicStream = topicStreamEl.parentElement.style.display !== 'none' ? topicStreamEl.value : 'علوم تجريبية';
 
             const found = allSubmissionsCache.find(s => 
                 s.studentName === currentStudent && 
@@ -590,23 +608,22 @@
 
         function renderBacProgressContent() {
             const currentStudent = localStorage.getItem('bac_username');
+            const studentStream = localStorage.getItem('bac_user_stream') || 'experimental';
             let contentEl = document.getElementById('progress-content-list');
             contentEl.innerHTML = '';
             
-            // قائمة مفترضة لكل الدورات والمواضيع الأساسية لعرضها في الخريطة الشاملة
-            let subjectsList = ['الرياضيات', 'العلوم الفيزيائية', 'العلوم الطبيعية'];
+            let subjectsList = ['الرياضيات', 'العلوم الفيزيائية'];
+            if (studentStream === 'experimental') subjectsList.push('العلوم الطبيعية');
+
             let yearsList = [2026, 2025, 2024, 2023, 2022];
             let topicsList = ['الموضوع الأول', 'الموضوع الثاني'];
 
             let completedCount = 0;
-            let totalPossible = 0;
-
             let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent);
 
             subjectsList.forEach(subj => {
                 yearsList.forEach(yr => {
                     topicsList.forEach(top => {
-                        totalPossible++;
                         let foundSub = studentSubmissions.find(s => s.subject === subj && s.year == yr && s.topic === top && s.score === 10);
                         
                         if (foundSub) {
@@ -614,19 +631,19 @@
                             contentEl.innerHTML += `
                                 <div class="input-bg border border-emerald-500/40 p-3 rounded-xl flex justify-between items-center">
                                     <div>
-                                        <p class="font-bold text-emerald-400">${subj} - دورة ${yr} (${top})</p>
+                                        <p class="font-bold text-emerald-400">📚 ${subj} - دورة ${yr} (${top})</p>
                                         <p class="text-[10px] text-slate-300">الشعبة: ${foundSub.topicStream || 'علوم تجريبية'} - المحور: ${foundSub.category}</p>
                                     </div>
-                                    <span class="font-bold text-emerald-400">10/10 ✅</span>
+                                    <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (10/10) ✅</span>
                                 </div>`;
                         } else {
                             contentEl.innerHTML += `
-                                <div class="input-bg border border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-70">
+                                <div class="input-bg border border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-80">
                                     <div>
-                                        <p class="font-bold text-slate-300">${subj} - دورة ${yr} (${top})</p>
-                                        <p class="text-[10px] text-slate-400">لم يتم الحل بعد ⏳</p>
+                                        <p class="font-bold text-slate-300">📚 ${subj} - دورة ${yr} (${top})</p>
+                                        <p class="text-[10px] text-rose-400 font-semibold">لم يتم الحل بعد ⏳</p>
                                     </div>
-                                    <span class="font-bold text-amber-400 text-[11px]">قيد الانتظار</span>
+                                    <span class="font-bold text-slate-400 text-[11px] bg-slate-900 px-2 py-1 rounded border border-slate-700">قيد الانتظار</span>
                                 </div>`;
                         }
                     });
@@ -699,7 +716,7 @@
             let desc = document.getElementById('chal-desc').value;
             if(!title) return alert('اكتب عنوان التحدي');
             await db.collection("challenges").add({ title, description: desc, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            alert('تم نشر التحدي بنجاح يديك! 🚀');
+            alert('تم نشر التحدي بنجاح يدوي 🚀');
         }
 
         function logout() { localStorage.clear(); location.reload(); }
