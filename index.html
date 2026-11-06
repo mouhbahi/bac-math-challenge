@@ -142,7 +142,7 @@
                 </div>
 
                 <div>
-                    <label id="category-label" class="block text-sm font-semibold mb-1">المحور أو نوع التمرين:</label>
+                    <label id="category-label" class="block text-sm font-semibold mb-1">نوع التمرين أو المحور:</label>
                     <select id="category-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 focus:outline-none font-semibold">
                     </select>
                 </div>
@@ -245,7 +245,7 @@
 
     </main>
 
-    <!-- Modal Progress (خريطة الإنجاز بتصميمها الكلاسيكي المريح) -->
+    <!-- Modal Progress (خريطة الإنجاز مع خيارات المادة والشعبة) -->
     <div id="bac-progress-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="card-bg border rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -253,22 +253,18 @@
                 <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white font-bold text-lg cursor-pointer">✕</button>
             </div>
             
-            <!-- أزرار اختيار المادة والشعبة في أعلى الخريطة -->
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[11px] font-semibold mb-1 text-slate-300">اختر المادة:</label>
-                    <select id="map-subject-select" onchange="renderBacProgressContent()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold focus:outline-none text-amber-400">
+                    <select id="map-subject-select" onchange="onMapSubjectChange()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold focus:outline-none text-amber-400">
                         <option value="الرياضيات">📐 الرياضيات</option>
                         <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
                         <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
                     </select>
                 </div>
-                <div>
+                <div id="map-stream-wrapper">
                     <label class="block text-[11px] font-semibold mb-1 text-slate-300">اختر الشعبة:</label>
                     <select id="map-stream-select" onchange="renderBacProgressContent()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold focus:outline-none text-emerald-400">
-                        <option value="علوم تجريبية">🧬 علوم تجريبية</option>
-                        <option value="رياضيات">📐 رياضيات</option>
-                        <option value="تقني رياضي">⚙️ تقني رياضي</option>
                     </select>
                 </div>
             </div>
@@ -284,7 +280,6 @@
                 </div>
             </div>
 
-            <!-- تسلسل مواضيع المادة من 2009 إلى 2026 -->
             <div class="space-y-3 pt-2">
                 <h4 class="text-xs font-bold text-slate-300">تسلسل المواضيع (من 2026 إلى 2009):</h4>
                 <div id="progress-content-list" class="space-y-3 text-xs"></div>
@@ -338,17 +333,20 @@
             return keys[Math.floor(Math.random() * keys.length)];
         }
 
+        // الذكاء الاصطناعي مع شروط التنقيط الخاصة (%75 -> 10, %50-%75 -> 7, أقل -> 0)
         async function evaluateWithGemini(subject, year, topic, category, base64Images) {
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             const promptText = `أنت أستاذ تصحيح بكالوريا جزائرية خبير في مادة ${subject}.
-تم إرسال حل تمرين من دورة بكالوريا ${year} - ${topic} - محور: ${category}.
-قم بمراجعة صور الحل المرفقة وقارنها بالحل النموذجي الرسمي للبكالوريا الجزائرية:
-1. قم بتقدير علامة مستحقة من 10 (إما 10 كاملة أو أقل حسب الأخطاء).
-2. اكتب ملاحظة مختصرة ودقيقة باللغة العربية تشرح فيها الأخطاء والخطوات المفقودة.
+تم إرسال حل تمرين من دورة بكالوريا ${year} - ${topic} - (${category}).
+قم بمراجعة صور الحل وقارنها بالحل النموذجي الرسمي للبكالوريا الجزائرية وقدر نسبة صحة الإجابة:
+- إذا كانت نسبة صحة الحل أكثر من 75%: ضع العلامة score = 10، واذكر الأخطاء البسيطة في الملاحظة adminNote.
+- إذا كانت نسبة الصحة من 50% إلى 75%: ضع العلامة score = 7، واذكر الأخطاء بالتفصيل في الملاحظة adminNote.
+- إذا كانت نسبة الصحة أقل من 50%: ضع العلامة score = 0، واشرح الأخطاء والملاحظات ليقوم الطالب بإعادة الحل.
+
 قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل:
-{"score": 8, "adminNote": "أخطأت في السطر الثالث في مجموعة التعريف، باقي الحل صحيح."}`;
+{"accuracyPercentage": 80, "score": 10, "adminNote": "حل ممتاز، أخطأت فقط في السطر الثالث في حظر مجموعة التعريف."}`;
 
             let inlineDataParts = base64Images.map(img => ({
                 inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
@@ -431,6 +429,18 @@
             subjectSelect.innerHTML = '';
             subjectsList.forEach(subj => subjectSelect.innerHTML += `<option value="${subj.value}">${subj.text}</option>`);
             onSubjectChange();
+            setupMapDropdowns();
+        }
+
+        function setupMapDropdowns() {
+            const stream = localStorage.getItem('bac_user_stream') || 'experimental';
+            const mapSubSelect = document.getElementById('map-subject-select');
+            let subList = [{ value: 'الرياضيات', text: '📐 الرياضيات' }, { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }];
+            if (stream === 'experimental') subList.push({ value: 'العلوم الطبيعية', text: '🧬 علوم الطبيعة والحياة' });
+
+            mapSubSelect.innerHTML = '';
+            subList.forEach(subj => mapSubSelect.innerHTML += `<option value="${subj.value}">${subj.text}</option>`);
+            onMapSubjectChange();
         }
 
         function onSubjectChange() {
@@ -456,15 +466,38 @@
                     <option value="علوم تجريبية">🧬 علوم تجريبية</option>
                     <option value="رياضيات وتقني رياضي">📐 رياضيات وتقني رياضي</option>
                 `;
-                options = ['الميكانيك', 'الكهرباء', 'التطور الكيميائي', 'المتابعة الزمنية', 'أحماض وأسس', 'النووي'];
+                options = ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
             } else {
-                // العلوم الطبيعية (خاصة بالعلوم فقط)
                 topicStreamContainer.style.display = 'none';
                 options = ['استرجاع المعارف', 'استدلال علمي', 'مسعى علمي'];
             }
 
             options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
             checkExistingSubmission();
+        }
+
+        function onMapSubjectChange() {
+            const subject = document.getElementById('map-subject-select').value;
+            const streamWrapper = document.getElementById('map-stream-wrapper');
+            const streamSelect = document.getElementById('map-stream-select');
+
+            if (subject === 'الرياضيات') {
+                streamWrapper.style.display = 'block';
+                streamSelect.innerHTML = `
+                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
+                    <option value="رياضيات">📐 رياضيات</option>
+                    <option value="تقني رياضي">⚙️ تقني رياضي</option>
+                `;
+            } else if (subject === 'العلوم الفيزيائية') {
+                streamWrapper.style.display = 'block';
+                streamSelect.innerHTML = `
+                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
+                    <option value="رياضيات وتقني رياضي">📐 رياضيات وتقني رياضي</option>
+                `;
+            } else {
+                streamWrapper.style.display = 'none';
+            }
+            renderBacProgressContent();
         }
 
         function checkExistingSubmission() {
@@ -537,10 +570,11 @@
                     allSubmissionsCache.push(d);
                     if (d.studentName === currentStudent) {
                         if (d.score === 10) points += (currentStudent === 'محمد' ? 20 : 10);
+                        else if (d.score === 7) points += 7;
                         if (!d.hideForStudent) studentList.push(d);
                     }
-                    if (d.score === 10) {
-                        userScoresMap[d.studentName] = (userScoresMap[d.studentName] || 0) + (d.studentName === 'محمد' ? 20 : 10);
+                    if (d.score === 10 || d.score === 7) {
+                        userScoresMap[d.studentName] = (userScoresMap[d.studentName] || 0) + (d.score === 10 ? (d.studentName === 'محمد' ? 20 : 10) : 7);
                     }
                 });
 
@@ -549,12 +583,12 @@
                 let listEl = document.getElementById('student-submissions-list');
                 listEl.innerHTML = studentList.length === 0 ? '<p class="text-center text-slate-400 text-sm py-2">لا توجد حلول مرسلة حالياً.</p>' : '';
                 studentList.forEach(d => {
-                    let colorClass = d.score === 10 ? 'border-emerald-500/40' : 'border-rose-500/40';
+                    let colorClass = d.score === 10 ? 'border-emerald-500/40' : (d.score === 7 ? 'border-amber-500/40' : 'border-rose-500/40');
                     listEl.innerHTML += `
                         <div class="input-bg border ${colorClass} rounded-xl p-4 space-y-2 text-xs">
                             <div class="flex justify-between font-bold">
                                 <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
-                                <span class="${d.score === 10 ? 'text-emerald-400' : 'text-rose-400'}">${d.score}/10</span>
+                                <span class="${d.score === 10 ? 'text-emerald-400' : (d.score === 7 ? 'text-amber-400' : 'text-rose-400')}">${d.score}/10</span>
                             </div>
                             <p class="text-slate-300 font-semibold">${d.adminNote}</p>
                             <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1 rounded">إزالة من القائمة 🗑️</button>
@@ -624,7 +658,9 @@
         function renderBacProgressContent() {
             const currentStudent = localStorage.getItem('bac_username');
             const selectedSubject = document.getElementById('map-subject-select').value;
-            const selectedStream = document.getElementById('map-stream-select').value;
+            const streamWrapper = document.getElementById('map-stream-wrapper');
+            const selectedStream = streamWrapper.style.display !== 'none' ? document.getElementById('map-stream-select').value : 'علوم تجريبية';
+            
             let contentEl = document.getElementById('progress-content-list');
             contentEl.innerHTML = '';
             
@@ -645,7 +681,7 @@
                             <div class="input-bg border border-emerald-500/40 p-3 rounded-xl flex justify-between items-center">
                                 <div>
                                     <p class="font-bold text-emerald-400">📅 دورة بكالوريا ${yr} - ${top}</p>
-                                    <p class="text-[10px] text-slate-300">المحور: ${foundSub.category}</p>
+                                    <p class="text-[10px] text-slate-300">التمرين: ${foundSub.category}</p>
                                 </div>
                                 <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (10/10) ✅</span>
                             </div>`;
