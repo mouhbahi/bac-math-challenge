@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحدي مواضيع البكالوريا - النسخة الاحترافية بالذكاء الاصطناعي</title>
-    <!-- أيقونة الموقع في المتصفح (Favicon) -->
     <link rel="icon" href="https://images.emojiterra.com/google/android-11/512px/1f393.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        
         body.theme-default { background-color: #030712; color: #f8fafc; }
         body.theme-purple { background-color: #1e1b4b; color: #f5f3ff; }
         body.theme-blue { background-color: #0f172a; color: #e0f2fe; }
@@ -129,12 +127,6 @@
                     </select>
                 </div>
 
-                <div id="topic-stream-container" class="hidden" style="display: none !important;">
-                    <label id="topic-stream-label" class="block text-sm font-semibold mb-1">شعبة موضوع التمرين:</label>
-                    <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
-                    </select>
-                </div>
-
                 <div>
                     <label class="block text-sm font-semibold mb-1">اختر الموضوع:</label>
                     <select id="topic-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-emerald-400">
@@ -203,7 +195,6 @@
                 <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
             </div>
 
-            <!-- Admin Tabs -->
             <div class="flex gap-1 border-b border-slate-700 pb-3 overflow-x-auto">
                 <button onclick="switchAdminTab('pending')" id="tab-pending" class="flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">التقييمات 📥</button>
                 <button onclick="switchAdminTab('keys')" id="tab-keys" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">مفاتيح AI 🔑</button>
@@ -211,27 +202,22 @@
                 <button onclick="switchAdminTab('users')" id="tab-users" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">إدارة الطلاب 👥</button>
             </div>
 
-            <!-- Admin Submissions Review -->
             <div class="space-y-4" id="admin-pending-section">
                 <div id="pending-list" class="space-y-4"></div>
             </div>
 
-            <!-- Admin Key Rotation Management -->
             <div class="space-y-4 hidden" id="admin-keys-section">
                 <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
                     <h4 class="font-bold text-amber-400 text-sm">🔑 إدارة مفاتيح Gemini API (Key Rotation)</h4>
                     <p class="text-xs text-slate-300">أضف مفاتيح مجانية من حسابات Google مختلفة ليقوم الكود بالتنقل بينها تلقائياً عند انتهاء Quota!</p>
-                    
                     <div class="flex gap-2">
                         <input type="text" id="new-api-key-input" placeholder="أدخل Gemini API Key هنا (AIzaSy...)" class="flex-1 input-bg border rounded-xl p-3 text-xs">
                         <button onclick="addApiKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 rounded-xl text-xs">إضافة ➕</button>
                     </div>
-
                     <div id="api-keys-list" class="space-y-2 pt-2"></div>
                 </div>
             </div>
 
-            <!-- Admin Challenge Tab -->
             <div class="space-y-4 hidden" id="admin-challenge-section">
                 <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
                     <h4 class="font-bold text-amber-400 text-sm">🎯 نشر تحدي جديد</h4>
@@ -243,7 +229,6 @@
                 </div>
             </div>
 
-            <!-- Admin Users Tab -->
             <div class="space-y-4 hidden" id="admin-users-section">
                 <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
                     <h4 class="font-bold text-emerald-400 text-sm">👥 إدارة الطلاب والنقاط</h4>
@@ -253,6 +238,17 @@
         </div>
 
     </main>
+
+    <!-- Modal Progress -->
+    <div id="bac-progress-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="card-bg border rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="text-lg font-bold text-amber-400">📊 خريطة إنجازي لمواضيع البكالوريا</h3>
+                <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+            </div>
+            <div id="progress-content-list" class="space-y-3 text-xs"></div>
+        </div>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -287,6 +283,12 @@
             yearSelect.appendChild(opt);
         }
 
+        function toggleRoleInput() {
+            const role = document.getElementById('user-role').value;
+            document.getElementById('name-group').classList.toggle('hidden', role === 'admin');
+            document.getElementById('pin-group').classList.toggle('hidden', role !== 'admin');
+        }
+
         async function getWorkingApiKey() {
             let keys = JSON.parse(localStorage.getItem('bac_api_keys') || '[]');
             if(!keys || keys.length === 0) keys = defaultApiKeys;
@@ -303,7 +305,7 @@
 1. قم بتقدير علامة مستحقة من 10 (إما 10 كاملة أو أقل حسب الأخطاء).
 2. اكتب ملاحظة مختصرة ودقيقة باللغة العربية تشرح فيها الأخطاء والخطوات المفقودة.
 قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل:
-{"score": 8, "adminNote": "أخطأت في السطر الثالث في حظر مجموعة التعريف، باقي الحل صحيح."}`;
+{"score": 8, "adminNote": "أخطأت في السطر الثالث في مجموعة التعريف، باقي الحل صحيح."}`;
 
             let inlineDataParts = base64Images.map(img => ({
                 inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
@@ -365,6 +367,7 @@
 
                 alert(`تم تصحيح حلك بالذكاء الاصطناعي! 🎉\nالعلامة: ${aiResult.score}/10\nالملاحظة: ${aiResult.adminNote}`);
                 filesInput.value = '';
+                checkExistingSubmission();
             } catch (e) {
                 alert('حدث خطأ أثناء التصحيح: ' + e.message);
             } finally {
@@ -390,6 +393,27 @@
             categorySelect.innerHTML = '';
             let options = subject.includes('الرياضيات') ? ['الدوال (العددية، الأسية، اللوغاريتمية)', 'المتتاليات العددية', 'الإحصاء والاحتمالات', 'الأعداد المركبة والهندسة'] : ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
             options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
+            checkExistingSubmission();
+        }
+
+        function checkExistingSubmission() {
+            const currentStudent = localStorage.getItem('bac_username');
+            const subject = document.getElementById('subject-select').value;
+            const year = document.getElementById('bac-year').value;
+            const topic = document.getElementById('topic-select').value;
+            const category = document.getElementById('category-select').value;
+
+            const found = allSubmissionsCache.find(s => 
+                s.studentName === currentStudent && 
+                s.subject === subject && 
+                s.year == year && 
+                s.topic === topic && 
+                s.category === category && 
+                s.score === 10
+            );
+
+            document.getElementById('upload-form-section').classList.toggle('hidden', !!found);
+            document.getElementById('already-submitted-msg').classList.toggle('hidden', !found);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -399,9 +423,10 @@
             if (savedAdmin === 'true') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
-                if (db) { renderApiKeys(); }
+                if (db) { loadAdminData(); renderApiKeys(); }
             } else if (savedStudent) {
                 document.getElementById('student-display-name').textContent = savedStudent;
+                document.getElementById('student-stream-tag').textContent = (localStorage.getItem('bac_user_stream') === 'math' ? '📐 رياضيات / تقني رياضي' : '🧬 علوم تجريبية');
                 setupSubjectDropdowns();
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('student-dashboard').classList.remove('hidden');
@@ -428,23 +453,92 @@
         function listenSubmissionsCache() {
             const currentStudent = localStorage.getItem('bac_username');
             db.collection("submissions").onSnapshot((snapshot) => {
-                let listEl = document.getElementById('student-submissions-list');
-                listEl.innerHTML = '';
+                allSubmissionsCache = [];
+                let studentList = [];
+                let points = 0;
+                let userScoresMap = {};
+
                 snapshot.forEach((doc) => {
                     let d = doc.data(); d.id = doc.id;
-                    if (d.studentName === currentStudent && !d.hideForStudent) {
-                        let colorClass = d.score === 10 ? 'border-emerald-500/40' : 'border-rose-500/40';
-                        listEl.innerHTML += `
-                            <div class="input-bg border ${colorClass} rounded-xl p-4 space-y-2 text-xs">
-                                <div class="flex justify-between font-bold">
+                    allSubmissionsCache.push(d);
+                    if (d.studentName === currentStudent) {
+                        if (d.score === 10) points += (currentStudent === 'محمد' ? 20 : 10);
+                        if (!d.hideForStudent) studentList.push(d);
+                    }
+                    if (d.score === 10) {
+                        userScoresMap[d.studentName] = (userScoresMap[d.studentName] || 0) + (d.studentName === 'محمد' ? 20 : 10);
+                    }
+                });
+
+                document.getElementById('total-points-label').textContent = `مجموع نقاطك: ${points} نقطة`;
+                
+                let listEl = document.getElementById('student-submissions-list');
+                listEl.innerHTML = studentList.length === 0 ? '<p class="text-center text-slate-400 text-sm py-2">لا توجد حلول مرسلة حالياً.</p>' : '';
+                studentList.forEach(d => {
+                    let colorClass = d.score === 10 ? 'border-emerald-500/40' : 'border-rose-500/40';
+                    listEl.innerHTML += `
+                        <div class="input-bg border ${colorClass} rounded-xl p-4 space-y-2 text-xs">
+                            <div class="flex justify-between font-bold">
                                     <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
                                     <span class="${d.score === 10 ? 'text-emerald-400' : 'text-rose-400'}">${d.score}/10</span>
                                 </div>
                                 <p class="text-slate-300 font-semibold">${d.adminNote}</p>
                                 <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1 rounded">إزالة من القائمة 🗑️</button>
-                            </div>`;
-                    }
+                        </div>`;
                 });
+
+                renderLeaderboard(userScoresMap);
+                checkExistingSubmission();
+            });
+
+            db.collection("challenges").onSnapshot((snapshot) => {
+                let chalEl = document.getElementById('student-challenges-container');
+                chalEl.innerHTML = '';
+                snapshot.forEach(doc => {
+                    let c = doc.data();
+                    chalEl.innerHTML += `<div class="bg-slate-900 border border-amber-500/30 rounded-xl p-4 space-y-2 text-xs"><h4 class="font-bold text-amber-400">${c.title}</h4><p class="text-slate-300">${c.description}</p></div>`;
+                });
+            });
+        }
+
+        function renderLeaderboard(userScoresMap) {
+            let lbEl = document.getElementById('leaderboard-list');
+            let sorted = Object.entries(userScoresMap).sort((a,b) => b[1] - a[1]);
+            lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-2">لا توجد نقاط مسجلة بعد.</p>' : '';
+            sorted.forEach(([name, pts], index) => {
+                lbEl.innerHTML += `
+                    <div class="flex justify-between items-center input-bg border rounded-xl p-3 text-xs">
+                        <span class="font-bold">#${index+1} ${name}</span>
+                        <span class="text-amber-400 font-bold">${pts} نقطة</span>
+                    </div>`;
+            });
+        }
+
+        function toggleBacProgressModal() {
+            const modal = document.getElementById('bac-progress-modal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                renderBacProgressContent();
+            }
+        }
+
+        function renderBacProgressContent() {
+            const currentStudent = localStorage.getItem('bac_username');
+            let contentEl = document.getElementById('progress-content-list');
+            contentEl.innerHTML = '';
+            
+            let completedCount = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10).length;
+            contentEl.innerHTML += `<div class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-400 font-bold text-center mb-3">مجموع التمارين المكتملة بعلامة كاملة: ${completedCount} تمارين</div>`;
+            
+            allSubmissionsCache.filter(s => s.studentName === currentStudent).forEach(s => {
+                contentEl.innerHTML += `
+                    <div class="input-bg border border-slate-700 p-3 rounded-xl flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-emerald-400">${s.subject} (${s.year})</p>
+                            <p class="text-[10px] text-slate-400">${s.topic} - ${s.category}</p>
+                        </div>
+                        <span class="font-bold ${s.score === 10 ? 'text-emerald-400' : 'text-rose-400'}">${s.score}/10</span>
+                    </div>`;
             });
         }
 
@@ -502,6 +596,14 @@
             keys.splice(index, 1);
             localStorage.setItem('bac_api_keys', JSON.stringify(keys));
             renderApiKeys();
+        }
+
+        async function publishChallenge() {
+            let title = document.getElementById('chal-title').value;
+            let desc = document.getElementById('chal-desc').value;
+            if(!title) return alert('اكتب عنوان التحدي');
+            await db.collection("challenges").add({ title, description: desc, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+            alert('تم نشر التحدي بنجاح! 🚀');
         }
 
         function logout() { localStorage.clear(); location.reload(); }
