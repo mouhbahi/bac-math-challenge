@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي مواضيع البكالوريا - النسخة المتكاملة بالذكاء الاصطناعي</title>
+    <title>تحدي مواضيع البكالوريا - النسخة الاحترافية المتكاملة</title>
     <link rel="icon" href="https://images.emojiterra.com/google/android-11/512px/1f393.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -76,7 +76,7 @@
                     <label class="block text-sm font-semibold mb-2">شعبتك الأصلية:</label>
                     <select id="user-stream" class="w-full input-bg border rounded-xl p-3.5 font-bold focus:outline-none text-emerald-400">
                         <option value="experimental">🧬 علوم تجريبية</option>
-                        <option value="math">📐 رياضيات / تقني رياضي (Math x2)</option>
+                        <option value="math">📐 رياضيات / تقني رياضي</option>
                     </select>
                 </div>
             </div>
@@ -127,11 +127,11 @@
                     </select>
                 </div>
 
-                <div id="topic-stream-container" class="hidden">
-                    <label class="block text-sm font-semibold mb-1">شعبة موضوع التمرين:</label>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">شعبة المواضيع:</label>
                     <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
-                        <option value="العلوم التجريبية">🧬 مواضيع شعبة علوم تجريبية</option>
-                        <option value="الرياضيات والتقني الرياضي">📐 مواضيع شعبة رياضيات وتقني رياضي</option>
+                        <option value="علوم تجريبية">🧬 مواضيع شعبة علوم تجريبية</option>
+                        <option value="رياضيات وتقني رياضي">📐 مواضيع شعبة رياضيات وتقني رياضي</option>
                     </select>
                 </div>
 
@@ -228,7 +228,7 @@
 
             <div class="space-y-4 hidden" id="admin-challenge-section">
                 <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
-                    <h4 class="font-bold text-amber-400 text-sm">🎯 نشر تحدي جديد</h4>
+                    <h4 class="font-bold text-amber-400 text-sm">🎯 نشر تحدي جديد (يدوي - بدون تدخل AI)</h4>
                     <input type="text" id="chal-title" placeholder="عنوان التحدي..." class="w-full input-bg border rounded-xl p-3 text-xs">
                     <textarea id="chal-desc" rows="2" placeholder="الوصف..." class="w-full input-bg border rounded-xl p-3 text-xs"></textarea>
                     <input type="file" id="chal-image-input" accept="image/*" class="w-full input-bg border rounded-xl p-2 text-xs">
@@ -247,11 +247,11 @@
 
     </main>
 
-    <!-- Modal Progress (الخريطة القديمة بتصميمها المنظم) -->
+    <!-- Modal Progress (خريطة الإنجاز الشاملة) -->
     <div id="bac-progress-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="card-bg border rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="text-lg font-bold text-amber-400">📊 خريطة إنجازي لمواضيع البكالوريا</h3>
+                <h3 class="text-lg font-bold text-amber-400">📊 خريطة إنجازي الشاملة لمواضيع البكالوريا</h3>
                 <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white font-bold text-lg cursor-pointer">✕</button>
             </div>
             
@@ -267,7 +267,7 @@
             </div>
 
             <div class="space-y-2 pt-2">
-                <h4 class="text-xs font-bold text-slate-300">سجل الحلول والإنجازات المفصلة:</h4>
+                <h4 class="text-xs font-bold text-slate-300">سجل جميع المواضيع والإنجازات:</h4>
                 <div id="progress-content-list" class="space-y-2 text-xs"></div>
             </div>
         </div>
@@ -372,7 +372,7 @@
                 const year = document.getElementById('bac-year').value;
                 const topic = document.getElementById('topic-select').value;
                 const category = document.getElementById('category-select').value;
-                const topicStream = document.getElementById('topic-stream-container').style.display !== 'none' ? document.getElementById('topic-stream-select').value : '';
+                const topicStream = document.getElementById('topic-stream-select').value;
 
                 const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls);
 
@@ -405,7 +405,11 @@
         function setupSubjectDropdowns() {
             const stream = localStorage.getItem('bac_user_stream') || 'experimental';
             const subjectSelect = document.getElementById('subject-select');
-            let subjectsList = [{ value: 'الرياضيات', text: '📐 الرياضيات' }, { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }];
+            let subjectsList = [
+                { value: 'الرياضيات', text: '📐 الرياضيات (علوم تجريبية)' }, 
+                { value: 'الرياضيات (رياضي وتقني رياضي)', text: '📐 الرياضيات (رياضي / تقني رياضي)' },
+                { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }
+            ];
             if (stream === 'experimental') subjectsList.push({ value: 'العلوم الطبيعية', text: '🧬 علوم الطبيعة والحياة' });
 
             subjectSelect.innerHTML = '';
@@ -416,20 +420,15 @@
         function onSubjectChange() {
             const subject = document.getElementById('subject-select').value;
             const categorySelect = document.getElementById('category-select');
-            const topicStreamContainer = document.getElementById('topic-stream-container');
-            
             categorySelect.innerHTML = '';
             let options = [];
 
             if (subject.includes('الرياضيات')) {
                 options = ['الدوال (العددية، الأسية، اللوغاريتمية)', 'المتتاليات العددية', 'الإحصاء والاحتمالات', 'الأعداد المركبة والهندسة'];
-                topicStreamContainer.style.display = 'block';
             } else if (subject.includes('الفيزيائية')) {
                 options = ['الميكانيك', 'الكهرباء', 'التطور الكيميائي', 'المتابعة الزمنية', 'أحماض وأسس', 'النووي'];
-                topicStreamContainer.style.display = 'block';
             } else {
                 options = ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
-                topicStreamContainer.style.display = 'none';
             }
 
             options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
@@ -442,12 +441,14 @@
             const year = document.getElementById('bac-year').value;
             const topic = document.getElementById('topic-select').value;
             const category = document.getElementById('category-select').value;
+            const topicStream = document.getElementById('topic-stream-select').value;
 
             const found = allSubmissionsCache.find(s => 
                 s.studentName === currentStudent && 
                 s.subject === subject && 
                 s.year == year && 
                 s.topic === topic && 
+                s.topicStream === topicStream &&
                 s.category === category && 
                 s.score === 10
             );
@@ -539,8 +540,6 @@
                 snapshot.forEach(doc => {
                     let cId = doc.id;
                     let c = doc.data();
-                    
-                    // التحقق مما إذا كان التحدي قد تم حله مسبقاً ليتم إخفاؤه من النافذة
                     if (!completedChallengesCache.includes(cId)) {
                         activeChallengesCount++;
                         chalEl.innerHTML += `
@@ -564,7 +563,6 @@
             if (!completedChallengesCache.includes(challengeId)) {
                 completedChallengesCache.push(challengeId);
                 localStorage.setItem('bac_completed_challenges', JSON.stringify(completedChallengesCache));
-                // إعادة تحميل سريعة لتحديث الشاشة وإخفاء التحدي المحلول
                 location.reload();
             }
         }
@@ -595,28 +593,49 @@
             let contentEl = document.getElementById('progress-content-list');
             contentEl.innerHTML = '';
             
-            let completedList = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10);
-            let totalPoints = completedList.length * (currentStudent === 'محمد' ? 20 : 10);
-            
-            document.getElementById('modal-stat-completed').textContent = completedList.length;
-            document.getElementById('modal-stat-points').textContent = totalPoints;
-            
-            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent);
-            if (studentSubmissions.length === 0) {
-                contentEl.innerHTML = '<p class="text-center text-slate-400 text-xs py-4">لم تقم بإرسال أي حلول بعد.</p>';
-                return;
-            }
+            // قائمة مفترضة لكل الدورات والمواضيع الأساسية لعرضها في الخريطة الشاملة
+            let subjectsList = ['الرياضيات', 'العلوم الفيزيائية', 'العلوم الطبيعية'];
+            let yearsList = [2026, 2025, 2024, 2023, 2022];
+            let topicsList = ['الموضوع الأول', 'الموضوع الثاني'];
 
-            studentSubmissions.forEach(s => {
-                contentEl.innerHTML += `
-                    <div class="input-bg border border-slate-700 p-3 rounded-xl flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-emerald-400">${s.subject} (${s.year})</p>
-                            <p class="text-[10px] text-slate-400">${s.topic} - ${s.category}</p>
-                        </div>
-                        <span class="font-bold ${s.score === 10 ? 'text-emerald-400' : 'text-rose-400'}">${s.score}/10</span>
-                    </div>`;
+            let completedCount = 0;
+            let totalPossible = 0;
+
+            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent);
+
+            subjectsList.forEach(subj => {
+                yearsList.forEach(yr => {
+                    topicsList.forEach(top => {
+                        totalPossible++;
+                        let foundSub = studentSubmissions.find(s => s.subject === subj && s.year == yr && s.topic === top && s.score === 10);
+                        
+                        if (foundSub) {
+                            completedCount++;
+                            contentEl.innerHTML += `
+                                <div class="input-bg border border-emerald-500/40 p-3 rounded-xl flex justify-between items-center">
+                                    <div>
+                                        <p class="font-bold text-emerald-400">${subj} - دورة ${yr} (${top})</p>
+                                        <p class="text-[10px] text-slate-300">الشعبة: ${foundSub.topicStream || 'علوم تجريبية'} - المحور: ${foundSub.category}</p>
+                                    </div>
+                                    <span class="font-bold text-emerald-400">10/10 ✅</span>
+                                </div>`;
+                        } else {
+                            contentEl.innerHTML += `
+                                <div class="input-bg border border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-70">
+                                    <div>
+                                        <p class="font-bold text-slate-300">${subj} - دورة ${yr} (${top})</p>
+                                        <p class="text-[10px] text-slate-400">لم يتم الحل بعد ⏳</p>
+                                    </div>
+                                    <span class="font-bold text-amber-400 text-[11px]">قيد الانتظار</span>
+                                </div>`;
+                        }
+                    });
+                });
             });
+
+            let totalPoints = completedCount * (currentStudent === 'محمد' ? 20 : 10);
+            document.getElementById('modal-stat-completed').textContent = completedCount;
+            document.getElementById('modal-stat-points').textContent = totalPoints;
         }
 
         async function hideSubmissionForStudent(id) {
@@ -680,7 +699,7 @@
             let desc = document.getElementById('chal-desc').value;
             if(!title) return alert('اكتب عنوان التحدي');
             await db.collection("challenges").add({ title, description: desc, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            alert('تم نشر التحدي بنجاح! 🚀');
+            alert('تم نشر التحدي بنجاح يديك! 🚀');
         }
 
         function logout() { localStorage.clear(); location.reload(); }
