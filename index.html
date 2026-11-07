@@ -52,7 +52,7 @@
 
     <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto space-y-6">
 
-        <!-- Login -->
+        <!-- Login Screen -->
         <div id="login-screen" class="card-bg border rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
             <div class="text-center mb-2">
                 <h2 class="text-2xl font-bold mb-2">مرحباً بك يا بطل البكالوريا 🏆</h2>
@@ -209,7 +209,9 @@
             </div>
 
             <div class="space-y-4" id="admin-pending-section">
-                <div id="pending-list" class="space-y-4"></div>
+                <div id="pending-list" class="space-y-4">
+                    <p class="text-center text-slate-400 text-sm py-4">جاري تحميل التقييمات...</p>
+                </div>
             </div>
 
             <div class="space-y-4 hidden" id="admin-keys-section">
@@ -238,7 +240,9 @@
             <div class="space-y-4 hidden" id="admin-users-section">
                 <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
                     <h4 class="font-bold text-emerald-400 text-sm">👥 إدارة الطلاب والنقاط</h4>
-                    <div id="admin-users-list" class="space-y-3"></div>
+                    <div id="admin-users-list" class="space-y-3">
+                        <p class="text-center text-slate-400 text-sm py-4">جاري تحميل قائمة الطلاب...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -247,7 +251,7 @@
 
     <!-- Modal النتيجة المنبثقة للذكاء الاصطناعي -->
     <div id="ai-result-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="card-bg border border-amber-500/50 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl animate-scale">
+        <div class="card-bg border border-amber-500/50 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="text-center space-y-1">
                 <span class="text-3xl">🤖✨</span>
                 <h3 class="text-lg font-bold text-amber-400">نتيجة التصحيح الذكي</h3>
@@ -258,10 +262,33 @@
             </div>
             <div class="space-y-1">
                 <p class="text-xs font-bold text-amber-400">📝 ملاحظات وأخطاء الذكاء الاصطناعي:</p>
-                <div id="modal-ai-notes" class="input-bg border rounded-xl p-3 text-xs text-slate-200 leading-relaxed max-h-40 overflow-y-auto"></div>
+                <div id="modal-ai-notes" class="input-bg border rounded-xl p-3 text-xs text-slate-200 leading-relaxed max-h-40 overflow-y-auto whitespace-pre-line"></div>
             </div>
             <button onclick="closeAiResultModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-xl transition cursor-pointer">
                 حسناً، فهمت الأخطاء 💪
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal نافذة تفاصيل الحل والأخطاء المخصصة -->
+    <div id="solution-detail-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="card-bg border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 id="detail-modal-title" class="text-base font-bold text-amber-400">🔍 تفاصيل الحل والأخطاء</h3>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white font-bold text-lg cursor-pointer">✕</button>
+            </div>
+            <div class="space-y-3">
+                <div class="input-bg border rounded-xl p-3 text-xs flex justify-between font-semibold">
+                    <span id="detail-modal-year-topic"></span>
+                    <span id="detail-modal-score" class="font-bold"></span>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-xs font-bold text-emerald-400">📋 الأسئلة والأخطاء بالتفصيل (ما لم تحله أو أخطأت فيه):</p>
+                    <div id="detail-modal-body" class="input-bg border rounded-xl p-4 text-xs text-slate-200 leading-relaxed space-y-2 whitespace-pre-line"></div>
+                </div>
+            </div>
+            <button onclick="closeDetailModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold p-2.5 rounded-xl transition cursor-pointer text-xs">
+                إغلاق النافذة ✕
             </button>
         </div>
     </div>
@@ -354,7 +381,6 @@
             return keys[Math.floor(Math.random() * keys.length)];
         }
 
-        // الذكاء الاصطناعي يرسل تفصيل الأخطاء في الملاحظة والتقييم حسب الشروط
         async function evaluateWithGemini(subject, year, topic, category, base64Images) {
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
@@ -367,10 +393,10 @@
 - إذا كانت الصحة من 50% إلى 75%: score = 7.
 - إذا كانت الصحة < 50%: score = 0.
 
-اكتب في خانة adminNote تفصيل دقيق وشامل لجميع الأخطاء التي وقع فيها الطالب والخطوات الناقصة ليقوم بتصحيح مساره.
+اكتب في خانة adminNote تفصيل دقيق وشامل لجميع الأخطاء والأسئلة غير المحلولة والخطوات الناقصة ليقرأها الطالب بوضوح داخل النافذة المنبثقة.
 
 قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل:
-{"accuracyPercentage": 80, "score": 10, "adminNote": "التفصيل الكامل للأخطاء والخطوات المفقودة هنا..."}`;
+{"accuracyPercentage": 80, "score": 10, "adminNote": "أخطأت في السؤال الأول ج، ولم تقم بحل السؤال الثاني كاملاً..."}`;
 
             let inlineDataParts = base64Images.map(img => ({
                 inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
@@ -390,7 +416,7 @@
                 return JSON.parse(cleanJson);
             } catch(e) {
                 console.error("AI Evaluation error:", e);
-                return { score: 7, adminNote: "تم التصحيح الأولي. يرجى الانتظار لمراجعة المشرف." };
+                return { score: 7, adminNote: "تم التصحيح الأولي. يرجى مراجعة محاولتك وتصحيح الخطوات المفقودة." };
             }
         }
 
@@ -418,24 +444,45 @@
 
                 const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls);
 
-                await db.collection("submissions").add({
-                    studentName: name,
-                    studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
-                    subject: subject,
-                    topic: topic,
-                    topicStream: topicStream,
-                    category: category,
-                    year: year,
-                    images: imageUrls,
-                    status: aiResult.score === 10 ? 'approved' : 'retry',
-                    score: aiResult.score,
-                    adminNote: `${aiResult.adminNote}`,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                // البحث عن حل سابق لنفس التمرين لتحديث العلامة بدون تكرار
+                const existingSubQuery = await db.collection("submissions")
+                    .where("studentName", "==", name)
+                    .where("subject", "==", subject)
+                    .where("year", "==", year)
+                    .where("topic", "==", topic)
+                    .where("topicStream", "==", topicStream)
+                    .where("category", "==", category)
+                    .get();
 
-                // إظهار القائمة المنبثقة بالنتيجة والأخطاء
+                if (!existingSubQuery.empty) {
+                    // تحديث الحل القديم
+                    const docId = existingSubQuery.docs[0].id;
+                    await db.collection("submissions").doc(docId).update({
+                        images: imageUrls,
+                        status: aiResult.score === 10 ? 'approved' : 'retry',
+                        score: aiResult.score,
+                        adminNote: aiResult.adminNote,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    // إخضاع مشاركة جديدة
+                    await db.collection("submissions").add({
+                        studentName: name,
+                        studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
+                        subject: subject,
+                        topic: topic,
+                        topicStream: topicStream,
+                        category: category,
+                        year: year,
+                        images: imageUrls,
+                        status: aiResult.score === 10 ? 'approved' : 'retry',
+                        score: aiResult.score,
+                        adminNote: aiResult.adminNote,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
                 showAiResultModal(aiResult.score, aiResult.adminNote);
-
                 filesInput.value = '';
                 checkExistingSubmission();
             } catch (e) {
@@ -454,6 +501,21 @@
 
         function closeAiResultModal() {
             document.getElementById('ai-result-modal').classList.add('hidden');
+        }
+
+        function openDetailModal(id) {
+            const sub = allSubmissionsCache.find(s => s.id === id);
+            if (!sub) return;
+            document.getElementById('detail-modal-title').textContent = `🔍 تفاصيل حل: ${sub.subject} - ${sub.category}`;
+            document.getElementById('detail-modal-year-topic').textContent = `📅 بكالوريا ${sub.year} (${sub.topic})`;
+            document.getElementById('detail-modal-score').textContent = `العلامة: ${sub.score}/10`;
+            document.getElementById('detail-modal-score').className = sub.score === 10 ? 'font-bold text-emerald-400' : 'font-bold text-amber-400';
+            document.getElementById('detail-modal-body').textContent = sub.adminNote || 'لا توجد أخطاء مسجلة.';
+            document.getElementById('solution-detail-modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('solution-detail-modal').classList.add('hidden');
         }
 
         function setupSubjectDropdowns() {
@@ -613,7 +675,7 @@
 
                     if (d.score === 10 || d.score === 7) {
                         if (!userStatsMap[d.studentName]) {
-                            userStatsMap[d.studentName] = { totalPoints: 0, subjects: {} };
+                            userStatsMap[d.studentName] = { totalPoints: 0, subjects: {}, stream: d.studentStream };
                         }
                         let pEarned = (d.score === 10 ? (d.studentName === 'محمد' ? 20 : 10) : 7);
                         userStatsMap[d.studentName].totalPoints += pEarned;
@@ -635,8 +697,10 @@
                                 <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
                                 <span class="${d.score === 10 ? 'text-emerald-400' : (d.score === 7 ? 'text-amber-400' : 'text-rose-400')}">${d.score}/10</span>
                             </div>
-                            <p class="text-slate-300 font-semibold">🔍 تفاصيل التصحيح والأخطاء: ${d.adminNote}</p>
-                            <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1 rounded">إزالة من القائمة 🗑️</button>
+                            <div class="flex justify-between items-center pt-1">
+                                <button onclick="openDetailModal('${d.id}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-lg text-[11px] font-bold hover:bg-amber-500/20 transition">عرض تفاصيل الأخطاء 🔍</button>
+                                <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] text-slate-400 hover:text-rose-400">إزالة من القائمة 🗑️</button>
+                            </div>
                         </div>`;
                 });
 
@@ -671,6 +735,62 @@
             });
         }
 
+        // لوحة تحكم الأدمن لضمان وصول التقييمات وعرض قائمة الطلاب
+        function loadAdminData() {
+            db.collection("submissions").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+                let pendingEl = document.getElementById('pending-list');
+                let usersEl = document.getElementById('admin-users-list');
+                
+                pendingEl.innerHTML = '';
+                usersEl.innerHTML = '';
+
+                let usersSummary = {};
+
+                if (snapshot.empty) {
+                    pendingEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">لا توجد تقييمات مسجلة.</p>';
+                    usersEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">لا يوجد طلاب مسجلون بعد.</p>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    let d = doc.data(); d.id = doc.id;
+
+                    // تجميع كارت التقييمات في لوحة الأدمن
+                    pendingEl.innerHTML += `
+                        <div class="input-bg border rounded-xl p-4 space-y-2 text-xs">
+                            <div class="flex justify-between font-bold">
+                                <span class="text-emerald-400">👤 ${d.studentName} (${d.subject})</span>
+                                <span class="text-amber-400">${d.score}/10</span>
+                            </div>
+                            <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
+                            <p class="text-slate-400 bg-slate-950 p-2 rounded">📝 الملاحظة: ${d.adminNote}</p>
+                        </div>`;
+
+                    // تجميع ملخص الطلاب
+                    if (!usersSummary[d.studentName]) {
+                        usersSummary[d.studentName] = { stream: d.studentStream, totalScore: 0, count: 0 };
+                    }
+                    usersSummary[d.studentName].totalScore += (d.score || 0);
+                    usersSummary[d.studentName].count += 1;
+                });
+
+                // طباعة الطلاب في تبويب إدارة الطلاب
+                Object.entries(usersSummary).forEach(([sName, sData]) => {
+                    usersEl.innerHTML += `
+                        <div class="input-bg border border-slate-700 rounded-xl p-3 text-xs flex justify-between items-center">
+                            <div>
+                                <h5 class="font-bold text-white text-sm">${sName}</h5>
+                                <p class="text-[10px] text-amber-400">الشعبة: ${sData.stream === 'math' ? 'رياضيات/تقني' : 'علوم تجريبية'}</p>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-bold text-emerald-400">${sData.totalScore} نقطة إجمالية</p>
+                                <p class="text-[10px] text-slate-400">${sData.count} إرسال</p>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
         function completeChallenge(challengeId) {
             if (!completedChallengesCache.includes(challengeId)) {
                 completedChallengesCache.push(challengeId);
@@ -679,7 +799,6 @@
             }
         }
 
-        // تحديث لوحة الترتيب لعرض عدد حلول كل مادة لكل طالب
         function renderLeaderboard(userStatsMap) {
             let lbEl = document.getElementById('leaderboard-list');
             let sorted = Object.entries(userStatsMap).sort((a,b) => b[1].totalPoints - a[1].totalPoints);
