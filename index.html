@@ -156,15 +156,18 @@
                 <div id="submission-container">
                     <div id="upload-form-section" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (اختر الصور تباعاً أو معاً):</label>
-                            <!-- دعم كامل لاختيار صور متعددة عبر تكرار الـ input والضغط المباشر -->
-                            <input type="file" id="solution-images" accept="image/*" multiple webkitdirectory="" style="display:none;" onchange="handleFilesSelected(this)">
+                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (اضغط لإضافة الصور واحدة تلو الأخرى):</label>
                             
-                            <div class="flex flex-col gap-2">
-                                <button type="button" onclick="document.getElementById('solution-images').click()" class="w-full input-bg border border-dashed border-emerald-500/60 hover:border-emerald-400 rounded-xl p-4 text-center cursor-pointer transition flex items-center justify-center gap-2">
-                                    <span>📁 اضغط لاختيار صور الحل (يدعم عدة صور)</span>
+                            <!-- Hidden File Input -->
+                            <input type="file" id="solution-image-input" accept="image/*" style="display:none;" onchange="appendImage(this)">
+
+                            <div class="flex flex-col gap-3">
+                                <button type="button" onclick="document.getElementById('solution-image-input').click()" class="w-full input-bg border border-dashed border-emerald-500/60 hover:border-emerald-400 rounded-xl p-4 text-center cursor-pointer transition flex items-center justify-center gap-2 font-bold text-emerald-400">
+                                    <span>📸 اضغط لإضافة صورة الحل (يمكنك إضافة عدة صور)</span>
                                 </button>
-                                <div id="selected-files-preview" class="text-xs text-emerald-400 font-semibold text-center"></div>
+                                
+                                <!-- Container displaying selected images preview thumbnails -->
+                                <div id="images-preview-container" class="flex flex-wrap gap-2"></div>
                             </div>
                         </div>
 
@@ -311,6 +314,9 @@
         let completedChallengesCache = JSON.parse(localStorage.getItem('bac_completed_challenges') || '[]');
         let defaultApiKeys = ["AQ.Ab8RN6K3s0h9TgvYu7WZDrtFLPH4S0jGi_K4FHru53gw5s1c2w"];
 
+        // مصفوفة لتخزين الصور المختارة تباعاً داخل تطبيق الهاتف
+        let selectedSolutionImages = [];
+
         try {
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
@@ -341,15 +347,42 @@
             return keys[Math.floor(Math.random() * keys.length)];
         }
 
-        function handleFilesSelected(input) {
-            const preview = document.getElementById('selected-files-preview');
-            if (input.files && input.files.length > 0) {
-                preview.textContent = `✅ تم اختيار ${input.files.length} صورة بنجاح للحل`;
-            } else {
-                preview.textContent = '';
+        // دالة تجميع الصور المختارة تدريجياً من تطبيق الهاتف
+        function appendImage(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedSolutionImages.push(e.target.result);
+                    renderImagesPreview();
+                };
+                reader.readAsDataURL(file);
             }
+            input.value = ''; // تصفير الحقل ليسمح باختيار صورة أخرى فوراً
         }
 
+        function removeImage(index) {
+            selectedSolutionImages.splice(index, 1);
+            renderImagesPreview();
+        }
+
+        function renderImagesPreview() {
+            const container = document.getElementById('images-preview-container');
+            container.innerHTML = '';
+            if (selectedSolutionImages.length === 0) {
+                container.innerHTML = '<span class="text-xs text-slate-400">لم يتم اختيار أي صورة بعد.</span>';
+                return;
+            }
+            selectedSolutionImages.forEach((imgSrc, idx) => {
+                container.innerHTML += `
+                    <div class="relative w-16 h-16 rounded-lg overflow-hidden border border-emerald-500/50 group">
+                        <img src="${imgSrc}" class="w-full h-full object-cover">
+                        <button type="button" onclick="removeImage(${idx})" class="absolute top-0 right-0 bg-rose-600 text-white w-5 h-5 text-[10px] flex items-center justify-center font-bold">×</button>
+                    </div>`;
+            });
+        }
+
+        // الذكاء الاصطناعي مع استثناء حساب المساحة في الدوال، وتنقيط (75% -> 10, 50-75% -> 7, أقل -> 0)
         async function evaluateWithGemini(subject, year, topic, category, base64Images) {
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
@@ -389,8 +422,7 @@
 
         async function submitSolution() {
             const name = localStorage.getItem('bac_username');
-            const filesInput = document.getElementById('solution-images');
-            if (filesInput.files.length === 0) return alert('اختر صورة واحدة على الأقل للحل!');
+            if (selectedSolutionImages.length === 0) return alert('اختر صورة واحدة على الأقل للحل!');
 
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
@@ -398,8 +430,8 @@
 
             try {
                 let imageUrls = [];
-                for (let i = 0; i < filesInput.files.length; i++) {
-                    imageUrls.push(await processHighQualityImage(filesInput.files[i]));
+                for (let i = 0; i < selectedSolutionImages.length; i++) {
+                    imageUrls.push(await processHighQualityImage(selectedSolutionImages[i]));
                 }
 
                 const subject = document.getElementById('subject-select').value;
@@ -427,8 +459,8 @@
                 });
 
                 alert(`تم تصحيح حلك بالذكاء الاصطناعي! 🎉\nالعلامة: ${aiResult.score}/10\nالملاحظة: ${aiResult.adminNote}`);
-                filesInput.value = '';
-                document.getElementById('selected-files-preview').textContent = '';
+                selectedSolutionImages = [];
+                renderImagesPreview();
                 checkExistingSubmission();
             } catch (e) {
                 alert('حدث خطأ أثناء التصحيح: ' + e.message);
