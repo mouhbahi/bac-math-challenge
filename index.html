@@ -444,7 +444,6 @@
 
                 const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls);
 
-                // البحث عن حل سابق لنفس التمرين لتحديث العلامة بدون تراكم مضاعف
                 const existingSubQuery = await db.collection("submissions")
                     .where("studentName", "==", name)
                     .where("subject", "==", subject)
@@ -461,6 +460,7 @@
                         status: aiResult.score === 10 ? 'approved' : 'retry',
                         score: aiResult.score,
                         adminNote: aiResult.adminNote,
+                        hidden: false,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } else {
@@ -476,6 +476,7 @@
                         status: aiResult.score === 10 ? 'approved' : 'retry',
                         score: aiResult.score,
                         adminNote: aiResult.adminNote,
+                        hidden: false,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
@@ -516,7 +517,7 @@
             document.getElementById('solution-detail-modal').classList.add('hidden');
         }
 
-        // صلاحيات الأدمن: حذف التقييم أو تعديل علامته إلى 10
+        // صلاحيات الأدمن: حذف التقييم، إخفاء/إظهار التقييم، أو تعديل علامته إلى 10
         async function adminDeleteSubmission(id) {
             if (confirm('هل أنت متأكد من حذف هذا التقييم نهائياً؟')) {
                 await db.collection("submissions").doc(id).delete();
@@ -524,11 +525,18 @@
             }
         }
 
+        async function adminToggleHideSubmission(id, currentHiddenState) {
+            const newState = !currentHiddenState;
+            await db.collection("submissions").doc(id).update({ hidden: newState });
+            alert(newState ? 'تم إخفاء التقييم بنجاح 🙈' : 'تم إظهار التقييم بنجاح 👁️');
+        }
+
         async function adminSetScoreTo10(id) {
             if (confirm('هل تريد اعتماد هذه النتيجة بعلامة كاملة (10/10)؟')) {
                 await db.collection("submissions").doc(id).update({
                     score: 10,
                     status: 'approved',
+                    hidden: false,
                     adminNote: '✨ تم اعتماد العلامة الكاملة (10/10) يدوياً من طرف المشرف (محمد).'
                 });
                 alert('تم تحديث العلامة إلى 10/10 بنجاح ✅');
@@ -631,7 +639,8 @@
                 s.topic === topic && 
                 s.topicStream === topicStream &&
                 s.category === category && 
-                s.score === 10
+                s.score === 10 &&
+                !s.hidden
             );
 
             document.getElementById('upload-form-section').classList.toggle('hidden', !!found);
@@ -684,21 +693,24 @@
                     let d = doc.data(); d.id = doc.id;
                     allSubmissionsCache.push(d);
                     
-                    if (d.studentName === currentStudent) {
-                        if (d.score === 10) points += (currentStudent === 'محمد' ? 20 : 10);
-                        else if (d.score === 7) points += 7;
-                        if (!d.hideForStudent) studentList.push(d);
-                    }
-
-                    if (d.score === 10 || d.score === 7) {
-                        if (!userStatsMap[d.studentName]) {
-                            userStatsMap[d.studentName] = { totalPoints: 0, subjects: {}, stream: d.studentStream };
+                    // تجاهل الحلول المخفية في حساب نقاط الطالب ولوحة الترتيب
+                    if (!d.hidden) {
+                        if (d.studentName === currentStudent) {
+                            if (d.score === 10) points += (currentStudent === 'محمد' ? 20 : 10);
+                            else if (d.score === 7) points += 7;
+                            if (!d.hideForStudent) studentList.push(d);
                         }
-                        let pEarned = (d.score === 10 ? (d.studentName === 'محمد' ? 20 : 10) : 7);
-                        userStatsMap[d.studentName].totalPoints += pEarned;
-                        
-                        let subjName = d.subject;
-                        userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
+
+                        if (d.score === 10 || d.score === 7) {
+                            if (!userStatsMap[d.studentName]) {
+                                userStatsMap[d.studentName] = { totalPoints: 0, subjects: {}, stream: d.studentStream };
+                            }
+                            let pEarned = (d.score === 10 ? (d.studentName === 'محمد' ? 20 : 10) : 7);
+                            userStatsMap[d.studentName].totalPoints += pEarned;
+                            
+                            let subjName = d.subject;
+                            userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
+                        }
                     }
                 });
 
@@ -752,7 +764,7 @@
             });
         }
 
-        // لوحة تحكم الأدمن المحدثة مع أزرار الحذف وتعديل العلامة إلى 10
+        // لوحة تحكم الأدمن المحدثة مع خيارات الإخفاء، التعديل إلى 10، والحذف
         function loadAdminData() {
             db.collection("submissions").onSnapshot((snapshot) => {
                 let pendingEl = document.getElementById('pending-list');
@@ -771,27 +783,34 @@
 
                 snapshot.forEach(doc => {
                     let d = doc.data(); d.id = doc.id;
+                    let isHidden = d.hidden ? true : false;
 
-                    // كارت التقييمات في لوحة الأدمن مع أزرار التحكم
+                    // كارت التقييمات في لوحة الأدمن مع أزرار التحكم الكاملة
                     pendingEl.innerHTML += `
-                        <div class="input-bg border rounded-xl p-4 space-y-2 text-xs">
+                        <div class="input-bg border ${isHidden ? 'border-rose-500/50 opacity-75' : ''} rounded-xl p-4 space-y-2 text-xs">
                             <div class="flex justify-between font-bold">
                                 <span class="text-emerald-400">👤 ${d.studentName} (${d.subject})</span>
-                                <span class="text-amber-400">${d.score}/10</span>
+                                <div class="flex gap-2">
+                                    ${isHidden ? '<span class="bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded text-[10px]">مخفي 🙈</span>' : ''}
+                                    <span class="text-amber-400">${d.score}/10</span>
+                                </div>
                             </div>
                             <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
                             <p class="text-slate-400 bg-slate-950 p-2 rounded">📝 الملاحظة: ${d.adminNote}</p>
-                            <div class="flex gap-2 pt-2 border-t border-slate-800">
-                                <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition">تعيين علامة 10 ✅</button>
-                                <button onclick="adminDeleteSubmission('${d.id}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-rose-600/30 transition">حذف التقييم 🗑️</button>
+                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
+                                <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition cursor-pointer">تعيين علامة 10 ✅</button>
+                                <button onclick="adminToggleHideSubmission('${d.id}', ${isHidden})" class="bg-amber-600/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/30 transition cursor-pointer">${isHidden ? 'إظهار 👁️' : 'إخفاء 🙈'}</button>
+                                <button onclick="adminDeleteSubmission('${d.id}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-rose-600/30 transition cursor-pointer">حذف التقييم 🗑️</button>
                             </div>
                         </div>`;
 
-                    // تجميع ملخص الطلاب
+                    // تجميع ملخص الطلاب (لا نحتسب المخفي في النقاط الإجمالية)
                     if (!usersSummary[d.studentName]) {
                         usersSummary[d.studentName] = { stream: d.studentStream, totalScore: 0, count: 0 };
                     }
-                    usersSummary[d.studentName].totalScore += (d.score || 0);
+                    if (!isHidden) {
+                        usersSummary[d.studentName].totalScore += (d.score || 0);
+                    }
                     usersSummary[d.studentName].count += 1;
                 });
 
@@ -866,7 +885,7 @@
             let topicsList = ['الموضوع الأول', 'الموضوع الثاني'];
 
             let completedCount = 0;
-            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.subject === selectedSubject && s.topicStream === selectedStream);
+            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.subject === selectedSubject && s.topicStream === selectedStream && !s.hidden);
 
             yearsList.forEach(yr => {
                 topicsList.forEach(top => {
@@ -895,8 +914,8 @@
                 });
             });
 
-            let totalPoints = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10).length * (currentStudent === 'محمد' ? 20 : 10);
-            document.getElementById('modal-stat-completed').textContent = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10).length;
+            let totalPoints = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10 && !s.hidden).length * (currentStudent === 'محمد' ? 20 : 10);
+            document.getElementById('modal-stat-completed').textContent = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score === 10 && !s.hidden).length;
             document.getElementById('modal-stat-points').textContent = totalPoints;
         }
 
