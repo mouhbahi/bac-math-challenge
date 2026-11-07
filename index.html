@@ -156,7 +156,7 @@
                 <div id="submission-container">
                     <div id="upload-form-section" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (سيقوم الذكاء الاصطناعي بقراءتها وتصحيحها):</label>
+                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (يمكنك اختيار عدة صور معاً للحل الطويل):</label>
                             <input type="file" id="solution-images" accept="image/*" multiple class="w-full input-bg border rounded-xl p-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
                         </div>
 
@@ -333,20 +333,21 @@
             return keys[Math.floor(Math.random() * keys.length)];
         }
 
-        // الذكاء الاصطناعي مع شروط التنقيط الخاصة (%75 -> 10, %50-%75 -> 7, أقل -> 0)
+        // الذكاء الاصطناعي مع استثناء حساب المساحة في الدوال، وتنقيط (75% -> 10, 50-75% -> 7, أقل -> 0)
         async function evaluateWithGemini(subject, year, topic, category, base64Images) {
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             const promptText = `أنت أستاذ تصحيح بكالوريا جزائرية خبير في مادة ${subject}.
 تم إرسال حل تمرين من دورة بكالوريا ${year} - ${topic} - (${category}).
-قم بمراجعة صور الحل وقارنها بالحل النموذجي الرسمي للبكالوريا الجزائرية وقدر نسبة صحة الإجابة:
-- إذا كانت نسبة صحة الحل أكثر من 75%: ضع العلامة score = 10، واذكر الأخطاء البسيطة في الملاحظة adminNote.
-- إذا كانت نسبة الصحة من 50% إلى 75%: ضع العلامة score = 7، واذكر الأخطاء بالتفصيل في الملاحظة adminNote.
-- إذا كانت نسبة الصحة أقل من 50%: ضع العلامة score = 0، واشرح الأخطاء والملاحظات ليقوم الطالب بإعادة الحل.
+ملاحظة هامة جداً: إذا كانت المادة رياضيات وفي تمرين الدوال، فتجنب تماماً أو لا تأخذ في الاعتبار حسابات المساحة (أو التكاملات الخاصة بحساب المساحات) إذا لم تكن مطلوبة بدقة أو تخطى الطالب جزء المساحة دون عقوبة قاسية.
+قم بمراجعة صور الحل المقارنة بالحل النموذجي الرسمي للبكالوريا وحدد نسبة الصحة:
+- إذا كانت صحة الحل > 75%: score = 10، والملاحظة adminNote تشرح الأخطاء البسيطة.
+- إذا كانت الصحة من 50% إلى 75%: score = 7، والملاحظة adminNote تفصل الأخطاء.
+- إذا كانت الصحة < 50%: score = 0، والملاحظة adminNote تشرح الخلل لإعادة الحل.
 
 قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل:
-{"accuracyPercentage": 80, "score": 10, "adminNote": "حل ممتاز، أخطأت فقط في السطر الثالث في حظر مجموعة التعريف."}`;
+{"accuracyPercentage": 80, "score": 10, "adminNote": "حل ممتاز، أخطأت فقط في السطر الثالث."}`;
 
             let inlineDataParts = base64Images.map(img => ({
                 inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
@@ -377,7 +378,7 @@
 
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span>جاري التحليل والتصحيح بالـ AI... 🤖⏳</span>';
+            submitBtn.innerHTML = '<span>جاري التحليل والتصحيح للصور بالـ AI... 🤖⏳</span>';
 
             try {
                 let imageUrls = [];
