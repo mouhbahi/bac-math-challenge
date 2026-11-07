@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -444,7 +444,7 @@
 
                 const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls);
 
-                // البحث عن حل سابق لنفس التمرين لتحديث العلامة بدون تكرار
+                // البحث عن حل سابق لنفس التمرين لتحديث العلامة بدون تراكم مضاعف
                 const existingSubQuery = await db.collection("submissions")
                     .where("studentName", "==", name)
                     .where("subject", "==", subject)
@@ -455,7 +455,6 @@
                     .get();
 
                 if (!existingSubQuery.empty) {
-                    // تحديث الحل القديم
                     const docId = existingSubQuery.docs[0].id;
                     await db.collection("submissions").doc(docId).update({
                         images: imageUrls,
@@ -465,7 +464,6 @@
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } else {
-                    // إخضاع مشاركة جديدة
                     await db.collection("submissions").add({
                         studentName: name,
                         studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
@@ -516,6 +514,25 @@
 
         function closeDetailModal() {
             document.getElementById('solution-detail-modal').classList.add('hidden');
+        }
+
+        // صلاحيات الأدمن: حذف التقييم أو تعديل علامته إلى 10
+        async function adminDeleteSubmission(id) {
+            if (confirm('هل أنت متأكد من حذف هذا التقييم نهائياً؟')) {
+                await db.collection("submissions").doc(id).delete();
+                alert('تم حذف التقييم بنجاح 🗑️');
+            }
+        }
+
+        async function adminSetScoreTo10(id) {
+            if (confirm('هل تريد اعتماد هذه النتيجة بعلامة كاملة (10/10)؟')) {
+                await db.collection("submissions").doc(id).update({
+                    score: 10,
+                    status: 'approved',
+                    adminNote: '✨ تم اعتماد العلامة الكاملة (10/10) يدوياً من طرف المشرف (محمد).'
+                });
+                alert('تم تحديث العلامة إلى 10/10 بنجاح ✅');
+            }
         }
 
         function setupSubjectDropdowns() {
@@ -735,9 +752,9 @@
             });
         }
 
-        // لوحة تحكم الأدمن لضمان وصول التقييمات وعرض قائمة الطلاب
+        // لوحة تحكم الأدمن المحدثة مع أزرار الحذف وتعديل العلامة إلى 10
         function loadAdminData() {
-            db.collection("submissions").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+            db.collection("submissions").onSnapshot((snapshot) => {
                 let pendingEl = document.getElementById('pending-list');
                 let usersEl = document.getElementById('admin-users-list');
                 
@@ -755,7 +772,7 @@
                 snapshot.forEach(doc => {
                     let d = doc.data(); d.id = doc.id;
 
-                    // تجميع كارت التقييمات في لوحة الأدمن
+                    // كارت التقييمات في لوحة الأدمن مع أزرار التحكم
                     pendingEl.innerHTML += `
                         <div class="input-bg border rounded-xl p-4 space-y-2 text-xs">
                             <div class="flex justify-between font-bold">
@@ -764,6 +781,10 @@
                             </div>
                             <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
                             <p class="text-slate-400 bg-slate-950 p-2 rounded">📝 الملاحظة: ${d.adminNote}</p>
+                            <div class="flex gap-2 pt-2 border-t border-slate-800">
+                                <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition">تعيين علامة 10 ✅</button>
+                                <button onclick="adminDeleteSubmission('${d.id}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-rose-600/30 transition">حذف التقييم 🗑️</button>
+                            </div>
                         </div>`;
 
                     // تجميع ملخص الطلاب
@@ -774,7 +795,7 @@
                     usersSummary[d.studentName].count += 1;
                 });
 
-                // طباعة الطلاب في تبويب إدارة الطلاب
+                // طباعة قائمة الطلاب في تبويب إدارة الطلاب
                 Object.entries(usersSummary).forEach(([sName, sData]) => {
                     usersEl.innerHTML += `
                         <div class="input-bg border border-slate-700 rounded-xl p-3 text-xs flex justify-between items-center">
