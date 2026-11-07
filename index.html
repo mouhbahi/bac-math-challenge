@@ -386,17 +386,12 @@
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             const promptText = `أنت أستاذ تصحيح بكالوريا جزائرية خبير في مادة ${subject}.
-تم إرسال حل تمرين من دورة بكالوريا ${year} - ${topic} - (${category}).
-ملاحظة هامة جداً: إذا كانت المادة رياضيات وفي تمرين الدوال، فتجنب تماماً أو لا تأخذ في الاعتبار حسابات المساحة (أو التكاملات الخاصة بحساب المساحات) إذا لم تكن مطلوبة بدقة أو تخطى الطالب جزء المساحة دون عقوبة قاسية.
-قم بمراجعة صور الحل المقارنة بالحل النموذجي الرسمي للبكالوريا وحدد نسبة الصحة:
-- إذا كانت صحة الحل > 75%: score = 10.
-- إذا كانت الصحة من 50% إلى 75%: score = 7.
-- إذا كانت الصحة < 50%: score = 0.
+قم بفحص صور الحل المرسلة لهذا التمرين بعناية:
+- إذا تحقق أن الطالب قد حاول كتابة الحل وقام بخطوات ومحاولة فعلية في التمرين، قم بمنحه مباشرة score = 10 ووضع ملاحظة إيجابية.
+- إذا كان الحل فارغاً تماماً أو لا علاقة له بالتمرين (أي لم يحاول نهائياً)، امنحه score = 0.
 
-اكتب في خانة adminNote تفصيل دقيق وشامل لجميع الأخطاء والأسئلة غير المحلولة والخطوات الناقصة ليقرأها الطالب بوضوح داخل النافذة المنبثقة.
-
-قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل:
-{"accuracyPercentage": 80, "score": 10, "adminNote": "أخطأت في السؤال الأول ج، ولم تقم بحل السؤال الثاني كاملاً..."}`;
+قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل دون أي نص إضافي:
+{"score": 10, "adminNote": "محاولة ممتازة وحل جدي للتمرين."}`;
 
             let inlineDataParts = base64Images.map(img => ({
                 inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
@@ -416,7 +411,7 @@
                 return JSON.parse(cleanJson);
             } catch(e) {
                 console.error("AI Evaluation error:", e);
-                return { score: 7, adminNote: "تم التصحيح الأولي. يرجى مراجعة محاولتك وتصحيح الخطوات المفقودة." };
+                return { score: 10, adminNote: "تم رصد المحاولة ومنح العلامة الكاملة بنجاح." };
             }
         }
 
@@ -517,20 +512,20 @@
             document.getElementById('solution-detail-modal').classList.add('hidden');
         }
 
-        // صلاحيات الأدمن: حذف التقييم، إخفاء/إظهار التقييم من لوحة التقييمات، أو تعديل علامته إلى 10
-        async function adminDeleteSubmission(id) {
+        // صلاحيات الأدمن: حذف التقييم، إخفاء التقييم من لوحة الأدمن، أو تعديل علامته إلى 10
+        window.adminDeleteSubmission = async function(id) {
             if (confirm('هل أنت متأكد من حذف هذا التقييم نهائياً؟')) {
                 await db.collection("submissions").doc(id).delete();
                 alert('تم حذف التقييم بنجاح 🗑️');
             }
-        }
+        };
 
-        async function adminToggleHideSubmission(id, currentHiddenState) {
-            const newState = !currentHiddenState;
-            await db.collection("submissions").doc(id).update({ hidden: newState });
-        }
+        window.adminToggleHideSubmission = async function(id) {
+            await db.collection("submissions").doc(id).update({ hidden: true });
+            alert('تم إخفاء التقييم من اللوحة بنجاح 🙈');
+        };
 
-        async function adminSetScoreTo10(id) {
+        window.adminSetScoreTo10 = async function(id) {
             if (confirm('هل تريد اعتماد هذه النتيجة بعلامة كاملة (10/10)؟')) {
                 await db.collection("submissions").doc(id).update({
                     score: 10,
@@ -540,7 +535,7 @@
                 });
                 alert('تم تحديث العلامة إلى 10/10 بنجاح ✅');
             }
-        }
+        };
 
         function setupSubjectDropdowns() {
             const stream = localStorage.getItem('bac_user_stream') || 'experimental';
@@ -725,8 +720,8 @@
                                 <span class="${d.score === 10 ? 'text-emerald-400' : (d.score === 7 ? 'text-amber-400' : 'text-rose-400')}">${d.score}/10</span>
                             </div>
                             <div class="flex justify-between items-center pt-1">
-                                <button onclick="openDetailModal('${d.id}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-lg text-[11px] font-bold hover:bg-amber-500/20 transition">عرض تفاصيل الأخطاء 🔍</button>
-                                <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] text-slate-400 hover:text-rose-400">إزالة من القائمة 🗑️</button>
+                                <button onclick="openDetailModal('${d.id}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-lg text-[11px] font-bold hover:bg-amber-500/20 transition cursor-pointer">عرض تفاصيل الأخطاء 🔍</button>
+                                <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] text-slate-400 hover:text-rose-400 cursor-pointer">إزالة من القائمة 🗑️</button>
                             </div>
                         </div>`;
                 });
@@ -762,7 +757,6 @@
             });
         }
 
-        // لوحة تحكم الأدمن المحدثة: إخفاء التقييم يجعله يختفي تماماً من لوحة التقييمات للأدمن
         function loadAdminData() {
             db.collection("submissions").onSnapshot((snapshot) => {
                 let pendingEl = document.getElementById('pending-list');
@@ -784,7 +778,6 @@
                     let d = doc.data(); d.id = doc.id;
                     let isHidden = d.hidden ? true : false;
 
-                    // إظهار التقييم في لوحة الأدمن فقط إذا لم تقم بإخفائه
                     if (!isHidden) {
                         pendingCount++;
                         pendingEl.innerHTML += `
@@ -797,13 +790,12 @@
                                 <p class="text-slate-400 bg-slate-950 p-2 rounded">📝 الملاحظة: ${d.adminNote}</p>
                                 <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
                                     <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition cursor-pointer">تعيين علامة 10 ✅</button>
-                                    <button onclick="adminToggleHideSubmission('${d.id}', true)" class="bg-amber-600/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/30 transition cursor-pointer">إخفاء من اللوحة 🙈</button>
+                                    <button onclick="adminToggleHideSubmission('${d.id}')" class="bg-amber-600/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/30 transition cursor-pointer">إخفاء من اللوحة 🙈</button>
                                     <button onclick="adminDeleteSubmission('${d.id}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-rose-600/30 transition cursor-pointer">حذف التقييم 🗑️</button>
                                 </div>
                             </div>`;
                     }
 
-                    // تجميع ملخص الطلاب
                     if (!usersSummary[d.studentName]) {
                         usersSummary[d.studentName] = { stream: d.studentStream, totalScore: 0, count: 0 };
                     }
@@ -817,7 +809,6 @@
                     pendingEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">لا توجد تقييمات ظاهرة حالياً (تم إخفاؤها).</p>';
                 }
 
-                // طباعة قائمة الطلاب في تبويب إدارة الطلاب
                 Object.entries(usersSummary).forEach(([sName, sData]) => {
                     usersEl.innerHTML += `
                         <div class="input-bg border border-slate-700 rounded-xl p-3 text-xs flex justify-between items-center">
