@@ -156,8 +156,16 @@
                 <div id="submission-container">
                     <div id="upload-form-section" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (يمكنك اختيار عدة صور معاً للحل الطويل):</label>
-                            <input type="file" id="solution-images" accept="image/*" multiple class="w-full input-bg border rounded-xl p-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
+                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (اختر الصور تباعاً أو معاً):</label>
+                            <!-- دعم كامل لاختيار صور متعددة عبر تكرار الـ input والضغط المباشر -->
+                            <input type="file" id="solution-images" accept="image/*" multiple webkitdirectory="" style="display:none;" onchange="handleFilesSelected(this)">
+                            
+                            <div class="flex flex-col gap-2">
+                                <button type="button" onclick="document.getElementById('solution-images').click()" class="w-full input-bg border border-dashed border-emerald-500/60 hover:border-emerald-400 rounded-xl p-4 text-center cursor-pointer transition flex items-center justify-center gap-2">
+                                    <span>📁 اضغط لاختيار صور الحل (يدعم عدة صور)</span>
+                                </button>
+                                <div id="selected-files-preview" class="text-xs text-emerald-400 font-semibold text-center"></div>
+                            </div>
                         </div>
 
                         <button id="submit-btn" onclick="submitSolution()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg transition cursor-pointer flex items-center justify-center gap-2">
@@ -333,7 +341,15 @@
             return keys[Math.floor(Math.random() * keys.length)];
         }
 
-        // الذكاء الاصطناعي مع استثناء حساب المساحة في الدوال، وتنقيط (75% -> 10, 50-75% -> 7, أقل -> 0)
+        function handleFilesSelected(input) {
+            const preview = document.getElementById('selected-files-preview');
+            if (input.files && input.files.length > 0) {
+                preview.textContent = `✅ تم اختيار ${input.files.length} صورة بنجاح للحل`;
+            } else {
+                preview.textContent = '';
+            }
+        }
+
         async function evaluateWithGemini(subject, year, topic, category, base64Images) {
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
@@ -412,6 +428,7 @@
 
                 alert(`تم تصحيح حلك بالذكاء الاصطناعي! 🎉\nالعلامة: ${aiResult.score}/10\nالملاحظة: ${aiResult.adminNote}`);
                 filesInput.value = '';
+                document.getElementById('selected-files-preview').textContent = '';
                 checkExistingSubmission();
             } catch (e) {
                 alert('حدث خطأ أثناء التصحيح: ' + e.message);
