@@ -157,8 +157,6 @@
                     <div id="upload-form-section" class="space-y-4">
                         <div>
                             <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (اختر عدة صور دفعة واحدة):</label>
-                            
-                            <!-- خاصية multiple الأصلية مدعومة بالكامل بدون قيود الـ WebViews القديمة -->
                             <input type="file" id="solution-images" accept="image/*" multiple class="w-full input-bg border rounded-xl p-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
                         </div>
 
@@ -246,6 +244,27 @@
         </div>
 
     </main>
+
+    <!-- Modal النتيجة المنبثقة للذكاء الاصطناعي -->
+    <div id="ai-result-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="card-bg border border-amber-500/50 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl animate-scale">
+            <div class="text-center space-y-1">
+                <span class="text-3xl">🤖✨</span>
+                <h3 class="text-lg font-bold text-amber-400">نتيجة التصحيح الذكي</h3>
+            </div>
+            <div class="input-bg border rounded-xl p-4 text-center space-y-2">
+                <p class="text-xs text-slate-300">العلامة المحصل عليها:</p>
+                <p id="modal-ai-score" class="text-3xl font-black text-emerald-400">0/10</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs font-bold text-amber-400">📝 ملاحظات وأخطاء الذكاء الاصطناعي:</p>
+                <div id="modal-ai-notes" class="input-bg border rounded-xl p-3 text-xs text-slate-200 leading-relaxed max-h-40 overflow-y-auto"></div>
+            </div>
+            <button onclick="closeAiResultModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-xl transition cursor-pointer">
+                حسناً، فهمت الأخطاء 💪
+            </button>
+        </div>
+    </div>
 
     <!-- Modal Progress (خريطة الإنجاز مع خيارات المادة والشعبة) -->
     <div id="bac-progress-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -335,7 +354,7 @@
             return keys[Math.floor(Math.random() * keys.length)];
         }
 
-        // الذكاء الاصطناعي مع استثناء حساب المساحة في الدوال، وتنقيط (75% -> 10, 50-75% -> 7, أقل -> 0)
+        // الذكاء الاصطناعي يرسل تفصيل الأخطاء في الملاحظة والتقييم حسب الشروط
         async function evaluateWithGemini(subject, year, topic, category, base64Images) {
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
@@ -344,12 +363,14 @@
 تم إرسال حل تمرين من دورة بكالوريا ${year} - ${topic} - (${category}).
 ملاحظة هامة جداً: إذا كانت المادة رياضيات وفي تمرين الدوال، فتجنب تماماً أو لا تأخذ في الاعتبار حسابات المساحة (أو التكاملات الخاصة بحساب المساحات) إذا لم تكن مطلوبة بدقة أو تخطى الطالب جزء المساحة دون عقوبة قاسية.
 قم بمراجعة صور الحل المقارنة بالحل النموذجي الرسمي للبكالوريا وحدد نسبة الصحة:
-- إذا كانت صحة الحل > 75%: score = 10، والملاحظة adminNote تشرح الأخطاء البسيطة.
-- إذا كانت الصحة من 50% إلى 75%: score = 7، والملاحظة adminNote تفصل الأخطاء.
-- إذا كانت الصحة < 50%: score = 0، والملاحظة adminNote تشرح الخلل لإعادة الحل.
+- إذا كانت صحة الحل > 75%: score = 10.
+- إذا كانت الصحة من 50% إلى 75%: score = 7.
+- إذا كانت الصحة < 50%: score = 0.
+
+اكتب في خانة adminNote تفصيل دقيق وشامل لجميع الأخطاء التي وقع فيها الطالب والخطوات الناقصة ليقوم بتصحيح مساره.
 
 قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل:
-{"accuracyPercentage": 80, "score": 10, "adminNote": "حل ممتاز، أخطأت فقط في السطر الثالث."}`;
+{"accuracyPercentage": 80, "score": 10, "adminNote": "التفصيل الكامل للأخطاء والخطوات المفقودة هنا..."}`;
 
             let inlineDataParts = base64Images.map(img => ({
                 inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
@@ -408,11 +429,13 @@
                     images: imageUrls,
                     status: aiResult.score === 10 ? 'approved' : 'retry',
                     score: aiResult.score,
-                    adminNote: `🤖 تصحيح الذكاء الاصطناعي: ${aiResult.adminNote}`,
+                    adminNote: `${aiResult.adminNote}`,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert(`تم تصحيح حلك بالذكاء الاصطناعي! 🎉\nالعلامة: ${aiResult.score}/10\nالملاحظة: ${aiResult.adminNote}`);
+                // إظهار القائمة المنبثقة بالنتيجة والأخطاء
+                showAiResultModal(aiResult.score, aiResult.adminNote);
+
                 filesInput.value = '';
                 checkExistingSubmission();
             } catch (e) {
@@ -421,6 +444,16 @@
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span>إرسال وتصحيح بالذكاء الاصطناعي 🤖</span>';
             }
+        }
+
+        function showAiResultModal(score, notes) {
+            document.getElementById('modal-ai-score').textContent = `${score}/10`;
+            document.getElementById('modal-ai-notes').textContent = notes;
+            document.getElementById('ai-result-modal').classList.remove('hidden');
+        }
+
+        function closeAiResultModal() {
+            document.getElementById('ai-result-modal').classList.add('hidden');
         }
 
         function setupSubjectDropdowns() {
@@ -566,18 +599,27 @@
                 allSubmissionsCache = [];
                 let studentList = [];
                 let points = 0;
-                let userScoresMap = {};
+                let userStatsMap = {};
 
                 snapshot.forEach((doc) => {
                     let d = doc.data(); d.id = doc.id;
                     allSubmissionsCache.push(d);
+                    
                     if (d.studentName === currentStudent) {
                         if (d.score === 10) points += (currentStudent === 'محمد' ? 20 : 10);
                         else if (d.score === 7) points += 7;
                         if (!d.hideForStudent) studentList.push(d);
                     }
+
                     if (d.score === 10 || d.score === 7) {
-                        userScoresMap[d.studentName] = (userScoresMap[d.studentName] || 0) + (d.score === 10 ? (d.studentName === 'محمد' ? 20 : 10) : 7);
+                        if (!userStatsMap[d.studentName]) {
+                            userStatsMap[d.studentName] = { totalPoints: 0, subjects: {} };
+                        }
+                        let pEarned = (d.score === 10 ? (d.studentName === 'محمد' ? 20 : 10) : 7);
+                        userStatsMap[d.studentName].totalPoints += pEarned;
+                        
+                        let subjName = d.subject;
+                        userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
                     }
                 });
 
@@ -593,12 +635,12 @@
                                 <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
                                 <span class="${d.score === 10 ? 'text-emerald-400' : (d.score === 7 ? 'text-amber-400' : 'text-rose-400')}">${d.score}/10</span>
                             </div>
-                            <p class="text-slate-300 font-semibold">${d.adminNote}</p>
+                            <p class="text-slate-300 font-semibold">🔍 تفاصيل التصحيح والأخطاء: ${d.adminNote}</p>
                             <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1 rounded">إزالة من القائمة 🗑️</button>
                         </div>`;
                 });
 
-                renderLeaderboard(userScoresMap);
+                renderLeaderboard(userStatsMap);
                 checkExistingSubmission();
             });
 
@@ -637,15 +679,27 @@
             }
         }
 
-        function renderLeaderboard(userScoresMap) {
+        // تحديث لوحة الترتيب لعرض عدد حلول كل مادة لكل طالب
+        function renderLeaderboard(userStatsMap) {
             let lbEl = document.getElementById('leaderboard-list');
-            let sorted = Object.entries(userScoresMap).sort((a,b) => b[1] - a[1]);
+            let sorted = Object.entries(userStatsMap).sort((a,b) => b[1].totalPoints - a[1].totalPoints);
             lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-4">لا توجد نقاط مسجلة بعد.</p>' : '';
-            sorted.forEach(([name, pts], index) => {
+            
+            sorted.forEach(([name, data], index) => {
+                let subjectsDetails = Object.entries(data.subjects)
+                    .map(([subj, count]) => `<span class="bg-slate-900 px-2 py-0.5 rounded text-[10px] text-emerald-300 border border-slate-700">${subj}: ${count}</span>`)
+                    .join(' ');
+
                 lbEl.innerHTML += `
-                    <div class="flex justify-between items-center input-bg border rounded-xl p-3 text-xs">
-                        <span class="font-bold">#${index+1} ${name}</span>
-                        <span class="text-amber-400 font-bold">${pts} نقطة</span>
+                    <div class="flex flex-col gap-2 input-bg border rounded-xl p-3 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-sm text-white">#${index+1} ${name}</span>
+                            <span class="text-amber-400 font-black text-sm">${data.totalPoints} نقطة</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 pt-1 border-t border-slate-800">
+                            <span class="text-[10px] text-slate-400 self-center">التمارين المحلولة:</span>
+                            ${subjectsDetails}
+                        </div>
                     </div>`;
             });
         }
