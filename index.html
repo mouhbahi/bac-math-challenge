@@ -478,10 +478,13 @@
 
                 if (!existingSubQuery.empty) {
                     const docId = existingSubQuery.docs[0].id;
+                    let existingData = existingSubQuery.docs[0].data();
+                    let finalScore = (existingData.score > 0) ? existingData.score : (aiResult.score > 0 ? aiResult.score : 10);
+
                     await db.collection("submissions").doc(docId).update({
                         images: imageUrls,
-                        status: aiResult.score > 0 ? 'approved' : 'retry',
-                        score: aiResult.score,
+                        status: 'approved',
+                        score: finalScore,
                         adminNote: aiResult.adminNote,
                         hidden: false,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -496,15 +499,15 @@
                         category: category,
                         year: year,
                         images: imageUrls,
-                        status: aiResult.score > 0 ? 'approved' : 'retry',
-                        score: aiResult.score,
+                        status: 'approved',
+                        score: aiResult.score > 0 ? aiResult.score : 10,
                         adminNote: aiResult.adminNote,
                         hidden: false,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
 
-                showAiResultModal(aiResult.score, aiResult.adminNote);
+                showAiResultModal(aiResult.score > 0 ? aiResult.score : 10, aiResult.adminNote);
                 filesInput.value = '';
                 checkExistingSubmission();
             } catch (e) {
@@ -530,8 +533,8 @@
             if (!sub) return;
             document.getElementById('detail-modal-title').textContent = `🔍 تفاصيل حل: ${sub.subject} - ${sub.category}`;
             document.getElementById('detail-modal-year-topic').textContent = `📅 بكالوريا ${sub.year} (${sub.topic})`;
-            document.getElementById('detail-modal-score').textContent = `نقاط التحدي: ${sub.score}/10`;
-            document.getElementById('detail-modal-score').className = sub.score > 0 ? 'font-bold text-emerald-400' : 'font-bold text-amber-400';
+            document.getElementById('detail-modal-score').textContent = `نقاط التحدي: ${sub.score || 10}/10`;
+            document.getElementById('detail-modal-score').className = 'font-bold text-emerald-400';
             document.getElementById('detail-modal-body').textContent = sub.adminNote || 'لا توجد أخطاء مسجلة.';
             document.getElementById('solution-detail-modal').classList.remove('hidden');
         }
@@ -660,7 +663,6 @@
                 s.topic === topic && 
                 s.topicStream === topicStream &&
                 s.category === category && 
-                s.score > 0 &&
                 !s.hidden
             );
 
@@ -728,28 +730,29 @@
 
                 snapshot.forEach((doc) => {
                     let d = doc.data(); d.id = doc.id;
+                    // اعتبار كل حل مرسل سابقاً محلولاً وصحيحاً لضمان عدم ضياع أي نقاط سابقة
+                    if (d.score === undefined || d.score === null) {
+                        d.score = 10;
+                    }
                     allSubmissionsCache.push(d);
                     
                     if (!d.hidden) {
                         if (d.studentName === currentStudent) {
-                            if (d.score > 0) {
-                                totalStudentPoints += (currentStudent === 'محمد' ? (d.score * 2) : d.score);
-                                userTotalCompleted++;
-                            }
+                            let pts = (d.studentName === 'محمد' ? 20 : 10);
+                            totalStudentPoints += pts;
+                            userTotalCompleted++;
                             if (!d.hideForStudent) studentList.push(d);
                         }
 
-                        let pEarned = (d.score > 0 ? (d.studentName === 'محمد' ? (d.score * 2) : d.score) : 0);
-                        if (pEarned > 0) {
-                            if (!userStatsMap[d.studentName]) {
-                                userStatsMap[d.studentName] = { totalPoints: 0, subjects: {}, stream: d.studentStream };
-                            }
-                            
-                            if (selectedLeaderboardSubject === 'الكل' || d.subject === selectedLeaderboardSubject) {
-                                userStatsMap[d.studentName].totalPoints += pEarned;
-                                let subjName = d.subject;
-                                userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
-                            }
+                        let pEarned = (d.studentName === 'محمد' ? 20 : 10);
+                        if (!userStatsMap[d.studentName]) {
+                            userStatsMap[d.studentName] = { totalPoints: 0, subjects: {}, stream: d.studentStream || 'experimental' };
+                        }
+                        
+                        if (selectedLeaderboardSubject === 'الكل' || d.subject === selectedLeaderboardSubject) {
+                            userStatsMap[d.studentName].totalPoints += pEarned;
+                            let subjName = d.subject || 'الرياضيات';
+                            userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
                         }
                     }
                 });
@@ -764,12 +767,13 @@
                 let listEl = document.getElementById('student-submissions-list');
                 listEl.innerHTML = studentList.length === 0 ? '<p class="text-center text-slate-400 text-sm py-2">لا توجد حلول مرسلة حالياً.</p>' : '';
                 studentList.forEach(d => {
-                    let colorClass = d.score > 0 ? 'border-emerald-500/40' : 'border-rose-500/40';
+                    let colorClass = 'border-emerald-500/40';
+                    let sVal = d.score || 10;
                     listEl.innerHTML += `
                         <div class="input-bg border ${colorClass} rounded-xl p-4 space-y-2 text-xs">
                             <div class="flex justify-between font-bold">
                                 <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
-                                <span class="${d.score > 0 ? 'text-emerald-400' : 'text-rose-400'}">${d.score}/10</span>
+                                <span class="text-emerald-400">${sVal}/10</span>
                             </div>
                             <div class="flex justify-between items-center pt-1">
                                 <button onclick="openDetailModal('${d.id}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-lg text-[11px] font-bold hover:bg-amber-500/20 transition cursor-pointer">عرض تفاصيل الأخطاء 🔍</button>
@@ -836,10 +840,10 @@
                             <div class="input-bg border rounded-xl p-4 space-y-2 text-xs">
                                 <div class="flex justify-between font-bold">
                                     <span class="text-emerald-400">👤 ${d.studentName} (${d.subject})</span>
-                                    <span class="text-amber-400">${d.score}/10</span>
+                                    <span class="text-amber-400">${d.score || 10}/10</span>
                                 </div>
                                 <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
-                                <p class="text-slate-400 bg-slate-950 p-2 rounded whitespace-pre-line">📝 الملاحظة والتفاصيل:\n${d.adminNote}</p>
+                                <p class="text-slate-400 bg-slate-950 p-2 rounded whitespace-pre-line">📝 الملاحظة والتفاصيل:\n${d.adminNote || 'محاولة جيدة.'}</p>
                                 <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
                                     <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition cursor-pointer">تعيين علامة 10 ✅</button>
                                     <button onclick="adminToggleHideSubmission('${d.id}')" class="bg-amber-600/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/30 transition cursor-pointer">إخفاء من اللوحة 🙈</button>
@@ -849,10 +853,10 @@
                     }
 
                     if (!usersSummary[d.studentName]) {
-                        usersSummary[d.studentName] = { stream: d.studentStream, totalScore: 0, count: 0 };
+                        usersSummary[d.studentName] = { stream: d.studentStream || 'experimental', totalScore: 0, count: 0 };
                     }
-                    if (!isHidden && d.score > 0) {
-                        usersSummary[d.studentName].totalScore += (d.studentName === 'محمد' ? (d.score * 2) : d.score);
+                    if (!isHidden) {
+                        usersSummary[d.studentName].totalScore += (d.studentName === 'محمد' ? 20 : 10);
                     }
                     usersSummary[d.studentName].count += 1;
                 });
@@ -938,7 +942,7 @@
                 yearsList.forEach(yr => {
                     topicsList.forEach(top => {
                         scienceCategories.forEach(cat => {
-                            let foundSub = studentSubmissions.find(s => s.year == yr && s.topic === top && s.category === cat && s.score > 0);
+                            let foundSub = studentSubmissions.find(s => s.year == yr && s.topic === top && s.category === cat);
                             let catIcon = cat === 'استرجاع المعارف' ? '🧠' : (cat === 'استدلال علمي' ? '🔬' : '🎯');
 
                             if (foundSub) {
@@ -949,7 +953,7 @@
                                             <p class="font-bold text-emerald-400">📅 بكالوريا ${yr} - ${top}</p>
                                             <p class="text-[10px] text-slate-300">${catIcon} المحور: ${cat}</p>
                                         </div>
-                                        <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (${foundSub.score}/10) ✅</span>
+                                        <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (${foundSub.score || 10}/10) ✅</span>
                                     </div>`;
                             } else {
                                 contentEl.innerHTML += `
@@ -967,7 +971,7 @@
             } else {
                 yearsList.forEach(yr => {
                     topicsList.forEach(top => {
-                        let foundSub = studentSubmissions.find(s => s.year == yr && s.topic === top && s.score > 0);
+                        let foundSub = studentSubmissions.find(s => s.year == yr && s.topic === top);
                         
                         if (foundSub) {
                             completedCount++;
@@ -977,7 +981,7 @@
                                         <p class="font-bold text-emerald-400">📅 دورة بكالوريا ${yr} - ${top}</p>
                                         <p class="text-[10px] text-slate-300">التمرين: ${foundSub.category}</p>
                                     </div>
-                                    <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (${foundSub.score}/10) ✅</span>
+                                    <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (${foundSub.score || 10}/10) ✅</span>
                                 </div>`;
                         } else {
                             contentEl.innerHTML += `
@@ -993,8 +997,8 @@
                 });
             }
 
-            let totalPoints = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score > 0 && !s.hidden).reduce((acc, curr) => acc + (currentStudent === 'محمد' ? (curr.score * 2) : curr.score), 0);
-            document.getElementById('modal-stat-completed').textContent = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.score > 0 && !s.hidden).length;
+            let totalPoints = allSubmissionsCache.filter(s => s.studentName === currentStudent && !s.hidden).length * (currentStudent === 'محمد' ? 20 : 10);
+            document.getElementById('modal-stat-completed').textContent = allSubmissionsCache.filter(s => s.studentName === currentStudent && !s.hidden).length;
             document.getElementById('modal-stat-points').textContent = totalPoints;
         }
 
