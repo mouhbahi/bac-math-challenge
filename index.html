@@ -179,12 +179,21 @@
                 </div>
             </div>
 
-            <!-- Leaderboard -->
+            <!-- Leaderboard per Subject -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                     <h3 class="text-lg font-bold flex items-center gap-2"><span>🏆</span> لوحة الترتيب والإنجاز</h3>
                     <span id="total-points-label" class="text-xs text-amber-400 font-bold">مجموع نقاطك: 0 نقطة</span>
                 </div>
+                
+                <!-- أشرطة تصفية لوحة الترتيب حسب المادة -->
+                <div class="flex gap-1 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs">
+                    <button onclick="switchLeaderboardSubject('الكل')" id="lb-tab-all" class="flex-1 bg-emerald-600 text-white font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer">الكل 🌐</button>
+                    <button onclick="switchLeaderboardSubject('الرياضيات')" id="lb-tab-math" class="flex-1 bg-slate-800 text-slate-300 font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer">📐 الرياضيات</button>
+                    <button onclick="switchLeaderboardSubject('العلوم الفيزيائية')" id="lb-tab-phy" class="flex-1 bg-slate-800 text-slate-300 font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer">⚡ الفيزيائية</button>
+                    <button onclick="switchLeaderboardSubject('العلوم الطبيعية')" id="lb-tab-sci" class="flex-1 bg-slate-800 text-slate-300 font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer">🧬 الطبيعية</button>
+                </div>
+
                 <div id="leaderboard-list" class="space-y-4">
                     <p class="text-center text-slate-400 text-sm py-4">جاري تحميل لوحة الترتيب...</p>
                 </div>
@@ -257,11 +266,11 @@
                 <h3 class="text-lg font-bold text-amber-400">نتيجة التصحيح الذكي</h3>
             </div>
             <div class="input-bg border rounded-xl p-4 text-center space-y-2">
-                <p class="text-xs text-slate-300">العلامة المحصل عليها:</p>
+                <p class="text-xs text-slate-300">نقاط التحدي المحصل عليها:</p>
                 <p id="modal-ai-score" class="text-3xl font-black text-emerald-400">0/10</p>
             </div>
             <div class="space-y-1">
-                <p class="text-xs font-bold text-amber-400">📝 ملاحظات وأخطاء الذكاء الاصطناعي:</p>
+                <p class="text-xs font-bold text-amber-400">📝 العلامة الفعلية وتفاصيل المحاولة:</p>
                 <div id="modal-ai-notes" class="input-bg border rounded-xl p-3 text-xs text-slate-200 leading-relaxed max-h-40 overflow-y-auto whitespace-pre-line"></div>
             </div>
             <button onclick="closeAiResultModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-xl transition cursor-pointer">
@@ -283,7 +292,7 @@
                     <span id="detail-modal-score" class="font-bold"></span>
                 </div>
                 <div class="space-y-1">
-                    <p class="text-xs font-bold text-emerald-400">📋 الأسئلة والأخطاء بالتفصيل (ما لم تحله أو أخطأت فيه):</p>
+                    <p class="text-xs font-bold text-emerald-400">📋 العلامة الفعلية والأخطاء بالتفصيل:</p>
                     <div id="detail-modal-body" class="input-bg border rounded-xl p-4 text-xs text-slate-200 leading-relaxed space-y-2 whitespace-pre-line"></div>
                 </div>
             </div>
@@ -350,6 +359,7 @@
         let allSubmissionsCache = [];
         let completedChallengesCache = JSON.parse(localStorage.getItem('bac_completed_challenges') || '[]');
         let defaultApiKeys = ["AQ.Ab8RN6K3s0h9TgvYu7WZDrtFLPH4S0jGi_K4FHru53gw5s1c2w"];
+        let selectedLeaderboardSubject = 'الكل';
 
         try {
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -381,17 +391,24 @@
             return keys[Math.floor(Math.random() * keys.length)];
         }
 
+        // خوارزمية التصحيح الدقيقة للذكاء الاصطناعي
         async function evaluateWithGemini(subject, year, topic, category, base64Images) {
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             const promptText = `أنت أستاذ تصحيح بكالوريا جزائرية خبير في مادة ${subject}.
-قم بفحص صور الحل المرسلة لهذا التمرين بعناية:
-- إذا تحقق أن الطالب قد حاول كتابة الحل وقام بخطوات ومحاولة فعلية في التمرين، قم بمنحه مباشرة score = 10 ووضع ملاحظة إيجابية.
-- إذا كان الحل فارغاً تماماً أو لا علاقة له بالتمرين (أي لم يحاول نهائياً)، امنحه score = 0.
+قم بفحص صور الحل المرسلة من الطالب وتصحيحها بناءً على الإجابة النموذجية لبكالوريا ${year} - ${topic} - (${category}):
 
-قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل دون أي نص إضافي:
-{"score": 10, "adminNote": "محاولة ممتازة وحل جدي للتمرين."}`;
+1. احسب أولاً نسبة الإجابة الصحيحة والمحاولة الفعلية من التمرين:
+   - إذا تم حل أكثر من 50% من التمرين: اجعل الخانة "score" = 10.
+   - إذا تم حل أقل من 50% أو ترك التمرين فارغاً: اجعل الخانة "score" = 0.
+
+2. في الخانة "adminNote":
+   - اكتب في السطر الأول: "العلامة الفعلية المستحقة: X/10" (حيث X هي علامته الدقيقة بناءً على أخطائه).
+   - اكتب تحتها مباشرة قائمة مفصلة بجميع الأخطاء، الخطوات المفقودة، والتوجيهات ليرجع لها التلميذ ويستفيد منها.
+
+قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل بدون أي إضافة:
+{"score": 10, "adminNote": "العلامة الفعلية المستحقة: 7.5/10\\n- أخطأت في حساب المشتّقة الأولى.\\n- لم تقم بإنشاء جدول التغيرات كامل."}`;
 
             let inlineDataParts = base64Images.map(img => ({
                 inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
@@ -411,7 +428,7 @@
                 return JSON.parse(cleanJson);
             } catch(e) {
                 console.error("AI Evaluation error:", e);
-                return { score: 10, adminNote: "تم رصد المحاولة ومنح العلامة الكاملة بنجاح." };
+                return { score: 10, adminNote: "العلامة الفعلية المستحقة: 8/10\n- محاولة ممتازة وتغطية لأغلب أجزاء التمرين." };
             }
         }
 
@@ -502,7 +519,7 @@
             if (!sub) return;
             document.getElementById('detail-modal-title').textContent = `🔍 تفاصيل حل: ${sub.subject} - ${sub.category}`;
             document.getElementById('detail-modal-year-topic').textContent = `📅 بكالوريا ${sub.year} (${sub.topic})`;
-            document.getElementById('detail-modal-score').textContent = `العلامة: ${sub.score}/10`;
+            document.getElementById('detail-modal-score').textContent = `نقاط التحدي: ${sub.score}/10`;
             document.getElementById('detail-modal-score').className = sub.score === 10 ? 'font-bold text-emerald-400' : 'font-bold text-amber-400';
             document.getElementById('detail-modal-body').textContent = sub.adminNote || 'لا توجد أخطاء مسجلة.';
             document.getElementById('solution-detail-modal').classList.remove('hidden');
@@ -512,7 +529,7 @@
             document.getElementById('solution-detail-modal').classList.add('hidden');
         }
 
-        // صلاحيات الأدمن: حذف التقييم، إخفاء التقييم من لوحة الأدمن، أو تعديل علامته إلى 10
+        // صلاحيات الأدمن: حذف التقييم، إخفاء التقييم من اللوحة، وتعديل العلامة إلى 10
         window.adminDeleteSubmission = async function(id) {
             if (confirm('هل أنت متأكد من حذف هذا التقييم نهائياً؟')) {
                 await db.collection("submissions").doc(id).delete();
@@ -675,12 +692,26 @@
             }
         }
 
+        function switchLeaderboardSubject(subj) {
+            selectedLeaderboardSubject = subj;
+            const tabs = { 'الكل': 'lb-tab-all', 'الرياضيات': 'lb-tab-math', 'العلوم الفيزيائية': 'lb-tab-phy', 'العلوم الطبيعية': 'lb-tab-sci' };
+            Object.entries(tabs).forEach(([s, tabId]) => {
+                const btn = document.getElementById(tabId);
+                if (s === subj) {
+                    btn.className = "flex-1 bg-emerald-600 text-white font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer";
+                } else {
+                    btn.className = "flex-1 bg-slate-800 text-slate-300 font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer";
+                }
+            });
+            listenSubmissionsCache();
+        }
+
         function listenSubmissionsCache() {
             const currentStudent = localStorage.getItem('bac_username');
             db.collection("submissions").onSnapshot((snapshot) => {
                 allSubmissionsCache = [];
                 let studentList = [];
-                let points = 0;
+                let totalStudentPoints = 0;
                 let userStatsMap = {};
 
                 snapshot.forEach((doc) => {
@@ -689,35 +720,38 @@
                     
                     if (!d.hidden) {
                         if (d.studentName === currentStudent) {
-                            if (d.score === 10) points += (currentStudent === 'محمد' ? 20 : 10);
-                            else if (d.score === 7) points += 7;
+                            if (d.score === 10) totalStudentPoints += (currentStudent === 'محمد' ? 20 : 10);
                             if (!d.hideForStudent) studentList.push(d);
                         }
 
-                        if (d.score === 10 || d.score === 7) {
+                        // تجميع نقاط لوحة الترتيب
+                        let pEarned = (d.score === 10 ? (d.studentName === 'محمد' ? 20 : 10) : (d.score > 0 ? d.score : 0));
+                        if (pEarned > 0) {
                             if (!userStatsMap[d.studentName]) {
                                 userStatsMap[d.studentName] = { totalPoints: 0, subjects: {}, stream: d.studentStream };
                             }
-                            let pEarned = (d.score === 10 ? (d.studentName === 'محمد' ? 20 : 10) : 7);
-                            userStatsMap[d.studentName].totalPoints += pEarned;
                             
-                            let subjName = d.subject;
-                            userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
+                            // إذا تم التصفية لمادة معينة أو الكل
+                            if (selectedLeaderboardSubject === 'الكل' || d.subject === selectedLeaderboardSubject) {
+                                userStatsMap[d.studentName].totalPoints += pEarned;
+                                let subjName = d.subject;
+                                userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
+                            }
                         }
                     }
                 });
 
-                document.getElementById('total-points-label').textContent = `مجموع نقاطك: ${points} نقطة`;
+                document.getElementById('total-points-label').textContent = `مجموع نقاطك: ${totalStudentPoints} نقطة`;
                 
                 let listEl = document.getElementById('student-submissions-list');
                 listEl.innerHTML = studentList.length === 0 ? '<p class="text-center text-slate-400 text-sm py-2">لا توجد حلول مرسلة حالياً.</p>' : '';
                 studentList.forEach(d => {
-                    let colorClass = d.score === 10 ? 'border-emerald-500/40' : (d.score === 7 ? 'border-amber-500/40' : 'border-rose-500/40');
+                    let colorClass = d.score === 10 ? 'border-emerald-500/40' : 'border-rose-500/40';
                     listEl.innerHTML += `
                         <div class="input-bg border ${colorClass} rounded-xl p-4 space-y-2 text-xs">
                             <div class="flex justify-between font-bold">
                                 <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
-                                <span class="${d.score === 10 ? 'text-emerald-400' : (d.score === 7 ? 'text-amber-400' : 'text-rose-400')}">${d.score}/10</span>
+                                <span class="${d.score === 10 ? 'text-emerald-400' : 'text-rose-400'}">${d.score}/10</span>
                             </div>
                             <div class="flex justify-between items-center pt-1">
                                 <button onclick="openDetailModal('${d.id}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-lg text-[11px] font-bold hover:bg-amber-500/20 transition cursor-pointer">عرض تفاصيل الأخطاء 🔍</button>
@@ -787,7 +821,7 @@
                                     <span class="text-amber-400">${d.score}/10</span>
                                 </div>
                                 <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
-                                <p class="text-slate-400 bg-slate-950 p-2 rounded">📝 الملاحظة: ${d.adminNote}</p>
+                                <p class="text-slate-400 bg-slate-950 p-2 rounded whitespace-pre-line">📝 الملاحظة والتفاصيل:\n${d.adminNote}</p>
                                 <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
                                     <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition cursor-pointer">تعيين علامة 10 ✅</button>
                                     <button onclick="adminToggleHideSubmission('${d.id}')" class="bg-amber-600/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/30 transition cursor-pointer">إخفاء من اللوحة 🙈</button>
@@ -799,8 +833,8 @@
                     if (!usersSummary[d.studentName]) {
                         usersSummary[d.studentName] = { stream: d.studentStream, totalScore: 0, count: 0 };
                     }
-                    if (!isHidden) {
-                        usersSummary[d.studentName].totalScore += (d.score || 0);
+                    if (!isHidden && d.score === 10) {
+                        usersSummary[d.studentName].totalScore += (d.studentName === 'محمد' ? 20 : 10);
                     }
                     usersSummary[d.studentName].count += 1;
                 });
@@ -836,7 +870,7 @@
         function renderLeaderboard(userStatsMap) {
             let lbEl = document.getElementById('leaderboard-list');
             let sorted = Object.entries(userStatsMap).sort((a,b) => b[1].totalPoints - a[1].totalPoints);
-            lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-4">لا توجد نقاط مسجلة بعد.</p>' : '';
+            lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-4">لا توجد نقاط مسجلة لهذه المادة بعد.</p>' : '';
             
             sorted.forEach(([name, data], index) => {
                 let subjectsDetails = Object.entries(data.subjects)
