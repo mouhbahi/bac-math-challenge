@@ -104,14 +104,6 @@
                 </div>
             </div>
 
-            <!-- Active Challenges -->
-            <div class="card-bg border border-amber-500/40 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>🔥</span> تحديات الأدمن النشطة</h3>
-                <div id="student-challenges-container" class="space-y-4">
-                    <p class="text-center text-slate-400 text-sm py-2">لا توجد تحديات مرسلة حالياً.</p>
-                </div>
-            </div>
-
             <!-- Submit Solution Section -->
             <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -204,7 +196,7 @@
             <div class="card-bg border rounded-2xl p-6 shadow-xl flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-bold text-emerald-400">🛠️ لوحة الأدمن والتحكم (محمد)</h3>
-                    <p class="text-xs text-slate-300">إدارة مفاتيح الـ AI، التقييمات، والتحديات</p>
+                    <p class="text-xs text-slate-300">إدارة مفاتيح الـ AI والتقييمات</p>
                 </div>
                 <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
             </div>
@@ -212,7 +204,6 @@
             <div class="flex gap-1 border-b border-slate-700 pb-3 overflow-x-auto">
                 <button onclick="switchAdminTab('pending')" id="tab-pending" class="flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">التقييمات 📥</button>
                 <button onclick="switchAdminTab('keys')" id="tab-keys" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">مفاتيح AI 🔑</button>
-                <button onclick="switchAdminTab('challenge')" id="tab-challenge" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">إرسال تحدي 🎯</button>
                 <button onclick="switchAdminTab('users')" id="tab-users" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">إدارة الطلاب 👥</button>
             </div>
 
@@ -231,17 +222,6 @@
                         <button onclick="addApiKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 rounded-xl text-xs">إضافة ➕</button>
                     </div>
                     <div id="api-keys-list" class="space-y-2 pt-2"></div>
-                </div>
-            </div>
-
-            <div class="space-y-4 hidden" id="admin-challenge-section">
-                <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
-                    <h4 class="font-bold text-amber-400 text-sm">🎯 نشر تحدي جديد (يدوي - بدون تدخل AI)</h4>
-                    <input type="text" id="chal-title" placeholder="عنوان التحدي..." class="w-full input-bg border rounded-xl p-3 text-xs">
-                    <textarea id="chal-desc" rows="2" placeholder="الوصف..." class="w-full input-bg border rounded-xl p-3 text-xs"></textarea>
-                    <input type="file" id="chal-image-input" accept="image/*" class="w-full input-bg border rounded-xl p-2 text-xs">
-                    <input type="number" id="chal-points" value="25" class="w-full input-bg border rounded-xl p-3 text-xs text-amber-400 font-bold text-center">
-                    <button onclick="publishChallenge()" class="w-full bg-amber-600 text-white font-bold py-3 rounded-xl text-xs">نشر التحدي 🚀</button>
                 </div>
             </div>
 
@@ -369,7 +349,6 @@
 
         let db = null;
         let allSubmissionsCache = [];
-        let completedChallengesCache = JSON.parse(localStorage.getItem('bac_completed_challenges') || '[]');
         let defaultApiKeys = ["AQ.Ab8RN6K3s0h9TgvYu7WZDrtFLPH4S0jGi_K4FHru53gw5s1c2w"];
         let selectedLeaderboardSubject = 'الكل';
 
@@ -533,7 +512,7 @@
             if (!sub) return;
             document.getElementById('detail-modal-title').textContent = `🔍 تفاصيل حل: ${sub.subject} - ${sub.category}`;
             document.getElementById('detail-modal-year-topic').textContent = `📅 بكالوريا ${sub.year} (${sub.topic})`;
-            document.getElementById('detail-modal-score').textContent = `نقاط التحدي: ${sub.score || 10}/10`;
+            document.getElementById('detail-modal-score').textContent = `نقاط التمارين: ${sub.score || 10}/10`;
             document.getElementById('detail-modal-score').className = 'font-bold text-emerald-400';
             document.getElementById('detail-modal-body').textContent = sub.adminNote || 'لا توجد أخطاء مسجلة.';
             document.getElementById('solution-detail-modal').classList.remove('hidden');
@@ -548,11 +527,6 @@
                 await db.collection("submissions").doc(id).delete();
                 alert('تم حذف التقييم بنجاح 🗑️');
             }
-        };
-
-        window.adminToggleHideSubmission = async function(id) {
-            await db.collection("submissions").doc(id).update({ hidden: true });
-            alert('تم إخفاء التقييم من اللوحة بنجاح 🙈');
         };
 
         window.adminSetScoreTo10 = async function(id) {
@@ -734,7 +708,6 @@
                     }
                     allSubmissionsCache.push(d);
                     
-                    // إلغاء شرط الإخفاء نهائياً لتظهر كل الحلول والتقييمات تلقائياً
                     if (d.studentName === currentStudent) {
                         let pts = (d.studentName === 'محمد' ? 20 : 10);
                         totalStudentPoints += pts;
@@ -781,32 +754,6 @@
 
                 renderLeaderboard(userStatsMap);
                 checkExistingSubmission();
-            });
-
-            db.collection("challenges").onSnapshot((snapshot) => {
-                let chalEl = document.getElementById('student-challenges-container');
-                chalEl.innerHTML = '';
-                let activeChallengesCount = 0;
-
-                snapshot.forEach(doc => {
-                    let cId = doc.id;
-                    let c = doc.data();
-                    if (!completedChallengesCache.includes(cId)) {
-                        activeChallengesCount++;
-                        chalEl.innerHTML += `
-                            <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-4 space-y-2 text-xs flex justify-between items-center">
-                                <div>
-                                    <h4 class="font-bold text-amber-400">${c.title}</h4>
-                                    <p class="text-slate-300">${c.description}</p>
-                                </div>
-                                <button onclick="completeChallenge('${cId}')" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-2 rounded-lg shrink-0 cursor-pointer">إتمام ✅</button>
-                            </div>`;
-                    }
-                });
-
-                if (activeChallengesCount === 0) {
-                    chalEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-2">لا توجد تحديات نشطة حالياً. أتممتها كلها ببطولة! 🔥</p>';
-                }
             });
         }
 
@@ -867,14 +814,6 @@
             });
         }
 
-        function completeChallenge(challengeId) {
-            if (!completedChallengesCache.includes(challengeId)) {
-                completedChallengesCache.push(challengeId);
-                localStorage.setItem('bac_completed_challenges', JSON.stringify(completedChallengesCache));
-                location.reload();
-            }
-        }
-
         function renderLeaderboard(userStatsMap) {
             let lbEl = document.getElementById('leaderboard-list');
             let sorted = Object.entries(userStatsMap).sort((a,b) => b[1].totalPoints - a[1].totalPoints);
@@ -921,7 +860,6 @@
             let topicsList = ['الموضوع الأول', 'الموضوع الثاني'];
 
             let completedCount = 0;
-            // إزالة شرط hidden لتظهر الحلول في الخريطة مباشرة
             let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.subject === selectedSubject && (selectedSubject === 'العلوم الطبيعية' || s.topicStream === selectedStream));
 
             if (selectedSubject === 'العلوم الطبيعية') {
@@ -1012,7 +950,7 @@
         }
 
         function switchAdminTab(tab) {
-            ['pending', 'keys', 'challenge', 'users'].forEach(t => {
+            ['pending', 'keys', 'users'].forEach(t => {
                 document.getElementById(`admin-${t}-section`).classList.toggle('hidden', t !== tab);
             });
         }
@@ -1043,14 +981,6 @@
             keys.splice(index, 1);
             localStorage.setItem('bac_api_keys', JSON.stringify(keys));
             renderApiKeys();
-        }
-
-        async function publishChallenge() {
-            let title = document.getElementById('chal-title').value;
-            let desc = document.getElementById('chal-desc').value;
-            if(!title) return alert('اكتب عنوان التحدي');
-            await db.collection("challenges").add({ title, description: desc, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            alert('تم نشر التحدي بنجاح يدوي 🚀');
         }
 
         function logout() { localStorage.clear(); location.reload(); }
