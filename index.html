@@ -662,8 +662,7 @@
                 s.year == year && 
                 s.topic === topic && 
                 s.topicStream === topicStream &&
-                s.category === category && 
-                !s.hidden
+                s.category === category
             );
 
             document.getElementById('upload-form-section').classList.toggle('hidden', !!found);
@@ -730,30 +729,28 @@
 
                 snapshot.forEach((doc) => {
                     let d = doc.data(); d.id = doc.id;
-                    // اعتبار كل حل مرسل سابقاً محلولاً وصحيحاً لضمان عدم ضياع أي نقاط سابقة
                     if (d.score === undefined || d.score === null) {
                         d.score = 10;
                     }
                     allSubmissionsCache.push(d);
                     
-                    if (!d.hidden) {
-                        if (d.studentName === currentStudent) {
-                            let pts = (d.studentName === 'محمد' ? 20 : 10);
-                            totalStudentPoints += pts;
-                            userTotalCompleted++;
-                            if (!d.hideForStudent) studentList.push(d);
-                        }
+                    // إلغاء شرط الإخفاء نهائياً لتظهر كل الحلول والتقييمات تلقائياً
+                    if (d.studentName === currentStudent) {
+                        let pts = (d.studentName === 'محمد' ? 20 : 10);
+                        totalStudentPoints += pts;
+                        userTotalCompleted++;
+                        if (!d.hideForStudent) studentList.push(d);
+                    }
 
-                        let pEarned = (d.studentName === 'محمد' ? 20 : 10);
-                        if (!userStatsMap[d.studentName]) {
-                            userStatsMap[d.studentName] = { totalPoints: 0, subjects: {}, stream: d.studentStream || 'experimental' };
-                        }
-                        
-                        if (selectedLeaderboardSubject === 'الكل' || d.subject === selectedLeaderboardSubject) {
-                            userStatsMap[d.studentName].totalPoints += pEarned;
-                            let subjName = d.subject || 'الرياضيات';
-                            userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
-                        }
+                    let pEarned = (d.studentName === 'محمد' ? 20 : 10);
+                    if (!userStatsMap[d.studentName]) {
+                        userStatsMap[d.studentName] = { totalPoints: 0, subjects: {}, stream: d.studentStream || 'experimental' };
+                    }
+                    
+                    if (selectedLeaderboardSubject === 'الكل' || d.subject === selectedLeaderboardSubject) {
+                        userStatsMap[d.studentName].totalPoints += pEarned;
+                        let subjName = d.subject || 'الرياضيات';
+                        userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
                     }
                 });
 
@@ -832,38 +829,27 @@
 
                 snapshot.forEach(doc => {
                     let d = doc.data(); d.id = doc.id;
-                    let isHidden = d.hidden ? true : false;
-
-                    if (!isHidden) {
-                        pendingCount++;
-                        pendingEl.innerHTML += `
-                            <div class="input-bg border rounded-xl p-4 space-y-2 text-xs">
-                                <div class="flex justify-between font-bold">
-                                    <span class="text-emerald-400">👤 ${d.studentName} (${d.subject})</span>
-                                    <span class="text-amber-400">${d.score || 10}/10</span>
-                                </div>
-                                <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
-                                <p class="text-slate-400 bg-slate-950 p-2 rounded whitespace-pre-line">📝 الملاحظة والتفاصيل:\n${d.adminNote || 'محاولة جيدة.'}</p>
-                                <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
-                                    <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition cursor-pointer">تعيين علامة 10 ✅</button>
-                                    <button onclick="adminToggleHideSubmission('${d.id}')" class="bg-amber-600/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600/30 transition cursor-pointer">إخفاء من اللوحة 🙈</button>
-                                    <button onclick="adminDeleteSubmission('${d.id}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-rose-600/30 transition cursor-pointer">حذف التقييم 🗑️</button>
-                                </div>
-                            </div>`;
-                    }
+                    pendingCount++;
+                    pendingEl.innerHTML += `
+                        <div class="input-bg border rounded-xl p-4 space-y-2 text-xs">
+                            <div class="flex justify-between font-bold">
+                                <span class="text-emerald-400">👤 ${d.studentName} (${d.subject})</span>
+                                <span class="text-amber-400">${d.score || 10}/10</span>
+                            </div>
+                            <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
+                            <p class="text-slate-400 bg-slate-950 p-2 rounded whitespace-pre-line">📝 الملاحظة والتفاصيل:\n${d.adminNote || 'محاولة جيدة.'}</p>
+                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
+                                <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition cursor-pointer">تعيين علامة 10 ✅</button>
+                                <button onclick="adminDeleteSubmission('${d.id}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-rose-600/30 transition cursor-pointer">حذف التقييم 🗑️</button>
+                            </div>
+                        </div>`;
 
                     if (!usersSummary[d.studentName]) {
                         usersSummary[d.studentName] = { stream: d.studentStream || 'experimental', totalScore: 0, count: 0 };
                     }
-                    if (!isHidden) {
-                        usersSummary[d.studentName].totalScore += (d.studentName === 'محمد' ? 20 : 10);
-                    }
+                    usersSummary[d.studentName].totalScore += (d.studentName === 'محمد' ? 20 : 10);
                     usersSummary[d.studentName].count += 1;
                 });
-
-                if (pendingCount === 0) {
-                    pendingEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">لا توجد تقييمات ظاهرة حالياً (تم إخفاؤها).</p>';
-                }
 
                 Object.entries(usersSummary).forEach(([sName, sData]) => {
                     usersEl.innerHTML += `
@@ -935,7 +921,8 @@
             let topicsList = ['الموضوع الأول', 'الموضوع الثاني'];
 
             let completedCount = 0;
-            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.subject === selectedSubject && (selectedSubject === 'العلوم الطبيعية' || s.topicStream === selectedStream) && !s.hidden);
+            // إزالة شرط hidden لتظهر الحلول في الخريطة مباشرة
+            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.subject === selectedSubject && (selectedSubject === 'العلوم الطبيعية' || s.topicStream === selectedStream));
 
             if (selectedSubject === 'العلوم الطبيعية') {
                 let scienceCategories = ['استرجاع المعارف', 'استدلال علمي', 'مسعى علمي'];
@@ -997,8 +984,8 @@
                 });
             }
 
-            let totalPoints = allSubmissionsCache.filter(s => s.studentName === currentStudent && !s.hidden).length * (currentStudent === 'محمد' ? 20 : 10);
-            document.getElementById('modal-stat-completed').textContent = allSubmissionsCache.filter(s => s.studentName === currentStudent && !s.hidden).length;
+            let totalPoints = allSubmissionsCache.filter(s => s.studentName === currentStudent).length * (currentStudent === 'محمد' ? 20 : 10);
+            document.getElementById('modal-stat-completed').textContent = allSubmissionsCache.filter(s => s.studentName === currentStudent).length;
             document.getElementById('modal-stat-points').textContent = totalPoints;
         }
 
