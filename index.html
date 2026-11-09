@@ -398,7 +398,6 @@
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-            // تحديد السلم الرسمي للعلامة بناءً على المادة والتمرين
             let markScale = "7";
             if (subject === 'العلوم الطبيعية') {
                 if (category === 'استرجاع المعارف') markScale = "5";
@@ -407,8 +406,8 @@
             } else if (subject === 'العلوم الفيزيائية') {
                 markScale = "6 أو 7";
             } else if (subject === 'الرياضيات') {
-                if (category.includes('المتتاليات') || category.includes('الإحصاء')) markScale = "6";
-                else markScale = "7";
+                if (category.includes('المتتاليات') || category.includes('الدوال')) markScale = "6 أو 7";
+                else markScale = "5 أو 6";
             }
 
             const unstudiedTextSection = unstudiedNote ? `ملاحظة خاصة من الطالب بشأن أسئلة لم يدرسها بعد ولا ينبغي الخصم عليها: "${unstudiedNote}"` : '';
@@ -608,7 +607,12 @@ ${unstudiedTextSection}
                     <option value="رياضيات">📐 رياضيات</option>
                     <option value="تقني رياضي">⚙️ تقني رياضي</option>
                 `;
-                options = ['الدوال (العددية، الأسية، اللوغاريتمية)', 'المتتاليات العددية', 'الإحصاء والاحتمالات', 'الأعداد المركبة والهندسة'];
+                options = [
+                    'التمرين الأول: الدوال (العددية، الأسية، اللوغاريتمية)', 
+                    'التمرين الثاني: المتتاليات العددية', 
+                    'التمرين الثالث: الأعداد المركبة', 
+                    'التمرين الرابع: الهندسة في الفضاء / الاحتمالات'
+                ];
             } else if (subject === 'العلوم الفيزيائية') {
                 topicStreamContainer.style.display = 'block';
                 topicStreamSelect.innerHTML = `
@@ -784,7 +788,7 @@ ${unstudiedTextSection}
         }
 
         function loadAdminData() {
-            db.collection("submissions").onSnapshot((snapshot) => {
+            db.collection("submissions").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
                 let pendingEl = document.getElementById('pending-list');
                 let usersEl = document.getElementById('admin-users-list');
                 
@@ -792,7 +796,6 @@ ${unstudiedTextSection}
                 usersEl.innerHTML = '';
 
                 let usersSummary = {};
-                let pendingCount = 0;
 
                 if (snapshot.empty) {
                     pendingEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">لا توجد تقييمات مسجلة.</p>';
@@ -802,12 +805,21 @@ ${unstudiedTextSection}
 
                 snapshot.forEach(doc => {
                     let d = doc.data(); d.id = doc.id;
-                    pendingCount++;
+                    
+                    let timeFormatted = 'وقت غير متوفر';
+                    if (d.timestamp && d.timestamp.toDate) {
+                        let dateObj = d.timestamp.toDate();
+                        timeFormatted = dateObj.toLocaleDateString('ar-DZ') + ' - ' + dateObj.toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
+                    }
+
                     pendingEl.innerHTML += `
                         <div class="input-bg border rounded-xl p-4 space-y-2 text-xs">
-                            <div class="flex justify-between font-bold">
+                            <div class="flex justify-between font-bold items-center">
                                 <span class="text-emerald-400">👤 ${d.studentName} (${d.subject})</span>
-                                <span class="text-amber-400">${d.score || 10}/10</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">🕒 ${timeFormatted}</span>
+                                    <span class="text-amber-400">${d.score || 10}/10</span>
+                                </div>
                             </div>
                             <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
                             <p class="text-slate-400 bg-slate-950 p-2 rounded whitespace-pre-line">📝 الملاحظة والتفاصيل:\n${d.adminNote || 'محاولة جيدة.'}</p>
