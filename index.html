@@ -147,6 +147,14 @@
 
                 <div id="submission-container">
                     <div id="upload-form-section" class="space-y-4">
+                        <!-- ملاحظة الأسئلة غير المدروسة -->
+                        <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 space-y-1.5">
+                            <label class="block text-xs font-bold text-amber-400 flex items-center gap-1">
+                                <span>⚠️ ملاحظة لـ AI (للأسئلة غير المدروسة فقط):</span>
+                            </label>
+                            <input type="text" id="unstudied-note-input" placeholder="مثال: لم أدرس السؤال الأخير (الجزء 3)، فلا تحتسبه في الخصم..." class="w-full input-bg border rounded-xl p-2.5 text-xs focus:outline-none">
+                        </div>
+
                         <div>
                             <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (اختر عدة صور دفعة واحدة):</label>
                             <input type="file" id="solution-images" accept="image/*" multiple class="w-full input-bg border rounded-xl p-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
@@ -386,15 +394,18 @@
             return keys[Math.floor(Math.random() * keys.length)];
         }
 
-        async function evaluateWithGemini(subject, year, topic, category, base64Images) {
+        async function evaluateWithGemini(subject, year, topic, category, base64Images, unstudiedNote) {
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
+            const unstudiedTextSection = unstudiedNote ? `ملاحظة هامة من الطالب بخصوص أجزاء لم يدرسها بعد ولا يجب حسابها كخطأ: "${unstudiedNote}"` : '';
+
             const promptText = `أنت أستاذ تصحيح بكالوريا جزائرية خبير في مادة ${subject}.
 قم بفحص صور الحل المرسلة من الطالب وتصحيحها بناءً على الإجابة النموذجية لبكالوريا ${year} - ${topic} - (${category}):
+${unstudiedTextSection}
 
-1. احسب أولاً نسبة الإجابة الصحيحة والمحاولة الفعلية من التمرين:
-   - إذا تم حل أكثر من 50% من التمرين: اجعل الخانة "score" = 10.
+1. احسب أولاً نسبة الإجابة الصحيحة والمحاولة الفعلية من التمرين مع الأخذ بعين الاعتبار ملاحظة الطالب حول ما لم يدرسه:
+   - إذا تم حل أكثر من 50% من الأجزاء المدروسة: اجعل الخانة "score" = 10.
    - إذا تم حل أقل من 50% أو ترك التمرين فارغاً: اجعل الخانة "score" = 0.
 
 2. في الخانة "adminNote":
@@ -431,6 +442,7 @@
             const filesInput = document.getElementById('solution-images');
             if (filesInput.files.length === 0) return alert('اختر صورة واحدة على الأقل للحل!');
 
+            const unstudiedNote = document.getElementById('unstudied-note-input').value.trim();
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span>جاري التحليل والتصحيح للصور بالـ AI... 🤖⏳</span>';
@@ -448,7 +460,7 @@
                 const topicStreamEl = document.getElementById('topic-stream-select');
                 const topicStream = topicStreamEl.parentElement.style.display !== 'none' ? topicStreamEl.value : 'علوم تجريبية';
 
-                const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls);
+                const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls, unstudiedNote);
 
                 const existingSubQuery = await db.collection("submissions")
                     .where("studentName", "==", name)
@@ -468,7 +480,7 @@
                         images: imageUrls,
                         status: 'approved',
                         score: finalScore,
-                        adminNote: aiResult.adminNote,
+                        adminNote: (unstudiedNote ? `[ملاحظة الطالب: ${unstudiedNote}]\n` : '') + aiResult.adminNote,
                         hidden: false,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -484,7 +496,7 @@
                         images: imageUrls,
                         status: 'approved',
                         score: aiResult.score > 0 ? aiResult.score : 10,
-                        adminNote: aiResult.adminNote,
+                        adminNote: (unstudiedNote ? `[ملاحظة الطالب: ${unstudiedNote}]\n` : '') + aiResult.adminNote,
                         hidden: false,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -492,6 +504,7 @@
 
                 showAiResultModal(aiResult.score > 0 ? aiResult.score : 10, aiResult.adminNote);
                 filesInput.value = '';
+                document.getElementById('unstudied-note-input').value = '';
                 checkExistingSubmission();
             } catch (e) {
                 alert('حدث خطأ أثناء التصحيح: ' + e.message);
@@ -819,7 +832,6 @@
             });
         }
 
-        // دالة عرض حلول الطالب للأدمن لإدارتها وحذفها
         function openAdminStudentSubmissions(studentName) {
             const modal = document.getElementById('admin-student-submissions-modal');
             const titleEl = document.getElementById('admin-student-modal-title');
@@ -857,9 +869,9 @@
         function renderLeaderboard(userStatsMap) {
             let lbEl = document.getElementById('leaderboard-list');
             let sorted = Object.entries(userStatsMap).sort((a,b) => b[1].totalPoints - a[1].totalPoints);
-            lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-4">لا توجد نقاط مسجلة لهذه المادة بعد الحديث.</p>' : '';
+            lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-4">لا توجد نقاط مسجلة لهذه المادة بعد.</p>' : '';
             
-            let totalAvailableExercises = 120; // إجمالي التمارين التقريبي
+            let totalAvailableExercises = 120;
 
             sorted.forEach(([name, data], index) => {
                 let progressPercent = Math.min(100, Math.round((data.completedCount / totalAvailableExercises) * 100));
