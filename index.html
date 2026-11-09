@@ -254,7 +254,7 @@
             </div>
             <div class="input-bg border rounded-xl p-4 text-center space-y-2">
                 <p class="text-xs text-slate-300">نقاط التحدي المحصل عليها:</p>
-                <p id="modal-ai-score" class="text-3xl font-black text-emerald-400">0/10</p>
+                <p id="modal-ai-score" class="text-3xl font-black text-emerald-400">10/10</p>
             </div>
             <div class="space-y-1">
                 <p class="text-xs font-bold text-amber-400">📝 العلامة الفعلية وتفاصيل المحاولة:</p>
@@ -398,22 +398,33 @@
             const apiKey = await getWorkingApiKey();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-            const unstudiedTextSection = unstudiedNote ? `ملاحظة هامة من الطالب بخصوص أجزاء لم يدرسها بعد ولا يجب حسابها كخطأ: "${unstudiedNote}"` : '';
+            // تحديد السلم الرسمي للعلامة بناءً على المادة والتمرين
+            let markScale = "7";
+            if (subject === 'العلوم الطبيعية') {
+                if (category === 'استرجاع المعارف') markScale = "5";
+                else if (category === 'استدلال علمي') markScale = "7";
+                else if (category === 'مسعى علمي') markScale = "8";
+            } else if (subject === 'العلوم الفيزيائية') {
+                markScale = "6 أو 7";
+            } else if (subject === 'الرياضيات') {
+                if (category.includes('المتتاليات') || category.includes('الإحصاء')) markScale = "6";
+                else markScale = "7";
+            }
 
-            const promptText = `أنت أستاذ تصحيح بكالوريا جزائرية خبير في مادة ${subject}.
-قم بفحص صور الحل المرسلة من الطالب وتصحيحها بناءً على الإجابة النموذجية لبكالوريا ${year} - ${topic} - (${category}):
+            const unstudiedTextSection = unstudiedNote ? `ملاحظة خاصة من الطالب بشأن أسئلة لم يدرسها بعد ولا ينبغي الخصم عليها: "${unstudiedNote}"` : '';
+
+            const promptText = `أنت أستاذ تصحيح دقيق في البكالوريا الجزائرية لمادة ${subject}.
+قم بمراجعة إجابة الطالب المرسلة عبر الصور وتصحيحها بناءً على الإجابة النموذجية لبكالوريا ${year} - ${topic} - المحور (${category}):
 ${unstudiedTextSection}
 
-1. احسب أولاً نسبة الإجابة الصحيحة والمحاولة الفعلية من التمرين مع الأخذ بعين الاعتبار ملاحظة الطالب حول ما لم يدرسه:
-   - إذا تم حل أكثر من 50% من الأجزاء المدروسة: اجعل الخانة "score" = 10.
-   - إذا تم حل أقل من 50% أو ترك التمرين فارغاً: اجعل الخانة "score" = 0.
+المطلوب:
+1. احسب العلامة الفعلية المستحقة بناءً على التصحيح النموذجي الجزائري والتوزيع الرسمي لهذا التمرين المقدر بـ (${markScale} نقاط).
+2. بالنسبة لخيار "score" اجعل قيمته دائماً = 10 في حال المحاولة الجادة لتسجيل التحدي.
+3. اكتب في الخانة "adminNote" في السطر الأول بالضبط: "العلامة الفعلية المستحقة: X / ${markScale}" (حيث X هي العلامة المحسوبة بدقة بعد خصم الأخطاء).
+4. اكتب تحتها تفصيل الأخطاء، الأجزاء الصحيحة، والتوجيهات.
 
-2. في الخانة "adminNote":
-   - اكتب في السطر الأول: "العلامة الفعلية المستحقة: X/10" (حيث X هي علامته الدقيقة بناءً على أخطائه).
-   - اكتب تحتها مباشرة قائمة مفصلة بجميع الأخطاء، الخطوات المفقودة، والتوجيهات ليرجع لها التلميذ ويستفيد منها.
-
-قم بإرجاع النتيجة بصيغة JSON حصراً بهذا الشكل بدون أي إضافة:
-{"score": 10, "adminNote": "العلامة الفعلية المستحقة: 7.5/10\\n- أخطأت في حساب المشتّقة الأولى.\\n- لم تقم بإنشاء جدول التغيرات كامل."}`;
+قم بإرجاع النتيجة بصيغة JSON حصراً بدون أي كود آخر:
+{"score": 10, "adminNote": "العلامة الفعلية المستحقة: 5.5 / ${markScale}\\n- الإجابة عن السؤال الأول صحيحة.\\n- يوجد خطأ في الحساب النهائي للمرحلة الأخيرة."}`;
 
             let inlineDataParts = base64Images.map(img => ({
                 inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
@@ -433,7 +444,7 @@ ${unstudiedTextSection}
                 return JSON.parse(cleanJson);
             } catch(e) {
                 console.error("AI Evaluation error:", e);
-                return { score: 10, adminNote: "العلامة الفعلية المستحقة: 8/10\n- محاولة ممتازة وتغطية لأغلب أجزاء التمرين." };
+                return { score: 10, adminNote: `العلامة الفعلية المستحقة: محاولة ممتازة / ${markScale}\n- تم فحص الحل بنجاح.` };
             }
         }
 
@@ -529,7 +540,7 @@ ${unstudiedTextSection}
             if (!sub) return;
             document.getElementById('detail-modal-title').textContent = `🔍 تفاصيل حل: ${sub.subject} - ${sub.category}`;
             document.getElementById('detail-modal-year-topic').textContent = `📅 بكالوريا ${sub.year} (${sub.topic})`;
-            document.getElementById('detail-modal-score').textContent = `نقاط التمارين: ${sub.score || 10}/10`;
+            document.getElementById('detail-modal-score').textContent = `نقاط التحدي: ${sub.score || 10}/10`;
             document.getElementById('detail-modal-score').className = 'font-bold text-emerald-400';
             document.getElementById('detail-modal-body').textContent = sub.adminNote || 'لا توجد أخطاء مسجلة.';
             document.getElementById('solution-detail-modal').classList.remove('hidden');
