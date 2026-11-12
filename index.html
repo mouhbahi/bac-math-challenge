@@ -447,6 +447,39 @@ ${unstudiedTextSection}
             }
         }
 
+        // دالة الضغط الذكي لمنع تجاوز حد 1MB عند إرسال عدة أوراق (مثل 7 أوراق)
+        function processHighQualityImage(file, totalFilesCount = 1) {
+            return new Promise((resolve) => {
+                const reader = new FileReader(); 
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image(); 
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        
+                        let max = totalFilesCount >= 5 ? 950 : (totalFilesCount >= 3 ? 1100 : 1250);
+                        let quality = totalFilesCount >= 5 ? 0.55 : (totalFilesCount >= 3 ? 0.68 : 0.8);
+
+                        let w = img.width, h = img.height;
+                        if (w > h && w > max) { h *= max / w; w = max; }
+                        else if (h > max) { w *= max / h; h = max; }
+                        
+                        canvas.width = w; 
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        
+                        if (totalFilesCount >= 5) {
+                            ctx.filter = 'grayscale(100%) contrast(115%)';
+                        }
+                        
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                };
+            });
+        }
+
         async function submitSolution() {
             const name = localStorage.getItem('bac_username');
             const filesInput = document.getElementById('solution-images');
@@ -459,8 +492,9 @@ ${unstudiedTextSection}
 
             try {
                 let imageUrls = [];
-                for (let i = 0; i < filesInput.files.length; i++) {
-                    imageUrls.push(await processHighQualityImage(filesInput.files[i]));
+                const totalFiles = filesInput.files.length;
+                for (let i = 0; i < totalFiles; i++) {
+                    imageUrls.push(await processHighQualityImage(filesInput.files[i], totalFiles));
                 }
 
                 const subject = document.getElementById('subject-select').value;
@@ -1008,24 +1042,6 @@ ${unstudiedTextSection}
 
         async function hideSubmissionForStudent(id) {
             await db.collection("submissions").doc(id).update({ hideForStudent: true });
-        }
-
-        function processHighQualityImage(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader(); reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image(); img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height, max = 1200;
-                        if (w > h && w > max) { h *= max / w; w = max; }
-                        else if (h > max) { w *= max / h; h = max; }
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', 0.8));
-                    };
-                };
-            });
         }
 
         function switchAdminTab(tab) {
