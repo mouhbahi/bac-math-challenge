@@ -1,1084 +1,212 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="default">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحدي مواضيع البكالوريا - النسخة الاحترافية المتكاملة</title>
-    <link rel="icon" href="https://images.emojiterra.com/google/android-11/512px/1f393.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Cairo', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        body.theme-default { background-color: #030712; color: #f8fafc; }
-        body.theme-purple { background-color: #1e1b4b; color: #f5f3ff; }
-        body.theme-blue { background-color: #0f172a; color: #e0f2fe; }
-        body.theme-gold { background-color: #0c0a09; color: #fef3c7; }
-
-        .theme-default .card-bg { background-color: #0f172a; border-color: #1e293b; }
-        .theme-purple .card-bg { background-color: #312e81; border-color: #4338ca; }
-        .theme-blue .card-bg { background-color: #1e293b; border-color: #38bdf8; box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.15); }
-        .theme-gold .card-bg { background-color: #1c1917; border-color: #44403c; }
-
-        .theme-default .input-bg { background-color: #020617; border-color: #334155; color: #ffffff; }
-        .theme-purple .input-bg { background-color: #1e1b4b; border-color: #4f46e5; color: #ffffff; }
-        .theme-blue .input-bg { background-color: #0f172a; border-color: #0284c7; color: #38bdf8; }
-        .theme-gold .input-bg { background-color: #0c0a09; border-color: #57534e; color: #fef3c7; }
-    </style>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تحدي مواضيع البكالوريا</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e1424;--panel:#161d33;--line:#27304d;--ink:#eef1fa;--mute:#8e98b8;--pen:#ff5a4d;--ok:#3ddc97;--on:#111;--r:14px;--sh:none;--vg:1;--btn:var(--pen);
+--bgimg:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);--bgsz:28px 28px;--deco:"📐 ✏️ 📚 🧪"}
+[data-theme=purple]{--bg:#1a0b2e;--panel:#2a1450aa;--line:#5b32a3;--ink:#f6ecff;--mute:#c4a8ee;--pen:#c084fc;--on:#fff;--r:28px;--sh:0 0 28px #c084fc40;--vg:.3;--btn:linear-gradient(135deg,#a855f7,#ec4899);
+--bgimg:radial-gradient(circle at 15% 10%,#7c3aed66,transparent 45%),radial-gradient(circle at 85% 85%,#ec489966,transparent 45%);--bgsz:auto;--deco:"🔮 ✨ 🌙 💫"}
+[data-theme=blue]{--bg:#e8f4ff;--panel:#ffffff;--line:#cde4f7;--ink:#0b2540;--mute:#5b7a99;--pen:#0a84ff;--ok:#12a36b;--on:#fff;--r:20px;--sh:0 10px 28px #0a84ff22;--vg:0;
+--bgimg:radial-gradient(circle at 85% 0,#9fd3ff99,transparent 50%),linear-gradient(180deg,#d6ecff,#eef7ff);--bgsz:auto;--deco:"🌊 🐬 🫧 ⛵"}
+[data-theme=gold]{--bg:#0b0b0b;--panel:#17140c;--line:#6b5416;--ink:#f6e7b8;--mute:#b09a62;--pen:#e8b923;--on:#1a1400;--r:3px;--sh:inset 0 0 0 5px #17140c,inset 0 0 0 6px #6b541677;--vg:.6;
+--bgimg:repeating-linear-gradient(45deg,#ffffff07 0 2px,transparent 2px 14px);--bgsz:auto;--deco:"👑 🏅 ⭐ 💎"}
+*{box-sizing:border-box;margin:0}
+body{font-family:Cairo,system-ui,sans-serif;background-color:var(--bg);background-image:var(--bgimg);background-size:var(--bgsz);background-attachment:fixed;color:var(--ink);min-height:100vh;transition:background-color .4s,color .4s}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 50% 0,transparent,var(--bg) 75%);opacity:var(--vg);pointer-events:none}
+body::after{content:var(--deco);position:fixed;bottom:10px;left:14px;font-size:1.8rem;letter-spacing:12px;opacity:.28;pointer-events:none}
+#app{position:relative;max-width:980px;margin:auto;padding:16px 14px 90px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+h1{font-size:1.25rem;font-weight:800}h2{font-size:1.05rem;margin-bottom:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:var(--sh);transition:transform .2s}
+.card:hover{transform:translateY(-2px)}
+[data-theme=purple] .card,[data-theme=purple] .modal>div{backdrop-filter:blur(10px)}
+label{display:block;font-size:.82rem;color:var(--mute);margin:10px 0 4px}
+input,select,textarea{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:calc(var(--r)*.7);padding:10px;font:inherit}
+[data-theme=blue] input,[data-theme=blue] select,[data-theme=blue] textarea{background:#f3f9ff}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--pen);outline-offset:1px}
+.btn{background:var(--btn);color:var(--on);border:0;border-radius:calc(var(--r)*.7);padding:10px 16px;font:inherit;font-weight:800;cursor:pointer;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+[data-theme=blue] .btn{border-radius:99px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}.btn.sm{padding:5px 10px;font-size:.8rem}
+.btn.red{background:#e5484d;color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+nav{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px}
+nav button{flex:1;white-space:nowrap;background:var(--panel);color:var(--mute);border:1px solid var(--line);border-radius:calc(var(--r)*.7);padding:9px 12px;font:inherit;cursor:pointer}
+nav button.on{color:var(--on);background:var(--btn);border-color:var(--pen);font-weight:800}
+[data-theme=purple] nav button,[data-theme=blue] nav button{border-radius:99px}
+[data-theme=blue] nav{background:#fff;padding:5px;border-radius:99px;box-shadow:var(--sh)}[data-theme=blue] nav button{border:0;background:transparent}[data-theme=blue] nav button.on{background:var(--pen)}
+[data-theme=gold] nav{border-bottom:1px solid var(--line)}[data-theme=gold] nav button{background:transparent;border:0;border-bottom:3px solid transparent;border-radius:0}[data-theme=gold] nav button.on{background:transparent;color:var(--pen);border-bottom-color:var(--pen)}
+[data-theme=blue] header,[data-theme=gold] header{flex-direction:column;text-align:center}
+[data-theme=gold] header{border-bottom:3px double var(--pen);padding-bottom:12px}[data-theme=gold] h1{letter-spacing:1px}
+.tag{display:inline-block;font-size:.75rem;padding:2px 9px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mute);margin:2px 0 2px 4px}
+.stamp{display:inline-grid;place-items:center;width:120px;height:120px;border:4px solid var(--pen);border-radius:50%;color:var(--pen);font-weight:800;font-size:2rem;transform:rotate(-8deg)}
+[data-theme=purple] .stamp{box-shadow:0 0 30px var(--pen),inset 0 0 20px #c084fc55}[data-theme=blue] .stamp{background:var(--pen);color:#fff;border-color:#fff;box-shadow:0 8px 24px #0a84ff55}[data-theme=gold] .stamp{border-style:double;border-width:7px;border-radius:8px}
+.hero{text-align:center;padding:26px 8px}.hero p{color:var(--mute);margin-top:6px}.emo{font-size:1.8rem;letter-spacing:10px;margin-top:10px}
+.bar{height:9px;background:var(--bg);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--btn);transition:width .6s}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.thumbs img{width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:pointer;margin:6px 0 0 6px}
+.dots{display:inline-flex;gap:4px}.dots b{width:16px;height:16px;border-radius:5px;border:1px solid var(--line)}.dots b.on{background:var(--ok);border-color:var(--ok)}
+.yr{display:grid;grid-template-columns:70px 1fr;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.rank{min-width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--bg);font-weight:800;font-size:1.2rem;flex:none}
+.top1{background:var(--btn);color:var(--on)}
+.modal{position:fixed;inset:0;background:#000a;display:grid;place-items:center;padding:14px;z-index:9}
+.modal>div{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r);padding:18px;max-width:640px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--sh)}
+.modal img.big{width:100%;border-radius:10px;margin-top:8px}
+pre{white-space:pre-wrap;font:inherit;line-height:1.9}
+.warn{color:var(--pen);font-size:.85rem;margin-top:8px}.mute{color:var(--mute);font-size:.85rem}
+.themes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.themes button{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:5px 12px;font:inherit;font-size:.82rem;cursor:pointer}
+.themes button.on{background:var(--btn);color:var(--on);border-color:var(--pen);font-weight:800}
+.fall{position:fixed;top:-40px;z-index:20;pointer-events:none}
+@media(prefers-reduced-motion:no-preference){.modal>div{animation:pop .2s ease-out}@keyframes pop{from{transform:scale(.94);opacity:0}}
+.stamp{animation:stamp .5s cubic-bezier(.3,1.6,.5,1)}@keyframes stamp{from{transform:rotate(-8deg) scale(2);opacity:0}}
+.fall{animation:fall 2.8s ease-in forwards}@keyframes fall{to{transform:translateY(112vh) rotate(420deg)}}
+body::after{animation:bob 4s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(-10px)}}}
+@media(prefers-reduced-motion:reduce){.fall{display:none}}
+</style>
 </head>
-<body class="theme-default min-h-screen flex flex-col justify-between">
-
-    <!-- Header -->
-    <header class="bg-slate-900/90 border-b border-slate-800 py-3 px-4 md:px-6 shadow-xl backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-4xl mx-auto flex justify-between items-center gap-2">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">🎓</span>
-                <div>
-                    <h1 class="text-base md:text-lg font-black text-amber-400">تحدي مواضيع البكالوريا 🤖 <span class="text-[10px] text-rose-400 font-semibold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/30">النسخة التجريبية - تتواجد بها أخطاء ⚠️</span></h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">منصة التصحيح الذكي والمتابعة الشاملة</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs">
-                <span class="text-[10px] text-slate-300 hidden sm:inline px-1">الثيم:</span>
-                <button onclick="setTheme('default')" class="w-5 h-5 rounded-full bg-emerald-600 border border-white/30 hover:scale-110 transition cursor-pointer"></button>
-                <button onclick="setTheme('purple')" class="w-5 h-5 rounded-full bg-indigo-600 border border-white/30 hover:scale-110 transition cursor-pointer"></button>
-                <button onclick="setTheme('blue')" class="w-5 h-5 rounded-full bg-sky-400 border border-white/30 hover:scale-110 transition cursor-pointer"></button>
-                <button onclick="setTheme('gold')" class="w-5 h-5 rounded-full bg-amber-500 border border-white/30 hover:scale-110 transition cursor-pointer"></button>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-2xl w-full mx-auto p-4 md:p-6 my-auto space-y-6">
-
-        <!-- Login Screen -->
-        <div id="login-screen" class="card-bg border rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
-            <div class="text-center mb-2">
-                <h2 class="text-2xl font-bold mb-2">مرحباً بك يا بطل البكالوريا 🏆</h2>
-                <p class="text-slate-300 text-sm">منصة احترافية مدعومة بالذكاء الاصطناعي للتصحيح الفوري</p>
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold mb-2">اختر صفتك:</label>
-                <select id="user-role" onchange="toggleRoleInput()" class="w-full input-bg border rounded-xl p-3.5 font-bold focus:outline-none">
-                    <option value="student">متنافس (طالب بكالوريا)</option>
-                    <option value="admin">مشرف المنصة (أدمن - محمد)</option>
-                </select>
-            </div>
-
-            <div id="name-group" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold mb-2">اسمك المستعار:</label>
-                    <input type="text" id="username-input" placeholder="اكتب اسمك هنا..." class="w-full input-bg border rounded-xl p-3.5 focus:outline-none font-semibold">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">شعبتك الأصلية:</label>
-                    <select id="user-stream" class="w-full input-bg border rounded-xl p-3.5 font-bold focus:outline-none text-emerald-400">
-                        <option value="experimental">🧬 علوم تجريبية</option>
-                        <option value="math">📐 رياضيات / تقني رياضي</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="pin-group" class="hidden">
-                <label class="block text-sm font-semibold mb-2">رمز المشرف السري:</label>
-                <input type="password" id="admin-pin" placeholder="أدخل كلمة السر الخاصة بك" class="w-full input-bg border rounded-xl p-3.5 focus:outline-none">
-            </div>
-
-            <button type="button" onclick="handleLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg transition cursor-pointer">
-                دخول إلى المنصة 🚀
-            </button>
-        </div>
-
-        <!-- Student Dashboard -->
-        <div id="student-dashboard" class="hidden space-y-6">
-            <div class="card-bg border rounded-2xl p-6 shadow-xl flex justify-between items-center">
-                <div>
-                    <p class="text-xs text-slate-300">مرحباً بالمتحدي،</p>
-                    <h3 id="student-display-name" class="text-xl font-bold text-emerald-400"></h3>
-                    <p id="student-stream-tag" class="text-[11px] text-amber-400 mt-0.5 font-semibold"></p>
-                </div>
-                <div>
-                    <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
-                </div>
-            </div>
-
-            <!-- Submit Solution Section -->
-            <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-lg font-bold flex items-center gap-2"><span>📤</span> إرسال حل تمرين (تصحيح ذكي AI 🤖)</h3>
-                    <button onclick="toggleBacProgressModal()" class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3.5 py-2 rounded-xl hover:bg-amber-500/25 transition font-bold cursor-pointer shadow-lg flex items-center gap-1">
-                        <span>📊 خريطة إنجازي الخاصة</span>
-                    </button>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-semibold mb-1">اختر المادة:</label>
-                    <select id="subject-select" onchange="onSubjectChange()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none">
-                    </select>
-                </div>
-
-                <div id="topic-stream-container">
-                    <label class="block text-sm font-semibold mb-1">شعبة موضوع البكالوريا المستهدف:</label>
-                    <select id="topic-stream-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-amber-400">
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold mb-1">اختر الموضوع:</label>
-                    <select id="topic-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 font-bold focus:outline-none text-emerald-400">
-                        <option value="الموضوع الأول">📄 الموضوع الأول</option>
-                        <option value="الموضوع الثاني">📄 الموضوع الثاني</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label id="category-label" class="block text-sm font-semibold mb-1">نوع التمرين أو المحور:</label>
-                    <select id="category-select" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 focus:outline-none font-semibold">
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold mb-1">دورة البكالوريا:</label>
-                    <select id="bac-year" onchange="checkExistingSubmission()" class="w-full input-bg border rounded-xl p-3 focus:outline-none font-semibold">
-                    </select>
-                </div>
-
-                <div id="submission-container">
-                    <div id="upload-form-section" class="space-y-4">
-                        <!-- ملاحظة الأسئلة غير المدروسة -->
-                        <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 space-y-1.5">
-                            <label class="block text-xs font-bold text-amber-400 flex items-center gap-1">
-                                <span>⚠️ ملاحظة لـ AI (للأسئلة غير المدروسة فقط):</span>
-                            </label>
-                            <input type="text" id="unstudied-note-input" placeholder="مثال: لم أدرس السؤال الأخير (الجزء 3)، فلا تحتسبه في الخصم..." class="w-full input-bg border rounded-xl p-2.5 text-xs focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">صور الحل من كراسك (اختر عدة صور دفعة واحدة):</label>
-                            <input type="file" id="solution-images" accept="image/*" multiple class="w-full input-bg border rounded-xl p-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
-                        </div>
-
-                        <button id="submit-btn" onclick="submitSolution()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-xl shadow-lg transition cursor-pointer flex items-center justify-center gap-2">
-                            <span>إرسال وتصحيح بالذكاء الاصطناعي 🤖</span>
-                        </button>
-                    </div>
-
-                    <div id="already-submitted-msg" class="hidden input-bg border border-amber-500/30 rounded-xl p-4 text-center space-y-2">
-                        <p class="text-amber-400 font-bold text-sm">⚠️ لقد قمت بحل وإرسال هذا التمرين مسبقاً!</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Submissions List -->
-            <div class="card-bg border border-slate-700 rounded-2xl p-6 shadow-xl space-y-4">
-                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2"><span>📂</span> حلولك المرسلة وتصحيحات الـ AI</h3>
-                <div id="student-submissions-list" class="space-y-3">
-                    <p class="text-center text-slate-400 text-sm py-2">لا توجد حلول مرسلة حالياً.</p>
-                </div>
-            </div>
-
-            <!-- Leaderboard per Subject -->
-            <div class="card-bg border rounded-2xl p-6 shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-lg font-bold flex items-center gap-2"><span>🏆</span> لوحة الترتيب والإنجاز</h3>
-                    <span id="total-points-label" class="text-xs text-amber-400 font-bold">مجموع نقاطك: 0 نقطة</span>
-                </div>
-                
-                <div class="flex gap-1 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs">
-                    <button onclick="switchLeaderboardSubject('الكل')" id="lb-tab-all" class="flex-1 bg-emerald-600 text-white font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer">الكل 🌐</button>
-                    <button onclick="switchLeaderboardSubject('الرياضيات')" id="lb-tab-math" class="flex-1 bg-slate-800 text-slate-300 font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer">📐 الرياضيات</button>
-                    <button onclick="switchLeaderboardSubject('العلوم الفيزيائية')" id="lb-tab-phy" class="flex-1 bg-slate-800 text-slate-300 font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer">⚡ الفيزيائية</button>
-                    <button onclick="switchLeaderboardSubject('العلوم الطبيعية')" id="lb-tab-sci" class="flex-1 bg-slate-800 text-slate-300 font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer">🧬 الطبيعية</button>
-                </div>
-
-                <div id="leaderboard-list" class="space-y-4">
-                    <p class="text-center text-slate-400 text-sm py-4">جاري تحميل لوحة الترتيب...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin Dashboard -->
-        <div id="admin-dashboard" class="hidden space-y-6">
-            <div class="card-bg border rounded-2xl p-6 shadow-xl flex justify-between items-center">
-                <div>
-                    <h3 class="text-lg font-bold text-emerald-400">🛠️ لوحة الأدمن والتحكم (محمد)</h3>
-                    <p class="text-xs text-slate-300">إدارة مفاتيح الـ AI والتقييمات</p>
-                </div>
-                <button onclick="logout()" class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl hover:bg-rose-500/25 transition font-bold cursor-pointer">تسجيل الخروج 🚪</button>
-            </div>
-
-            <div class="flex gap-1 border-b border-slate-700 pb-3 overflow-x-auto">
-                <button onclick="switchAdminTab('pending')" id="tab-pending" class="flex-1 bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">التقييمات 📥</button>
-                <button onclick="switchAdminTab('keys')" id="tab-keys" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">مفاتيح AI 🔑</button>
-                <button onclick="switchAdminTab('users')" id="tab-users" class="flex-1 bg-slate-800 text-slate-300 font-bold py-2 px-3 rounded-xl text-xs transition whitespace-nowrap cursor-pointer">إدارة الطلاب 👥</button>
-            </div>
-
-            <div class="space-y-4" id="admin-pending-section">
-                <div id="pending-list" class="space-y-4">
-                    <p class="text-center text-slate-400 text-sm py-4">جاري تحميل التقييمات...</p>
-                </div>
-            </div>
-
-            <div class="space-y-4 hidden" id="admin-keys-section">
-                <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
-                    <h4 class="font-bold text-amber-400 text-sm">🔑 إدارة مفاتيح Gemini API (Key Rotation)</h4>
-                    <p class="text-xs text-slate-300">أضف مفاتيح مجانية من حسابات Google مختلفة ليقوم الكود بالتنقل بينها تلقائياً عند انتهاء Quota!</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="new-api-key-input" placeholder="أدخل Gemini API Key هنا (AIzaSy...)" class="flex-1 input-bg border rounded-xl p-3 text-xs">
-                        <button onclick="addApiKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 rounded-xl text-xs">إضافة ➕</button>
-                    </div>
-                    <div id="api-keys-list" class="space-y-2 pt-2"></div>
-                </div>
-            </div>
-
-            <div class="space-y-4 hidden" id="admin-users-section">
-                <div class="card-bg border rounded-2xl p-5 space-y-4 shadow-lg">
-                    <h4 class="font-bold text-emerald-400 text-sm">👥 إدارة الطلاب والنقاط (عرض وحذف الحلول)</h4>
-                    <div id="admin-users-list" class="space-y-3">
-                        <p class="text-center text-slate-400 text-sm py-4">جاري تحميل قائمة الطلاب...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Modal النتيجة المنبثقة للذكاء الاصطناعي -->
-    <div id="ai-result-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="card-bg border border-amber-500/50 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div class="text-center space-y-1">
-                <span class="text-3xl">🤖✨</span>
-                <h3 class="text-lg font-bold text-amber-400">نتيجة التصحيح الذكي</h3>
-            </div>
-            <div class="input-bg border rounded-xl p-4 text-center space-y-2">
-                <p class="text-xs text-slate-300">نقاط التحدي المحصل عليها:</p>
-                <p id="modal-ai-score" class="text-3xl font-black text-emerald-400">10/10</p>
-            </div>
-            <div class="space-y-1">
-                <p class="text-xs font-bold text-amber-400">📝 العلامة الفعلية وتفاصيل المحاولة:</p>
-                <div id="modal-ai-notes" class="input-bg border rounded-xl p-3 text-xs text-slate-200 leading-relaxed max-h-40 overflow-y-auto whitespace-pre-line"></div>
-            </div>
-            <p class="text-[10px] text-rose-400 text-center font-semibold pt-1">* (ملاحظة: الذكاء الاصطناعي قابل للخطأ، يُرجى مراجعة الحلول مع الأستاذ)</p>
-            <button onclick="closeAiResultModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-xl transition cursor-pointer">
-                حسناً، فهمت الأخطاء 💪
-            </button>
-        </div>
-    </div>
-
-    <!-- Modal نافذة تفاصيل الحل والأخطاء المخصصة -->
-    <div id="solution-detail-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="card-bg border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 id="detail-modal-title" class="text-base font-bold text-amber-400">🔍 تفاصيل الحل والأخطاء</h3>
-                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white font-bold text-lg cursor-pointer">✕</button>
-            </div>
-            <div class="space-y-3">
-                <div class="input-bg border rounded-xl p-3 text-xs flex justify-between font-semibold">
-                    <span id="detail-modal-year-topic"></span>
-                    <span id="detail-modal-score" class="font-bold"></span>
-                </div>
-                <div class="space-y-1">
-                    <p class="text-xs font-bold text-emerald-400">📋 العلامة الفعلية والأخطاء بالتفصيل:</p>
-                    <div id="detail-modal-body" class="input-bg border rounded-xl p-4 text-xs text-slate-200 leading-relaxed space-y-2 whitespace-pre-line"></div>
-                </div>
-            </div>
-            <button onclick="closeDetailModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold p-2.5 rounded-xl transition cursor-pointer text-xs">
-                إغلاق النافذة ✕
-            </button>
-        </div>
-    </div>
-
-    <!-- Modal إدارة حلول الطالب للأدمن -->
-    <div id="admin-student-submissions-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="card-bg border border-amber-500/50 rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 id="admin-student-modal-title" class="text-base font-bold text-amber-400">📂 حلول الطالب</h3>
-                <button onclick="closeAdminStudentModal()" class="text-slate-400 hover:text-white font-bold text-lg cursor-pointer">✕</button>
-            </div>
-            <div id="admin-student-submissions-list" class="space-y-3">
-                <p class="text-center text-slate-400 text-xs py-4">جاري التحميل...</p>
-            </div>
-            <button onclick="closeAdminStudentModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold p-2.5 rounded-xl transition cursor-pointer text-xs">
-                إغلاق النافذة ✕
-            </button>
-        </div>
-    </div>
-
-    <!-- Modal Progress (خريطة الإنجاز مع فصل محاور العلوم الطبيعية) -->
-    <div id="bac-progress-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="card-bg border rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="text-lg font-bold text-amber-400">📊 خريطة إنجازي لمواضيع البكالوريا</h3>
-                <button onclick="toggleBacProgressModal()" class="text-slate-400 hover:text-white font-bold text-lg cursor-pointer">✕</button>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-[11px] font-semibold mb-1 text-slate-300">اختر المادة:</label>
-                    <select id="map-subject-select" onchange="onMapSubjectChange()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold focus:outline-none text-amber-400">
-                        <option value="الرياضيات">📐 الرياضيات</option>
-                        <option value="العلوم الفيزيائية">⚡ العلوم الفيزيائية</option>
-                        <option value="العلوم الطبيعية">🧬 علوم الطبيعة والحياة</option>
-                    </select>
-                </div>
-                <div id="map-stream-wrapper">
-                    <label class="block text-[11px] font-semibold mb-1 text-slate-300">اختر الشعبة:</label>
-                    <select id="map-stream-select" onchange="renderBacProgressContent()" class="w-full input-bg border rounded-xl p-2.5 text-xs font-bold focus:outline-none text-emerald-400">
-                    </select>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 text-center pt-2">
-                <div class="input-bg border p-3 rounded-xl">
-                    <p class="text-[10px] text-slate-400">التمارين المكتملة</p>
-                    <p id="modal-stat-completed" class="text-xl font-black text-emerald-400">0</p>
-                </div>
-                <div class="input-bg border p-3 rounded-xl">
-                    <p class="text-[10px] text-slate-400">مجموع النقاط المحققة</p>
-                    <p id="modal-stat-points" class="text-xl font-black text-amber-400">0</p>
-                </div>
-            </div>
-
-            <div class="space-y-3 pt-2">
-                <h4 class="text-xs font-bold text-slate-300">تسلسل المواضيع (من 2026 إلى 2009):</h4>
-                <div id="progress-content-list" class="space-y-3 text-xs"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAjhPYyOtm7maxcq4WNQIDJwFOBbCEIiaY",
-            authDomain: "bac-math-challenge.firebaseapp.com",
-            projectId: "bac-math-challenge",
-            storageBucket: "bac-math-challenge.firebasestorage.app",
-            messagingSenderId: "499117956219",
-            appId: "1:499117956219:web:42b92dcaeeee82e8a116de",
-            measurementId: "G-QYPW46359Q"
-        };
-
-        let db = null;
-        let allSubmissionsCache = [];
-        let defaultApiKeys = ["AQ.Ab8RN6K3s0h9TgvYu7WZDrtFLPH4S0jGi_K4FHru53gw5s1c2w"];
-        let selectedLeaderboardSubject = 'الكل';
-
-        try {
-            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-        } catch(e) { console.error(e); }
-
-        function setTheme(theme) {
-            document.body.className = `theme-${theme} min-h-screen flex flex-col justify-between`;
-            localStorage.setItem('bac_theme', theme);
-        }
-        setTheme(localStorage.getItem('bac_theme') || 'default');
-
-        const yearSelect = document.getElementById('bac-year');
-        for (let y = 2026; y >= 2009; y--) {
-            const opt = document.createElement('option');
-            opt.value = y; opt.textContent = `بكالوريا ${y}`;
-            yearSelect.appendChild(opt);
-        }
-
-        function toggleRoleInput() {
-            const role = document.getElementById('user-role').value;
-            document.getElementById('name-group').classList.toggle('hidden', role === 'admin');
-            document.getElementById('pin-group').classList.toggle('hidden', role !== 'admin');
-        }
-
-        async function getWorkingApiKey() {
-            let keys = JSON.parse(localStorage.getItem('bac_api_keys') || '[]');
-            if(!keys || keys.length === 0) keys = defaultApiKeys;
-            return keys[Math.floor(Math.random() * keys.length)];
-        }
-
-        async function evaluateWithGemini(subject, year, topic, category, base64Images, unstudiedNote) {
-            const apiKey = await getWorkingApiKey();
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-            let markScale = "7";
-            if (subject === 'العلوم الطبيعية') {
-                if (category === 'استرجاع المعارف') markScale = "5";
-                else if (category === 'استدلال علمي') markScale = "7";
-                else if (category === 'مسعى علمي') markScale = "8";
-            } else if (subject === 'العلوم الفيزيائية') {
-                markScale = "6 أو 7";
-            } else if (subject === 'الرياضيات') {
-                if (category.includes('المتتاليات') || category.includes('الدوال')) markScale = "6 أو 7";
-                else markScale = "5 أو 6";
-            }
-
-            const unstudiedTextSection = unstudiedNote ? `ملاحظة خاصة من الطالب بشأن أسئلة لم يدرسها بعد ولا ينبغي الخصم عليها: "${unstudiedNote}"` : '';
-
-            const promptText = `أنت أستاذ تصحيح دقيق في البكالوريا الجزائرية لمادة ${subject}.
-قم بمراجعة إجابة الطالب المرسلة عبر الصور وتصحيحها بناءً على الإجابة النموذجية لبكالوريا ${year} - ${topic} - المحور (${category}):
-${unstudiedTextSection}
-
-المطلوب:
-1. احسب العلامة الفعلية المستحقة بناءً على التصحيح النموذجي الجزائري والتوزيع الرسمي لهذا التمرين المقدر بـ (${markScale} نقاط).
-2. بالنسبة لخيار "score" اجعل قيمته دائماً = 10 في حال المحاولة الجادة لتسجيل التحدي.
-3. اكتب في الخانة "adminNote" في السطر الأول بالضبط: "العلامة الفعلية المستحقة: X / ${markScale}" (حيث X هي العلامة المحسوبة بدقة بعد خصم الأخطاء).
-4. اكتب تحتها تفصيل الأخطاء، الأجزاء الصحيحة، والتوجيهات.
-
-قم بإرجاع النتيجة بصيغة JSON حصراً بدون أي كود آخر:
-{"score": 10, "adminNote": "العلامة الفعلية المستحقة: 5.5 / ${markScale}\\n- الإجابة عن السؤال الأول صحيحة.\\n- يوجد خطأ في الحساب النهائي للمرحلة الأخيرة."}`;
-
-            let inlineDataParts = base64Images.map(img => ({
-                inline_data: { mime_type: "image/jpeg", data: img.split(',')[1] }
-            }));
-
-            let contents = [{ parts: [{ text: promptText }, ...inlineDataParts] }];
-
-            try {
-                let res = await fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ contents: contents })
-                });
-                let data = await res.json();
-                let textRes = data.candidates[0].content.parts[0].text;
-                let cleanJson = textRes.replace(/```json/g, '').replace(/```/g, '').trim();
-                return JSON.parse(cleanJson);
-            } catch(e) {
-                console.error("AI Evaluation error:", e);
-                return { score: 10, adminNote: `العلامة الفعلية المستحقة: محاولة ممتازة / ${markScale}\n- تم فحص الحل بنجاح.` };
-            }
-        }
-
-        // دالة الضغط الذكي لمنع تجاوز حد 1MB عند إرسال عدة أوراق (مثل 7 أوراق)
-        function processHighQualityImage(file, totalFilesCount = 1) {
-            return new Promise((resolve) => {
-                const reader = new FileReader(); 
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image(); 
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        
-                        let max = totalFilesCount >= 5 ? 950 : (totalFilesCount >= 3 ? 1100 : 1250);
-                        let quality = totalFilesCount >= 5 ? 0.55 : (totalFilesCount >= 3 ? 0.68 : 0.8);
-
-                        let w = img.width, h = img.height;
-                        if (w > h && w > max) { h *= max / w; w = max; }
-                        else if (h > max) { w *= max / h; h = max; }
-                        
-                        canvas.width = w; 
-                        canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        
-                        if (totalFilesCount >= 5) {
-                            ctx.filter = 'grayscale(100%) contrast(115%)';
-                        }
-                        
-                        ctx.drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                };
-            });
-        }
-
-        async function submitSolution() {
-            const name = localStorage.getItem('bac_username');
-            const filesInput = document.getElementById('solution-images');
-            if (filesInput.files.length === 0) return alert('اختر صورة واحدة على الأقل للحل!');
-
-            const unstudiedNote = document.getElementById('unstudied-note-input').value.trim();
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span>جاري التحليل والتصحيح للصور بالـ AI... 🤖⏳</span>';
-
-            try {
-                let imageUrls = [];
-                const totalFiles = filesInput.files.length;
-                for (let i = 0; i < totalFiles; i++) {
-                    imageUrls.push(await processHighQualityImage(filesInput.files[i], totalFiles));
-                }
-
-                const subject = document.getElementById('subject-select').value;
-                const year = document.getElementById('bac-year').value;
-                const topic = document.getElementById('topic-select').value;
-                const category = document.getElementById('category-select').value;
-                const topicStreamEl = document.getElementById('topic-stream-select');
-                const topicStream = topicStreamEl.parentElement.style.display !== 'none' ? topicStreamEl.value : 'علوم تجريبية';
-
-                const aiResult = await evaluateWithGemini(subject, year, topic, category, imageUrls, unstudiedNote);
-
-                const existingSubQuery = await db.collection("submissions")
-                    .where("studentName", "==", name)
-                    .where("subject", "==", subject)
-                    .where("year", "==", year)
-                    .where("topic", "==", topic)
-                    .where("topicStream", "==", topicStream)
-                    .where("category", "==", category)
-                    .get();
-
-                if (!existingSubQuery.empty) {
-                    const docId = existingSubQuery.docs[0].id;
-                    let existingData = existingSubQuery.docs[0].data();
-                    let finalScore = (existingData.score > 0) ? existingData.score : (aiResult.score > 0 ? aiResult.score : 10);
-
-                    await db.collection("submissions").doc(docId).update({
-                        images: imageUrls,
-                        status: 'approved',
-                        score: finalScore,
-                        adminNote: (unstudiedNote ? `[ملاحظة الطالب: ${unstudiedNote}]\n` : '') + aiResult.adminNote,
-                        hidden: false,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } else {
-                    await db.collection("submissions").add({
-                        studentName: name,
-                        studentStream: localStorage.getItem('bac_user_stream') || 'experimental',
-                        subject: subject,
-                        topic: topic,
-                        topicStream: topicStream,
-                        category: category,
-                        year: year,
-                        images: imageUrls,
-                        status: 'approved',
-                        score: aiResult.score > 0 ? aiResult.score : 10,
-                        adminNote: (unstudiedNote ? `[ملاحظة الطالب: ${unstudiedNote}]\n` : '') + aiResult.adminNote,
-                        hidden: false,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-
-                showAiResultModal(aiResult.score > 0 ? aiResult.score : 10, aiResult.adminNote);
-                filesInput.value = '';
-                document.getElementById('unstudied-note-input').value = '';
-                checkExistingSubmission();
-            } catch (e) {
-                alert('حدث خطأ أثناء التصحيح: ' + e.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>إرسال وتصحيح بالذكاء الاصطناعي 🤖</span>';
-            }
-        }
-
-        function showAiResultModal(score, notes) {
-            document.getElementById('modal-ai-score').textContent = `${score}/10`;
-            document.getElementById('modal-ai-notes').textContent = notes;
-            document.getElementById('ai-result-modal').classList.remove('hidden');
-        }
-
-        function closeAiResultModal() {
-            document.getElementById('ai-result-modal').classList.add('hidden');
-        }
-
-        function openDetailModal(id) {
-            const sub = allSubmissionsCache.find(s => s.id === id);
-            if (!sub) return;
-            document.getElementById('detail-modal-title').textContent = `🔍 تفاصيل حل: ${sub.subject} - ${sub.category}`;
-            document.getElementById('detail-modal-year-topic').textContent = `📅 بكالوريا ${sub.year} (${sub.topic})`;
-            document.getElementById('detail-modal-score').textContent = `نقاط التحدي: ${sub.score || 10}/10`;
-            document.getElementById('detail-modal-score').className = 'font-bold text-emerald-400';
-            document.getElementById('detail-modal-body').textContent = sub.adminNote || 'لا توجد أخطاء مسجلة.';
-            document.getElementById('solution-detail-modal').classList.remove('hidden');
-        }
-
-        function closeDetailModal() {
-            document.getElementById('solution-detail-modal').classList.add('hidden');
-        }
-
-        window.adminDeleteSubmission = async function(id) {
-            if (confirm('هل أنت متأكد من حذف هذا التقييم نهائياً؟')) {
-                await db.collection("submissions").doc(id).delete();
-                alert('تم حذف التقييم بنجاح 🗑️');
-            }
-        };
-
-        window.adminSetScoreTo10 = async function(id) {
-            if (confirm('هل تريد اعتماد هذه النتيجة بعلامة كاملة (10/10)؟')) {
-                await db.collection("submissions").doc(id).update({
-                    score: 10,
-                    status: 'approved',
-                    hidden: false,
-                    adminNote: '✨ تم اعتماد العلامة الكاملة (10/10) يدوياً من طرف المشرف (محمد).'
-                });
-                alert('تم تحديث العلامة إلى 10/10 بنجاح ✅');
-            }
-        };
-
-        function setupSubjectDropdowns() {
-            const stream = localStorage.getItem('bac_user_stream') || 'experimental';
-            const subjectSelect = document.getElementById('subject-select');
-            let subjectsList = [{ value: 'الرياضيات', text: '📐 الرياضيات' }, { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }];
-            if (stream === 'experimental') subjectsList.push({ value: 'العلوم الطبيعية', text: '🧬 علوم الطبيعة والحياة' });
-
-            subjectSelect.innerHTML = '';
-            subjectsList.forEach(subj => subjectSelect.innerHTML += `<option value="${subj.value}">${subj.text}</option>`);
-            onSubjectChange();
-            setupMapDropdowns();
-        }
-
-        function setupMapDropdowns() {
-            const stream = localStorage.getItem('bac_user_stream') || 'experimental';
-            const mapSubSelect = document.getElementById('map-subject-select');
-            let subList = [{ value: 'الرياضيات', text: '📐 الرياضيات' }, { value: 'العلوم الفيزيائية', text: '⚡ العلوم الفيزيائية' }];
-            if (stream === 'experimental') subList.push({ value: 'العلوم الطبيعية', text: '🧬 علوم الطبيعة والحياة' });
-
-            mapSubSelect.innerHTML = '';
-            subList.forEach(subj => mapSubSelect.innerHTML += `<option value="${subj.value}">${subj.text}</option>`);
-            onMapSubjectChange();
-        }
-
-        function onSubjectChange() {
-            const subject = document.getElementById('subject-select').value;
-            const categorySelect = document.getElementById('category-select');
-            const topicStreamContainer = document.getElementById('topic-stream-container');
-            const topicStreamSelect = document.getElementById('topic-stream-select');
-            
-            categorySelect.innerHTML = '';
-            let options = [];
-
-            if (subject === 'الرياضيات') {
-                topicStreamContainer.style.display = 'block';
-                topicStreamSelect.innerHTML = `
-                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
-                    <option value="رياضيات">📐 رياضيات</option>
-                    <option value="تقني رياضي">⚙️ تقني رياضي</option>
-                `;
-                options = [
-                    'التمرين الأول: الدوال (العددية، الأسية، اللوغاريتمية)', 
-                    'التمرين الثاني: المتتاليات العددية', 
-                    'التمرين الثالث: الأعداد المركبة', 
-                    'التمرين الرابع: الهندسة في الفضاء / الاحتمالات'
-                ];
-            } else if (subject === 'العلوم الفيزيائية') {
-                topicStreamContainer.style.display = 'block';
-                topicStreamSelect.innerHTML = `
-                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
-                    <option value="رياضيات وتقني رياضي">📐 رياضيات وتقني رياضي</option>
-                `;
-                options = ['التمرين الأول', 'التمرين الثاني', 'التمرين الثالث'];
-            } else {
-                topicStreamContainer.style.display = 'none';
-                options = ['استرجاع المعارف', 'استدلال علمي', 'مسعى علمي'];
-            }
-
-            options.forEach(opt => categorySelect.innerHTML += `<option value="${opt}">${opt}</option>`);
-            checkExistingSubmission();
-        }
-
-        function onMapSubjectChange() {
-            const subject = document.getElementById('map-subject-select').value;
-            const streamWrapper = document.getElementById('map-stream-wrapper');
-            const streamSelect = document.getElementById('map-stream-select');
-
-            if (subject === 'الرياضيات') {
-                streamWrapper.style.display = 'block';
-                streamSelect.innerHTML = `
-                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
-                    <option value="رياضيات">📐 رياضيات</option>
-                    <option value="تقني رياضي">⚙️ تقني رياضي</option>
-                `;
-            } else if (subject === 'العلوم الفيزيائية') {
-                streamWrapper.style.display = 'block';
-                streamSelect.innerHTML = `
-                    <option value="علوم تجريبية">🧬 علوم تجريبية</option>
-                    <option value="رياضيات وتقني رياضي">📐 رياضيات وتقني رياضي</option>
-                `;
-            } else {
-                streamWrapper.style.display = 'none';
-            }
-            renderBacProgressContent();
-        }
-
-        function checkExistingSubmission() {
-            const currentStudent = localStorage.getItem('bac_username');
-            const subject = document.getElementById('subject-select').value;
-            const year = document.getElementById('bac-year').value;
-            const topic = document.getElementById('topic-select').value;
-            const category = document.getElementById('category-select').value;
-            const topicStreamEl = document.getElementById('topic-stream-select');
-            const topicStream = topicStreamEl.parentElement.style.display !== 'none' ? topicStreamEl.value : 'علوم تجريبية';
-
-            const found = allSubmissionsCache.find(s => 
-                s.studentName === currentStudent && 
-                s.subject === subject && 
-                s.year == year && 
-                s.topic === topic && 
-                s.topicStream === topicStream &&
-                s.category === category
-            );
-
-            document.getElementById('upload-form-section').classList.toggle('hidden', !!found);
-            document.getElementById('already-submitted-msg').classList.toggle('hidden', !found);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedStudent = localStorage.getItem('bac_username');
-            const savedAdmin = localStorage.getItem('bac_is_admin');
-
-            if (savedAdmin === 'true') {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                if (db) { loadAdminData(); renderApiKeys(); }
-            } else if (savedStudent) {
-                document.getElementById('student-display-name').textContent = savedStudent;
-                document.getElementById('student-stream-tag').textContent = (localStorage.getItem('bac_user_stream') === 'math' ? '📐 رياضيات / تقني رياضي' : '🧬 علوم تجريبية');
-                setupSubjectDropdowns();
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('student-dashboard').classList.remove('hidden');
-                if (db) { listenSubmissionsCache(); }
-            }
-        });
-
-        function handleLogin() {
-            const role = document.getElementById('user-role').value;
-            if (role === 'admin') {
-                if (document.getElementById('admin-pin').value === '1234') {
-                    localStorage.setItem('bac_is_admin', 'true');
-                    location.reload();
-                } else alert('رمز المشرف خطأ!');
-            } else {
-                const name = document.getElementById('username-input').value.trim();
-                if (!name) return alert('اكتب اسمك!');
-                localStorage.setItem('bac_username', name);
-                localStorage.setItem('bac_user_stream', document.getElementById('user-stream').value);
-                location.reload();
-            }
-        }
-
-        function switchLeaderboardSubject(subj) {
-            selectedLeaderboardSubject = subj;
-            const tabs = { 'الكل': 'lb-tab-all', 'الرياضيات': 'lb-tab-math', 'العلوم الفيزيائية': 'lb-tab-phy', 'العلوم الطبيعية': 'lb-tab-sci' };
-            Object.entries(tabs).forEach(([s, tabId]) => {
-                const btn = document.getElementById(tabId);
-                if (s === subj) {
-                    btn.className = "flex-1 bg-emerald-600 text-white font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer";
-                } else {
-                    btn.className = "flex-1 bg-slate-800 text-slate-300 font-bold py-1.5 px-2 rounded-lg text-[11px] transition cursor-pointer";
-                }
-            });
-            listenSubmissionsCache();
-        }
-
-        function listenSubmissionsCache() {
-            const currentStudent = localStorage.getItem('bac_username');
-            db.collection("submissions").onSnapshot((snapshot) => {
-                allSubmissionsCache = [];
-                let studentList = [];
-                let totalStudentPoints = 0;
-                let userStatsMap = {};
-
-                snapshot.forEach((doc) => {
-                    let d = doc.data(); d.id = doc.id;
-                    if (d.score === undefined || d.score === null) {
-                        d.score = 10;
-                    }
-                    allSubmissionsCache.push(d);
-                    
-                    if (d.studentName === currentStudent) {
-                        let pts = (d.studentName === 'محمد' ? 20 : 10);
-                        totalStudentPoints += pts;
-                        if (!d.hideForStudent) studentList.push(d);
-                    }
-
-                    let pEarned = (d.studentName === 'محمد' ? 20 : 10);
-                    if (!userStatsMap[d.studentName]) {
-                        userStatsMap[d.studentName] = { 
-                            totalPoints: 0, 
-                            subjects: {}, 
-                            stream: d.studentStream || 'experimental',
-                            completedCount: 0 
-                        };
-                    }
-                    
-                    if (selectedLeaderboardSubject === 'الكل' || d.subject === selectedLeaderboardSubject) {
-                        userStatsMap[d.studentName].totalPoints += pEarned;
-                        userStatsMap[d.studentName].completedCount += 1;
-                        let subjName = d.subject || 'الرياضيات';
-                        userStatsMap[d.studentName].subjects[subjName] = (userStatsMap[d.studentName].subjects[subjName] || 0) + 1;
-                    }
-                });
-
-                document.getElementById('total-points-label').textContent = `مجموع نقاطك: ${totalStudentPoints} نقطة`;
-
-                let listEl = document.getElementById('student-submissions-list');
-                listEl.innerHTML = studentList.length === 0 ? '<p class="text-center text-slate-400 text-sm py-2">لا توجد حلول مرسلة حالياً.</p>' : '';
-                studentList.forEach(d => {
-                    let colorClass = 'border-emerald-500/40';
-                    let sVal = d.score || 10;
-                    listEl.innerHTML += `
-                        <div class="input-bg border ${colorClass} rounded-xl p-4 space-y-2 text-xs">
-                            <div class="flex justify-between font-bold">
-                                <span>📚 ${d.subject} - ${d.topic} (${d.category})</span>
-                                <span class="text-emerald-400">${sVal}/10</span>
-                            </div>
-                            <div class="flex justify-between items-center pt-1">
-                                <button onclick="openDetailModal('${d.id}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-lg text-[11px] font-bold hover:bg-amber-500/20 transition cursor-pointer">عرض تفاصيل الأخطاء 🔍</button>
-                                <button onclick="hideSubmissionForStudent('${d.id}')" class="text-[11px] text-slate-400 hover:text-rose-400 cursor-pointer">إزالة من القائمة 🗑️</button>
-                            </div>
-                        </div>`;
-                });
-
-                renderLeaderboard(userStatsMap);
-                checkExistingSubmission();
-            });
-        }
-
-        function loadAdminData() {
-            db.collection("submissions").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                let pendingEl = document.getElementById('pending-list');
-                let usersEl = document.getElementById('admin-users-list');
-                
-                pendingEl.innerHTML = '';
-                usersEl.innerHTML = '';
-
-                let usersSummary = {};
-
-                if (snapshot.empty) {
-                    pendingEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">لا توجد تقييمات مسجلة.</p>';
-                    usersEl.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">لا يوجد طلاب مسجلون بعد.</p>';
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    let d = doc.data(); d.id = doc.id;
-                    
-                    let timeFormatted = 'وقت غير متوفر';
-                    if (d.timestamp && d.timestamp.toDate) {
-                        let dateObj = d.timestamp.toDate();
-                        timeFormatted = dateObj.toLocaleDateString('ar-DZ') + ' - ' + dateObj.toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
-                    }
-
-                    pendingEl.innerHTML += `
-                        <div class="input-bg border rounded-xl p-4 space-y-2 text-xs">
-                            <div class="flex justify-between font-bold items-center">
-                                <span class="text-emerald-400">👤 ${d.studentName} (${d.subject})</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">🕒 ${timeFormatted}</span>
-                                    <span class="text-amber-400">${d.score || 10}/10</span>
-                                </div>
-                            </div>
-                            <p class="text-slate-300">📌 ${d.topic} - ${d.category} - ${d.year}</p>
-                            <p class="text-slate-400 bg-slate-950 p-2 rounded whitespace-pre-line">📝 الملاحظة والتفاصيل:\n${d.adminNote || 'محاولة جيدة.'}</p>
-                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
-                                <button onclick="adminSetScoreTo10('${d.id}')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition cursor-pointer">تعيين علامة 10 ✅</button>
-                                <button onclick="adminDeleteSubmission('${d.id}')" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-rose-600/30 transition cursor-pointer">حذف التقييم 🗑️</button>
-                            </div>
-                        </div>`;
-
-                    if (!usersSummary[d.studentName]) {
-                        usersSummary[d.studentName] = { stream: d.studentStream || 'experimental', totalScore: 0, count: 0 };
-                    }
-                    usersSummary[d.studentName].totalScore += (d.studentName === 'محمد' ? 20 : 10);
-                    usersSummary[d.studentName].count += 1;
-                });
-
-                Object.entries(usersSummary).forEach(([sName, sData]) => {
-                    usersEl.innerHTML += `
-                        <div class="input-bg border border-slate-700 rounded-xl p-3 text-xs flex justify-between items-center">
-                            <div>
-                                <h5 class="font-bold text-white text-sm">${sName}</h5>
-                                <p class="text-[10px] text-amber-400">الشعبة: ${sData.stream === 'math' ? 'رياضيات/تقني' : 'علوم تجريبية'}</p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="text-left">
-                                    <p class="font-bold text-emerald-400">${sData.totalScore} نقطة</p>
-                                    <p class="text-[10px] text-slate-400">${sData.count} إرسال</p>
-                                </div>
-                                <button onclick="openAdminStudentSubmissions('${sName}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-500/20 transition cursor-pointer text-xs">🔍 عرض الحلول</button>
-                            </div>
-                        </div>`;
-                });
-            });
-        }
-
-        function openAdminStudentSubmissions(studentName) {
-            const modal = document.getElementById('admin-student-submissions-modal');
-            const titleEl = document.getElementById('admin-student-modal-title');
-            const listEl = document.getElementById('admin-student-submissions-list');
-            
-            titleEl.textContent = `📂 حلول الطالب: ${studentName}`;
-            listEl.innerHTML = '';
-
-            let studentSubs = allSubmissionsCache.filter(s => s.studentName === studentName);
-            if (studentSubs.length === 0) {
-                listEl.innerHTML = '<p class="text-center text-slate-400 text-xs py-4">لا توجد حلول مسجلة لهذا الطالب.</p>';
-            } else {
-                studentSubs.forEach(sub => {
-                    listEl.innerHTML += `
-                        <div class="input-bg border border-slate-700 rounded-xl p-3 space-y-2 text-xs">
-                            <div class="flex justify-between font-bold">
-                                <span class="text-emerald-400">${sub.subject} - ${sub.topic} (${sub.category})</span>
-                                <span class="text-amber-400">${sub.score || 10}/10</span>
-                            </div>
-                            <p class="text-slate-300">📅 سنة: ${sub.year}</p>
-                            <div class="flex justify-between items-center pt-2 border-t border-slate-800">
-                                <button onclick="openDetailModal('${sub.id}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-lg font-bold">التفاصيل 🔍</button>
-                                <button onclick="adminDeleteSubmission('${sub.id}'); closeAdminStudentModal();" class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-lg font-bold hover:bg-rose-500/20">حذف الحل 🗑️</button>
-                            </div>
-                        </div>`;
-                });
-            }
-            modal.classList.remove('hidden');
-        }
-
-        function closeAdminStudentModal() {
-            document.getElementById('admin-student-submissions-modal').classList.add('hidden');
-        }
-
-        function renderLeaderboard(userStatsMap) {
-            let lbEl = document.getElementById('leaderboard-list');
-            let sorted = Object.entries(userStatsMap).sort((a,b) => b[1].totalPoints - a[1].totalPoints);
-            lbEl.innerHTML = sorted.length === 0 ? '<p class="text-center text-slate-400 text-sm py-4">لا توجد نقاط مسجلة لهذه المادة بعد.</p>' : '';
-            
-            let totalAvailableExercises = 120;
-
-            sorted.forEach(([name, data], index) => {
-                let progressPercent = Math.min(100, Math.round((data.completedCount / totalAvailableExercises) * 100));
-                
-                lbEl.innerHTML += `
-                    <div class="flex flex-col gap-2 input-bg border rounded-xl p-4 text-xs shadow-lg">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-sm text-white flex items-center gap-1.5">
-                                <span class="text-amber-400">#${index+1}</span> ${name}
-                            </span>
-                            <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-lg font-black text-xs">${data.totalPoints} نقطة</span>
-                        </div>
-                        <div class="text-[11px] text-slate-300 font-semibold">
-                            ${data.stream === 'math' ? '📐 رياضيات / تقني' : '🧬 علوم تجريبية'} | ${data.completedCount} تمارين تامة
-                        </div>
-                        <div class="w-full bg-slate-950 rounded-full h-2.5 border border-slate-800 overflow-hidden mt-1">
-                            <div class="bg-emerald-500 h-full transition-all duration-500" style="width: ${progressPercent}%"></div>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function toggleBacProgressModal() {
-            const modal = document.getElementById('bac-progress-modal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                renderBacProgressContent();
-            }
-        }
-
-        function renderBacProgressContent() {
-            const currentStudent = localStorage.getItem('bac_username');
-            const selectedSubject = document.getElementById('map-subject-select').value;
-            const streamWrapper = document.getElementById('map-stream-wrapper');
-            const selectedStream = streamWrapper.style.display !== 'none' ? document.getElementById('map-stream-select').value : 'علوم تجريبية';
-            
-            let contentEl = document.getElementById('progress-content-list');
-            contentEl.innerHTML = '';
-            
-            let yearsList = [];
-            for (let y = 2026; y >= 2009; y--) yearsList.push(y);
-            let topicsList = ['الموضوع الأول', 'الموضوع الثاني'];
-
-            let completedCount = 0;
-            let studentSubmissions = allSubmissionsCache.filter(s => s.studentName === currentStudent && s.subject === selectedSubject && (selectedSubject === 'العلوم الطبيعية' || s.topicStream === selectedStream));
-
-            if (selectedSubject === 'العلوم الطبيعية') {
-                let scienceCategories = ['استرجاع المعارف', 'استدلال علمي', 'مسعى علمي'];
-                yearsList.forEach(yr => {
-                    topicsList.forEach(top => {
-                        scienceCategories.forEach(cat => {
-                            let foundSub = studentSubmissions.find(s => s.year == yr && s.topic === top && s.category === cat);
-                            let catIcon = cat === 'استرجاع المعارف' ? '🧠' : (cat === 'استدلال علمي' ? '🔬' : '🎯');
-
-                            if (foundSub) {
-                                completedCount++;
-                                contentEl.innerHTML += `
-                                    <div class="input-bg border border-emerald-500/40 p-3 rounded-xl flex justify-between items-center">
-                                        <div>
-                                            <p class="font-bold text-emerald-400">📅 بكالوريا ${yr} - ${top}</p>
-                                            <p class="text-[10px] text-slate-300">${catIcon} المحور: ${cat}</p>
-                                        </div>
-                                        <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (${foundSub.score || 10}/10) ✅</span>
-                                    </div>`;
-                            } else {
-                                contentEl.innerHTML += `
-                                    <div class="input-bg border border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-80">
-                                        <div>
-                                            <p class="font-bold text-slate-300">📅 بكالوريا ${yr} - ${top}</p>
-                                            <p class="text-[10px] text-rose-400 font-semibold">${catIcon} المحور: ${cat} (لم يحل)</p>
-                                        </div>
-                                        <span class="font-bold text-slate-400 text-[11px] bg-slate-900 px-2 py-1 rounded border border-slate-700">قيد الانتظار</span>
-                                    </div>`;
-                            }
-                        });
-                    });
-                });
-            } else {
-                yearsList.forEach(yr => {
-                    topicsList.forEach(top => {
-                        let foundSub = studentSubmissions.find(s => s.year == yr && s.topic === top);
-                        
-                        if (foundSub) {
-                            completedCount++;
-                            contentEl.innerHTML += `
-                                <div class="input-bg border border-emerald-500/40 p-3 rounded-xl flex justify-between items-center">
-                                    <div>
-                                        <p class="font-bold text-emerald-400">📅 دورة بكالوريا ${yr} - ${top}</p>
-                                        <p class="text-[10px] text-slate-300">التمرين: ${foundSub.category}</p>
-                                    </div>
-                                    <span class="font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">محلول (${foundSub.score || 10}/10) ✅</span>
-                                </div>`;
-                        } else {
-                            contentEl.innerHTML += `
-                                <div class="input-bg border border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-80">
-                                    <div>
-                                        <p class="font-bold text-slate-300">📅 دورة بكالوريا ${yr} - ${top}</p>
-                                        <p class="text-[10px] text-rose-400 font-semibold">لم يتم الحل بعد ⏳</p>
-                                    </div>
-                                    <span class="font-bold text-slate-400 text-[11px] bg-slate-900 px-2 py-1 rounded border border-slate-700">قيد الانتظار</span>
-                                </div>`;
-                        }
-                    });
-                });
-            }
-
-            let totalPoints = allSubmissionsCache.filter(s => s.studentName === currentStudent).length * (currentStudent === 'محمد' ? 20 : 10);
-            document.getElementById('modal-stat-completed').textContent = allSubmissionsCache.filter(s => s.studentName === currentStudent).length;
-            document.getElementById('modal-stat-points').textContent = totalPoints;
-        }
-
-        async function hideSubmissionForStudent(id) {
-            await db.collection("submissions").doc(id).update({ hideForStudent: true });
-        }
-
-        function switchAdminTab(tab) {
-            ['pending', 'keys', 'users'].forEach(t => {
-                document.getElementById(`admin-${t}-section`).classList.toggle('hidden', t !== tab);
-            });
-        }
-
-        function addApiKey() {
-            let key = document.getElementById('new-api-key-input').value.trim();
-            if(!key) return;
-            let keys = JSON.parse(localStorage.getItem('bac_api_keys') || '[]');
-            keys.push(key);
-            localStorage.setItem('bac_api_keys', JSON.stringify(keys));
-            document.getElementById('new-api-key-input').value = '';
-            renderApiKeys();
-            alert('تمت إضافة المفتاح بنجاح! 🔑');
-        }
-
-        function renderApiKeys() {
-            let keys = JSON.parse(localStorage.getItem('bac_api_keys') || '[]');
-            if(keys.length === 0) keys = defaultApiKeys;
-            let listEl = document.getElementById('api-keys-list');
-            listEl.innerHTML = '';
-            keys.forEach((k, i) => {
-                listEl.innerHTML += `<div class="flex justify-between items-center bg-slate-900 p-2 rounded text-xs"><span>🔑 Key ${i+1}: ${k.substring(0, 10)}...</span><button onclick="removeApiKey(${i})" class="text-rose-400 font-bold">حذف</button></div>`;
-            });
-        }
-
-        function removeApiKey(index) {
-            let keys = JSON.parse(localStorage.getItem('bac_api_keys') || '[]');
-            keys.splice(index, 1);
-            localStorage.setItem('bac_api_keys', JSON.stringify(keys));
-            renderApiKeys();
-        }
-
-        function logout() { localStorage.clear(); location.reload(); }
-    </script>
+<body>
+<div id="app"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore,collection,addDoc,onSnapshot,query,orderBy,doc,updateDoc,deleteDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ===== ضع هنا نفس إعدادات Firebase القديمة لتبقى كل البيانات القديمة ===== */
+const FIREBASE_CONFIG={apiKey:"PASTE_HERE",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};
+const KEYS_COL="apiKeys";      // غيّر الاسم ليطابق مجموعة مفاتيح Gemini القديمة
+const ADMIN_CODE="1234";       // نفس الرمز القديم (يُفضّل تغييره)
+const GEMINI_MODEL="gemini-2.5-flash";
+
+const db=getFirestore(initializeApp(FIREBASE_CONFIG));
+const SUB=collection(db,"submissions");
+const SUBJECTS={
+ "الرياضيات":{cats:["الدوال","المتتاليات العددية","الأعداد المركبة","الهندسة في الفضاء / الاحتمالات"],ts:["علوم تجريبية","رياضيات","تقني رياضي"],ico:"📐"},
+ "العلوم الفيزيائية":{cats:["التمرين الأول","التمرين الثاني","التمرين الثالث"],ts:["علوم تجريبية","رياضيات وتقني رياضي"],ico:"⚡"},
+ "العلوم الطبيعية":{cats:["استرجاع المعارف","استدلال علمي","مسعى علمي"],ts:["علوم تجريبية"],ico:"🧬"}};
+const TOPICS=["الموضوع الأول","الموضوع الثاني"],STREAMS=["علوم تجريبية","رياضيات / تقني رياضي"];
+const YEARS=Array.from({length:18},(_,i)=>2026-i);
+
+const $=s=>document.querySelector(s),app=$("#app");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let me=JSON.parse(localStorage.getItem("bac_user")||"null"),tab="send",ALL=[],KEYS=[],lb="الكل",mapSub="الرياضيات",mapStr="علوم تجريبية";
+document.documentElement.dataset.theme=localStorage.getItem("bac_theme")||"default";
+
+const graded=s=>s.status!=="pending"&&typeof s.score==="number";
+const fmt=t=>t?.toDate?t.toDate().toLocaleString("ar-DZ",{dateStyle:"medium",timeStyle:"short"}):"الآن";
+const mine=()=>ALL.filter(s=>s.studentName===me.name);
+const sameEx=(a,b)=>["subject","topic","topicStream","category","year"].every(k=>String(a[k])===String(b[k]));
+
+onSnapshot(query(SUB,orderBy("timestamp","desc")),q=>{ALL=q.docs.map(d=>({id:d.id,...d.data()}));if(me&&tab!=="send"&&!$(".modal"))show()});
+onSnapshot(collection(db,KEYS_COL),q=>{KEYS=q.docs.map(d=>({id:d.id,...d.data()}));if(me?.role==="admin"&&tab==="keys")show()},()=>{});
+
+function modal(html){const m=document.createElement("div");m.className="modal";m.innerHTML=`<div>${html}<button class="btn ghost" style="margin-top:14px;width:100%" data-x>إغلاق</button></div>`;
+ m.onclick=e=>{if(e.target===m||e.target.dataset.x!==undefined)m.remove()};document.body.append(m)}
+const head=()=>`<header><div><h1>🎓 تحدي مواضيع البكالوريا</h1><span class="mute">${me?esc(me.name)+" · "+esc(me.stream||"مشرف"):"تصحيح ذكي ومتابعة شاملة"}</span></div>
+<div class="themes">${[["default","🌙","ليلي"],["purple","🔮","سحري"],["blue","🌊","محيط"],["gold","👑","ملكي"]].map(([t,e,n])=>`<button data-th="${t}" class="${document.documentElement.dataset.theme===t?"on":""}">${e} ${n}</button>`).join("")}${me?`<button id="out">🚪 خروج</button>`:""}</div></header>`;
+function wire(){document.querySelectorAll("[data-th]").forEach(b=>b.onclick=()=>{localStorage.setItem("bac_theme",b.dataset.th);document.documentElement.dataset.theme=b.dataset.th;document.querySelectorAll("[data-th]").forEach(x=>x.classList.toggle("on",x===b));burst(b.dataset.th)});
+ const o=$("#out");if(o)o.onclick=()=>{localStorage.removeItem("bac_user");me=null;show()}}
+
+function show(){app.innerHTML=head()+(!me?loginV():me.role==="admin"?adminV():studentV());wire();(!me?wireLogin:me.role==="admin"?wireAdmin:wireStudent)()}
+const tabs=(list)=>`<nav>${list.map(([k,t])=>`<button data-tab="${k}" class="${tab===k?"on":""}">${t}</button>`).join("")}</nav>`;
+const wireTabs=()=>document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;show()});
+
+/* ---------- الدخول ---------- */
+function loginV(){return`<div class="hero"><div class="stamp">10/10</div><div class="emo">📐 ⚡ 🧬 🎯</div><h1 style="font-size:1.6rem;margin-top:14px">أرسل حلّك، واعرف خطأك فوراً</h1><p>صوّر كراسك، يصحّحه الذكاء الاصطناعي، وتنافس مع زملائك.</p></div>
+<div class="card" style="max-width:440px;margin:auto"><div class="row"><button class="btn" id="rS">🧑‍🎓 متنافس</button><button class="btn ghost" id="rA">🛡️ مشرف</button></div>
+<div id="fS"><label>اسمك المستعار</label><input id="nm" maxlength="24"><label>شعبتك الأصلية</label><select id="st">${STREAMS.map(s=>`<option>${s}</option>`).join("")}</select></div>
+<div id="fA" hidden><label>رمز المشرف</label><input id="cd" type="password"></div><button class="btn" id="go" style="width:100%;margin-top:16px">🚀 دخول</button><div class="warn" id="er"></div></div>`}
+function wireLogin(){let role="student";const set=r=>{role=r;$("#fS").hidden=r!=="student";$("#fA").hidden=r!=="admin";$("#rS").className="btn"+(r==="student"?"":" ghost");$("#rA").className="btn"+(r==="admin"?"":" ghost")};
+ $("#rS").onclick=()=>set("student");$("#rA").onclick=()=>set("admin");
+ $("#go").onclick=()=>{if(role==="admin"){if($("#cd").value!==ADMIN_CODE)return $("#er").textContent="الرمز غير صحيح";me={role:"admin",name:"المشرف"};tab="reviews"}
+  else{const n=$("#nm").value.trim();if(!n)return $("#er").textContent="اكتب اسمك المستعار";me={role:"student",name:n,stream:$("#st").value};tab="send";mapStr=me.stream==="علوم تجريبية"?"علوم تجريبية":"رياضيات"}
+  localStorage.setItem("bac_user",JSON.stringify(me));show()}}
+
+/* ---------- الطالب ---------- */
+function studentV(){const pts=mine().filter(graded).reduce((a,s)=>a+s.score,0);
+ return`<div class="card item"><b>✨ ${pts} نقطة · ${lvl(pts)}</b><span class="mute">✅ ${mine().filter(graded).length} تمرين مكتمل</span></div>`+tabs([["send","📤 إرسال حل"],["mine","📂 حلولي"],["board","🏆 الترتيب"],["map","🗺️ خريطتي"]])+`<div id="v">${{send:sendV,mine:mineV,board:boardV,map:mapV}[tab]()}</div>`}
+const opts=(a,sel)=>a.map(x=>`<option ${x==sel?"selected":""}>${x}</option>`).join("");
+function sendV(){const subs=Object.keys(SUBJECTS).filter(s=>s!=="العلوم الطبيعية"||me.stream==="علوم تجريبية");
+ return`<div class="card"><h2>إرسال حل تمرين</h2><div class="row"><div><label>المادة</label><select id="sj">${opts(subs)}</select></div><div><label>شعبة الموضوع</label><select id="ts"></select></div></div>
+<div class="row"><div><label>الموضوع</label><select id="tp">${opts(TOPICS)}</select></div><div><label>المحور / التمرين</label><select id="ct"></select></div><div><label>الدورة</label><select id="yr">${opts(YEARS)}</select></div></div>
+<label>ملاحظة للذكاء الاصطناعي (الأسئلة التي لم تدرسها بعد، حتى لا تُخصم)</label><textarea id="nt" rows="2"></textarea>
+<label>صور الحل من كراسك (يمكن اختيار عدة صور)</label><input id="im" type="file" accept="image/*" multiple><div id="pv" class="thumbs"></div>
+<div class="warn" id="dup" hidden>⚠️ سبق أن أرسلت هذا التمرين.</div><button class="btn" id="sd" style="width:100%;margin-top:14px">إرسال للتصحيح 🤖</button><div class="mute" id="stt" style="margin-top:8px"></div></div>`}
+const cur=()=>({subject:$("#sj").value,topic:$("#tp").value,topicStream:$("#ts").value,category:$("#ct").value,year:+$("#yr").value});
+function wireStudent(){wireTabs();if(tab!=="send")return wireLists();
+ const fill=()=>{const s=SUBJECTS[$("#sj").value];$("#ts").innerHTML=opts(s.ts,me.stream==="علوم تجريبية"?"علوم تجريبية":s.ts[1]);$("#ct").innerHTML=opts(s.cats);chk()};
+ const chk=()=>{const d=mine().some(s=>sameEx(s,cur()));$("#dup").hidden=!d;$("#sd").disabled=d};
+ ["sj"].forEach(i=>$("#"+i).onchange=fill);["ts","tp","ct","yr"].forEach(i=>$("#"+i).onchange=chk);fill();
+ $("#im").onchange=e=>{$("#pv").innerHTML=[...e.target.files].map(f=>`<img src="${URL.createObjectURL(f)}">`).join("")};
+ $("#sd").onclick=async()=>{const files=[...$("#im").files];if(!files.length)return $("#stt").textContent="اختر صورة واحدة على الأقل";
+  $("#sd").disabled=true;try{$("#stt").textContent="جارٍ ضغط الصور…";const images=await compress(files);
+  const meta={...cur(),studentName:me.name,studentStream:me.stream,images,studentNote:$("#nt").value.trim(),hideForStudent:false,timestamp:serverTimestamp()};
+  $("#stt").textContent="الذكاء الاصطناعي يصحّح حلّك…";let r;try{r=await grade(meta)}catch(e){r=null}
+  await addDoc(SUB,r?{...meta,status:"graded",score:r.score,adminNote:r.details}:{...meta,status:"pending",score:0,adminNote:""});
+  $("#stt").textContent="";if(r&&r.score>=8)rain(["🎉","🏆","⭐","🔥","🎓"]);r?modal(`<div style="text-align:center"><div class="stamp">${r.score}/10</div></div><h2 style="margin-top:14px">${r.score>=8?"🎉 ممتاز! ":r.score>=5?"💪 تقدّم جيد! ":"📚 راجع أخطاءك! "}نتيجة التصحيح</h2><pre>${esc(r.details)}</pre><p class="mute">الذكاء الاصطناعي قد يخطئ، راجع الحل مع أستاذك.</p>`):modal(`<h2>📨 تم الإرسال</h2><p>تعذّر التصحيح الآلي الآن، وسيراجع المشرف حلّك.</p>`);
+  $("#im").value="";$("#pv").innerHTML=""}catch(e){$("#stt").textContent="حدث خطأ: "+e.message}chk()}}
+
+/* ضغط الصور حتى لا يتجاوز المستند 1MB في Firestore */
+async function compress(files){const n=files.length,[dim,q,gray]=n<=2?[1400,.72,0]:n<=4?[1100,.6,0]:n<=6?[900,.5,1]:[750,.42,1];
+ const one=(f,dm,qq)=>new Promise((ok,no)=>{const im=new Image();im.onload=()=>{const k=Math.min(1,dm/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;
+  const x=c.getContext("2d");if(gray)x.filter="grayscale(1) contrast(1.25)";x.drawImage(im,0,0,c.width,c.height);ok(c.toDataURL("image/jpeg",qq))};im.onerror=no;im.src=URL.createObjectURL(f)});
+ let dm=dim,qq=q,out;for(let t=0;t<5;t++){out=await Promise.all(files.map(f=>one(f,dm,qq)));if(out.join("").length<880000)return out;dm*=.8;qq*=.85}
+ throw new Error("حجم الصور كبير جداً، قلّل عدد الأوراق")}
+
+async function grade(m){const keys=[...KEYS].sort(()=>Math.random()-.5);if(!keys.length)return null;
+ const prompt=`أنت أستاذ بكالوريا جزائري. صحّح حل الطالب (شعبة ${m.studentStream}) للمادة ${m.subject}، ${m.topic} ${m.topicStream}، المحور: ${m.category}، دورة ${m.year}.
+${m.studentNote?"ملاحظة الطالب (أسئلة لم يدرسها فلا تخصم عليها): "+m.studentNote:""}
+أجب بـ JSON فقط بلا أي نص آخر: {"score": عدد من 0 إلى 10, "details": "العلامة الفعلية على 20 أو على سلم التمرين، ثم الأخطاء بالتفصيل بالعربية"}`;
+ const parts=[{text:prompt},...m.images.map(d=>({inline_data:{mime_type:"image/jpeg",data:d.split(",")[1]}}))];
+ for(const k of keys){try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${k.key}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts}],generationConfig:{responseMimeType:"application/json"}})});
+  if(!r.ok)continue;const j=await r.json(),t=j.candidates[0].content.parts.map(p=>p.text||"").join("").replace(/```json|```/g,"").trim(),o=JSON.parse(t);
+  return{score:Math.max(0,Math.min(10,Math.round(+o.score))),details:String(o.details)}}catch(e){}}return null}
+
+/* ---------- القوائم ---------- */
+const thumbs=s=>`<div class="thumbs">${(s.images||[]).map((u,i)=>`<img src="${u}" data-id="${s.id}" data-i="${i}">`).join("")}</div>`;
+const tags=s=>`<span class="tag">${SUBJECTS[s.subject]?.ico||"📘"} ${esc(s.subject)}</span><span class="tag">${esc(s.topic)}</span><span class="tag">${esc(s.category)}</span><span class="tag">${esc(s.year)}</span>`;
+const stat=s=>graded(s)?`<b style="color:var(--ok)">${s.score}/10</b>`:`<span class="tag">بانتظار المراجعة</span>`;
+function mineV(){const l=mine().filter(s=>!s.hideForStudent);return l.length?l.map(s=>`<div class="card"><div class="item"><div>${tags(s)}</div>${stat(s)}</div><div class="mute">${fmt(s.timestamp)}</div>${thumbs(s)}
+<div class="row" style="margin-top:10px"><button class="btn sm" data-det="${s.id}">تفاصيل الأخطاء</button><button class="btn ghost sm" data-hide="${s.id}">إخفاء</button></div></div>`).join(""):`<div class="card mute">📭 لا توجد حلول بعد. أرسل أول تمرين من تبويب «إرسال حل».</div>`}
+function boardV(){const g={};ALL.filter(graded).filter(s=>lb==="الكل"||s.subject===lb).forEach(s=>{(g[s.studentName]??={n:s.studentName,p:0,c:0,st:s.studentStream}).p+=s.score;g[s.studentName].c++});
+ const L=Object.values(g).sort((a,b)=>b.p-a.p),mx=L[0]?.p||1;
+ return`<nav>${["الكل",...Object.keys(SUBJECTS)].map(s=>`<button data-lb="${s}" class="${lb===s?"on":""}">${s}</button>`).join("")}</nav>`+(L.length?L.map((u,i)=>`<div class="card"><div class="item"><div class="item" style="justify-content:flex-start"><span class="rank ${i?"":"top1"}">${["🥇","🥈","🥉"][i]||i+1}</span><div><b>${esc(u.n)}${u.n===me.name?" (أنت)":""}</b><div class="mute">${esc(u.st)} · ${u.c} تمرين</div></div></div><b>⭐ ${u.p} نقطة</b></div><div class="bar" style="margin-top:10px"><i style="width:${u.p/mx*100}%"></i></div></div>`).join(""):`<div class="card mute">🏁 لا نتائج في هذه المادة بعد.</div>`)}
+function mapV(){const S=SUBJECTS[mapSub],ts=S.ts.includes(mapStr)?mapStr:S.ts[S.ts.length-1],M=mine().filter(graded).filter(s=>s.subject===mapSub&&s.topicStream===ts);
+ const done=s=>M.some(x=>sameEx(x,s)),total=YEARS.length*2*S.cats.length,n=M.length;
+ return`<div class="card"><div class="row"><div><label>المادة</label><select id="ms">${opts(Object.keys(SUBJECTS),mapSub)}</select></div><div><label>الشعبة</label><select id="mt">${opts(S.ts,ts)}</select></div></div>
+<div class="item" style="margin-top:12px"><b>${n} / ${total} تمرين</b><b>${M.reduce((a,s)=>a+s.score,0)} نقطة</b></div><div class="bar" style="margin-top:8px"><i style="width:${n/total*100}%"></i></div></div>
+<div class="card">`+YEARS.map(y=>`<div class="yr"><b>${y}</b><div>${TOPICS.map(t=>`<div class="item" style="justify-content:flex-start;gap:8px"><span class="mute" style="width:90px">${t}</span><span class="dots">${S.cats.map(c=>`<b class="${done({subject:mapSub,topic:t,topicStream:ts,category:c,year:y})?"on":""}" title="${esc(c)}"></b>`).join("")}</span></div>`).join("")}</div></div>`).join("")+`</div>`}
+function wireLists(){document.querySelectorAll("[data-lb]").forEach(b=>b.onclick=()=>{lb=b.dataset.lb;show()});
+ const ms=$("#ms");if(ms){ms.onchange=()=>{mapSub=ms.value;show()};$("#mt").onchange=e=>{mapStr=e.target.value;show()}}
+ document.querySelectorAll("[data-hide]").forEach(b=>b.onclick=()=>updateDoc(doc(db,"submissions",b.dataset.hide),{hideForStudent:true}));
+ document.querySelectorAll("[data-det]").forEach(b=>b.onclick=()=>{const s=ALL.find(x=>x.id===b.dataset.det);modal(`<h2>تفاصيل الحل</h2>${stat(s)}<pre>${esc(s.adminNote||"لم يُراجع بعد.")}</pre>`)});
+ document.querySelectorAll(".thumbs img").forEach(i=>i.onclick=()=>modal(`<img class="big" src="${ALL.find(x=>x.id===i.dataset.id).images[i.dataset.i]}">`))}
+
+/* ---------- المشرف ---------- */
+function adminV(){return tabs([["reviews","📥 التقييمات"],["keys","🔑 مفاتيح AI"],["users","👥 الطلاب"]])+`<div id="v">${{reviews:revV,keys:keysV,users:usersV}[tab]()}</div>`}
+const revV=()=>ALL.length?ALL.map(s=>`<div class="card"><div class="item"><div><b>${esc(s.studentName)}</b> <span class="mute">${esc(s.studentStream)}</span></div>${stat(s)}</div><div>${tags(s)}<span class="tag">${esc(s.topicStream)}</span></div>
+<div class="mute">🕒 ${fmt(s.timestamp)}</div>${s.studentNote?`<div class="mute">ملاحظة: ${esc(s.studentNote)}</div>`:""}${thumbs(s)}
+<div class="row" style="margin-top:10px"><button class="btn sm" data-det="${s.id}">التفاصيل</button><button class="btn sm" data-ten="${s.id}">علامة 10</button><button class="btn red sm" data-del="${s.id}">حذف</button></div></div>`).join(""):`<div class="card mute">📥 لا توجد تقييمات بعد.</div>`;
+const keysV=()=>`<div class="card"><h2>مفاتيح Gemini API</h2><p class="mute">تُستعمل بالتناوب العشوائي، وإذا فشل مفتاح يُجرَّب التالي.</p><div class="row" style="margin-top:10px"><input id="nk" placeholder="AIza…" style="flex:3"><button class="btn" id="ak">إضافة</button></div></div>`+KEYS.map(k=>`<div class="card item"><code>${esc(k.key.slice(0,8))}••••${esc(k.key.slice(-4))}</code><button class="btn red sm" data-dk="${k.id}">حذف</button></div>`).join("");
+function usersV(){const g={};ALL.forEach(s=>{(g[s.studentName]??={n:s.studentName,st:s.studentStream,p:0,c:0}).c++;if(graded(s))g[s.studentName].p+=s.score});
+ return Object.values(g).map(u=>`<div class="card item"><div><b>${esc(u.n)}</b><div class="mute">${esc(u.st)} · ${u.p} نقطة · ${u.c} إرسال</div></div><button class="btn sm" data-u="${esc(u.n)}">حلوله</button></div>`).join("")||`<div class="card mute">👥 لا طلاب بعد.</div>`}
+function wireAdmin(){wireTabs();wireLists();
+ document.querySelectorAll("[data-ten]").forEach(b=>b.onclick=()=>updateDoc(doc(db,"submissions",b.dataset.ten),{score:10,status:"graded"}));
+ document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>confirm("حذف هذا التقييم؟")&&deleteDoc(doc(db,"submissions",b.dataset.del)));
+ document.querySelectorAll("[data-dk]").forEach(b=>b.onclick=()=>deleteDoc(doc(db,KEYS_COL,b.dataset.dk)));
+ const ak=$("#ak");if(ak)ak.onclick=async()=>{const k=$("#nk").value.trim();if(k){await addDoc(collection(db,KEYS_COL),{key:k});}};
+ document.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const L=ALL.filter(s=>s.studentName===b.dataset.u);
+  modal(`<h2>حلول ${esc(b.dataset.u)}</h2>`+L.map(s=>`<div class="card"><div class="item">${stat(s)}<button class="btn red sm" data-del2="${s.id}">حذف</button></div>${tags(s)}<div class="mute">${fmt(s.timestamp)}</div></div>`).join(""));
+  document.querySelectorAll("[data-del2]").forEach(x=>x.onclick=async()=>{if(confirm("حذف الحل؟")){await deleteDoc(doc(db,"submissions",x.dataset.del2));x.closest(".card").remove()}})})}
+
+const lvl=p=>p<10?"🌱 مبتدئ":p<40?"📘 مجتهد":p<100?"🔥 متألق":"🏆 بطل البكالوريا";
+const DECO={default:["📐","✏️","📚","🧪"],purple:["🔮","✨","🌙","💫"],blue:["🌊","🐬","🫧","⛵"],gold:["👑","🏅","⭐","💎"]};
+function rain(a){for(let i=0;i<28;i++){const e=document.createElement("i");e.className="fall";e.textContent=a[i%a.length];e.style.cssText=`left:${Math.random()*100}vw;animation-delay:${Math.random()*.9}s;font-size:${18+Math.random()*22}px`;document.body.append(e);setTimeout(()=>e.remove(),3800)}}
+const burst=t=>rain(DECO[t]);
+show();
+</script>
 </body>
 </html>
