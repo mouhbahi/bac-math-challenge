@@ -3,121 +3,454 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>تحدي الباكالوريا — النسخة الشاملة</title>
+  <title>BAC 18 — منصة التحدي والامتياز</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f17;
-      --card: #131a26;
-      --border: #263244;
-      --text: #eef2f7;
-      --muted: #94a3b8;
-      --accent: #3b82f6;
-      --green: #16a34a;
-      --yellow: #eab308;
-      --gray: #475569;
+      --bg-base: #07090e;
+      --bg-glow-1: rgba(59, 130, 246, 0.14);
+      --bg-glow-2: rgba(139, 92, 246, 0.12);
+      --surface: rgba(17, 24, 39, 0.72);
+      --surface-solid: #111827;
+      --surface-hover: rgba(30, 41, 59, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: #6366f1;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-cyan: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
       --danger: #ef4444;
+      --gold: #fbbf24;
     }
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); padding: 16px; }
-    .container { max-width: 1080px; margin: 0 auto; }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(circle at 15% 15%, var(--bg-glow-1), transparent 40%),
+        radial-gradient(circle at 85% 80%, var(--bg-glow-2), transparent 45%);
+      color: var(--text-main);
+      padding: 20px 16px;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* شاشة الدخول */
+    .auth-wrapper {
+      min-height: calc(100vh - 40px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .auth-box {
-      max-width: 410px; margin: 56px auto; background: var(--card);
-      border: 1px solid var(--border); border-radius: 14px; padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
     }
-    input, select, button {
-      width: 100%; background: var(--bg); color: var(--text);
-      border: 1px solid var(--border); padding: 10px 12px;
-      border-radius: 8px; margin-bottom: 12px; font-size: 14px;
+
+    .brand-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.2));
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
     }
-    button { cursor: pointer; font-weight: 600; transition: 0.15s; }
-    button.primary { background: var(--accent); border-color: var(--accent); }
-    button.ghost { background: transparent; color: var(--muted); }
-    header, .card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 16px; margin-bottom: 16px;
+
+    .auth-box h2 {
+      margin: 0 0 6px 0;
+      font-size: 24px;
+      font-weight: 800;
     }
-    header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
-    .pills { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .pill {
-      background: var(--bg); border: 1px solid var(--border);
-      padding: 8px 14px; border-radius: 10px; font-size: 14px;
+
+    .auth-subtitle {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-bottom: 22px;
     }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; }
-    .lesson {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border);
+
+    .input-group {
+      margin-bottom: 14px;
     }
-    .lesson:last-child { border-bottom: none; }
-    .lesson select { width: auto; margin: 0; padding: 6px 10px; }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input, select {
+      width: 100%;
+      background: rgba(9, 13, 22, 0.85);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      color: #fff;
+      box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.6);
+    }
+
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px -6px rgba(99, 102, 241, 0.75);
+    }
+
+    button.ghost {
+      background: transparent;
+      color: var(--text-muted);
+      margin-top: 10px;
+      font-weight: 600;
+    }
+
+    button.ghost:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .error {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    /* لوحة التحكم */
+    header {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-welcome h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .user-welcome small {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .hud-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stat-pill {
+      background: rgba(9, 13, 22, 0.8);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-pill strong {
+      color: var(--accent-cyan);
+      font-size: 15px;
+    }
+
+    .btn-logout {
+      width: auto;
+      background: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      padding: 8px 14px;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.22);
+    }
+
+    /* شريط تقدم الرتبة */
+    .rank-progress-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(9, 13, 22, 0.9);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent-cyan));
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    /* الشبكة الرئيسية */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .card h3 {
+      margin: 0 0 14px 0;
+      font-size: 17px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lesson-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(9, 13, 22, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      transition: border-color 0.2s;
+    }
+
+    .lesson-item:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+
+    .lesson-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .lesson-item select {
+      width: auto;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
     .badge {
-      font-size: 12px; padding: 3px 9px; border-radius: 999px;
-      color: #fff; display: inline-block; margin-top: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-top: 5px;
     }
-    .unlocked { background: var(--green); }
-    .active { background: var(--yellow); color: #000; font-weight: 600; }
-    .locked { background: var(--gray); }
+
+    .unlocked { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .active { background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .locked { background: rgba(148, 163, 184, 0.14); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.25); }
+
+    .scope-list {
+      margin: 10px 0 0 0;
+      padding-right: 18px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #cbd5e1;
+    }
+
     .leader-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 12px; border-radius: 10px; background: var(--bg);
-      border: 1px solid var(--border); margin-bottom: 8px; font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: rgba(9, 13, 22, 0.65);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      font-size: 14px;
     }
-    .error { color: var(--danger); font-size: 13px; margin-bottom: 10px; min-height: 18px; }
-    .scope-list { margin: 8px 0 0 0; padding-right: 18px; line-height: 1.7; font-size: 14px; }
+
+    .leader-row.top-1 {
+      border-color: rgba(251, 191, 36, 0.45);
+      background: linear-gradient(90deg, rgba(251, 191, 36, 0.1), rgba(9, 13, 22, 0.7));
+    }
+
+    .rank-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      font-weight: 800;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    .top-1 .rank-num {
+      background: var(--gold);
+      color: #000;
+    }
   </style>
 </head>
 <body>
 
-  <!-- شاشة الدخول / إنشاء حساب باسم المستخدم وكلمة السر -->
-  <div id="auth-screen" class="auth-box">
-    <h2 id="auth-heading" style="margin-top:0; text-align:center;">دخول الطلاب — تحدي الباكالوريا</h2>
-    <div id="auth-error" class="error"></div>
-    <input type="text" id="auth-username" placeholder="اسم المستخدم (مثال: mohamed_2027)" autocomplete="username" />
-    <input type="password" id="auth-password" placeholder="كلمة السر (6 أحرف أو أكثر)" autocomplete="current-password" />
-    <select id="auth-stream" style="display:none;">
-      <option value="علوم تجريبية">شعبة العلوم التجريبية</option>
-      <option value="رياضيات">شعبة الرياضيات</option>
-      <option value="تقني رياضي">شعبة تقني رياضي</option>
-    </select>
-    <button class="primary" id="auth-submit" onclick="submitAuth()">دخول</button>
-    <button class="ghost" id="auth-switch" onclick="toggleMode()">حساب جديد؟ أنشئ حساباً باسم مستخدم وكلمة سر</button>
+  <!-- شاشة الدخول / إنشاء حساب -->
+  <div id="auth-screen" class="auth-wrapper">
+    <div class="auth-box">
+      <span class="brand-badge">BAC 2027 • EDITION</span>
+      <h2 id="auth-heading">تسجيل الدخول</h2>
+      <div class="auth-subtitle" id="auth-sub">ادخل باسم المستخدم وكلمة السر التي تختارها</div>
+
+      <div id="auth-error" class="error"></div>
+
+      <div class="input-group">
+        <label>اسم المستخدم</label>
+        <input type="text" id="auth-username" placeholder="اكتب اسمك أو لقبك..." />
+      </div>
+
+      <div class="input-group">
+        <label>كلمة السر</label>
+        <input type="password" id="auth-password" placeholder="أي كلمة سر تريدها..." />
+      </div>
+
+      <div class="input-group" id="stream-group" style="display:none;">
+        <label>الشعبة الدراسية</label>
+        <select id="auth-stream">
+          <option value="علوم تجريبية">شعبة العلوم التجريبية</option>
+          <option value="رياضيات">شعبة الرياضيات</option>
+          <option value="تقني رياضي">شعبة تقني رياضي</option>
+        </select>
+      </div>
+
+      <button class="primary" id="auth-submit" onclick="submitAuth()">دخول إلى المنصة</button>
+      <button class="ghost" id="auth-switch" onclick="toggleMode()">ليس لديك حساب؟ أنشئ حساباً الآن</button>
+    </div>
   </div>
 
-  <!-- المنصة الرئيسية بعد تسجيل الدخول -->
+  <!-- لوحة التحكم الرئيسية -->
   <div id="main-screen" class="container" style="display:none;">
     <header>
-      <div>
-        <h2 style="margin:0;">أهلاً، <span id="me-username"></span></h2>
-        <small style="color:var(--muted);">الشعبة: <span id="me-stream"></span> • قاعدة بيانات جديدة مستقلة</small>
+      <div class="user-welcome">
+        <h2>أهلاً، <span id="me-username"></span></h2>
+        <small>الشعبة: <span id="me-stream"></span></small>
       </div>
-      <div class="pills">
-        <div class="pill">النقاط: <strong id="me-xp">0</strong> XP</div>
-        <div class="pill">الرتبة: <strong id="me-rank">مبتدئ</strong></div>
-        <button style="width:auto; margin:0;" onclick="logout()">خروج</button>
+      <div class="hud-stats">
+        <div class="stat-pill">الخبرة: <strong id="me-xp">0</strong> XP</div>
+        <div class="stat-pill">الرتبة: <strong id="me-rank">مبتدئ</strong></div>
+        <button class="btn-logout" onclick="logout()">تسجيل خروج</button>
       </div>
     </header>
+
+    <div class="rank-progress-card">
+      <div class="progress-header">
+        <span>التقدم نحو الرتبة القادمة</span>
+        <span id="xp-next-label">0 / 250 XP</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="xp-bar"></div>
+      </div>
+    </div>
 
     <div class="grid">
       <!-- مسار الدروس -->
       <div class="card">
-        <h3 style="margin-top:0;">الرياضيات — مسار الدروس</h3>
+        <h3>مسار الدروس (الرياضيات)</h3>
         <div id="lessons-container"></div>
       </div>
 
-      <!-- التحدي ونطاق الدروس المفتوحة -->
+      <!-- نطاق الاختبار والتحدي -->
       <div class="card">
-        <h3 style="margin-top:0;">التحدي المسموح حسب تقدمك</h3>
-        <p style="color:var(--muted); margin:0; font-size:13px;">
-          يعتمد التحدي فقط على الدروس (مفتوح للاختبار / قيد الدراسة) ويستبعد المقفول.
+        <h3>نطاق الاختبار والتحدي</h3>
+        <p style="color:var(--text-muted); margin:0 0 8px 0; font-size:13px;">
+          النظام يختبرك فقط في الدروس المفتوحة أو قيد الدراسة:
         </p>
         <ul id="scope-container" class="scope-list"></ul>
-        <button class="primary" style="margin-top:16px;" onclick="completeChallenge()">
-          إتمام تحدٍ في الدروس المفتوحة (+75 XP)
+        <button class="primary" style="margin-top:18px;" onclick="completeChallenge()">
+          إتمام تحدي الدروس المفتوحة (+75 XP)
         </button>
       </div>
 
-      <!-- لوحة الترتيب التنافسية -->
+      <!-- لوحة المتصدرين -->
       <div class="card">
-        <h3 style="margin-top:0;">لوحة الترتيب التنافسية (XP)</h3>
+        <h3>لوحة المتصدرين</h3>
         <div id="leaderboard-container"></div>
       </div>
     </div>
@@ -128,7 +461,7 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    // ضع إعدادات مشروع Firebase الجديد هنا
+    // ضع إعدادات مشروع Firebase الخاص بك هنا
     const firebaseConfig = {
       apiKey: "YOUR_NEW_API_KEY",
       authDomain: "YOUR_NEW_PROJECT.firebaseapp.com",
@@ -143,7 +476,7 @@
     const db = getFirestore(app);
 
     const INITIAL_LESSONS = [
-      { id: 1, title: "الدوال العددية (نهايات، اشتقاق، فروع، مناقشة)", status: "unlocked" },
+      { id: 1, title: "الدوال العددية (نهايات، اشتقاق، مناقشة)", status: "unlocked" },
       { id: 2, title: "المتتاليات العددية", status: "active" },
       { id: 3, title: "الأعداد المركبة", status: "locked" },
       { id: 4, title: "الدوال الأصلية والتكامل", status: "locked" },
@@ -155,75 +488,93 @@
     let profile = null;
     let unsubLeaderboard = null;
 
-    function normalizeUsername(raw) {
-      return raw.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
+    // تحويل أي اسم مستخدم (عربي/إنجليزي/رموز) إلى معرّف آمن لـ Firebase Auth مع الاحتفاظ بالاسم الأصلي للعرض
+    function encodeUserKey(raw) {
+      const trimmed = raw.trim().toLowerCase();
+      const hex = Array.from(new TextEncoder().encode(trimmed))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+      return hex || "user";
     }
 
-    function toInternalEmail(cleanUser) {
-      return `${cleanUser}@bac-challenge.local`;
+    // السماح بأي كلمة سر يكتبها المستخدم (حتى لو قصيرة) عبر إكمالها داخلياً لتجاوز شرط Firebase الأدنى (6 خانات)
+    function normalizeAuthPassword(rawPass) {
+      return rawPass.length >= 6 ? rawPass : rawPass + "__bac18_pad";
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("auth-error");
+      if (!msg) {
+        el.style.display = "none";
+        el.textContent = "";
+      } else {
+        el.style.display = "block";
+        el.textContent = msg;
+      }
     }
 
     window.toggleMode = () => {
       isSignup = !isSignup;
-      document.getElementById("auth-error").textContent = "";
-      document.getElementById("auth-heading").textContent = isSignup
-        ? "إنشاء حساب جديد — تحدي الباكالوريا"
-        : "دخول الطلاب — تحدي الباكالوريا";
-      document.getElementById("auth-stream").style.display = isSignup ? "block" : "none";
-      document.getElementById("auth-submit").textContent = isSignup ? "إنشاء الحساب" : "دخول";
+      showError("");
+      document.getElementById("auth-heading").textContent = isSignup ? "إنشاء حساب جديد" : "تسجيل الدخول";
+      document.getElementById("auth-sub").textContent = isSignup
+        ? "اختر اسم مستخدم وأي كلمة سر للبدء"
+        : "ادخل باسم المستخدم وكلمة السر التي اخترتها";
+      document.getElementById("stream-group").style.display = isSignup ? "block" : "none";
+      document.getElementById("auth-submit").textContent = isSignup ? "إنشاء الحساب والدخول" : "دخول إلى المنصة";
       document.getElementById("auth-switch").textContent = isSignup
-        ? "لدي حساب بالفعل؟ تسجيل الدخول"
-        : "حساب جديد؟ أنشئ حساباً باسم مستخدم وكلمة سر";
+        ? "لديك حساب بالفعل؟ سجّل الدخول"
+        : "ليس لديك حساب؟ أنشئ حساباً الآن";
     };
 
     window.submitAuth = async () => {
-      const errEl = document.getElementById("auth-error");
-      errEl.textContent = "";
-      const rawUser = document.getElementById("auth-username").value;
-      const cleanUser = normalizeUsername(rawUser);
-      const password = document.getElementById("auth-password").value;
+      showError("");
+      const displayUsername = document.getElementById("auth-username").value.trim();
+      const rawPassword = document.getElementById("auth-password").value;
 
-      if (cleanUser.length < 3) {
-        errEl.textContent = "اكتب اسم مستخدم من 3 أحرف/أرقام إنجليزية على الأقل (مثل: bac_2027).";
+      if (!displayUsername) {
+        showError("يرجى كتابة اسم المستخدم.");
         return;
       }
-      if (password.length < 6) {
-        errEl.textContent = "كلمة السر يجب أن تكون 6 أحرف على الأقل.";
+      if (!rawPassword) {
+        showError("يرجى كتابة كلمة السر.");
         return;
       }
 
-      const internalEmail = toInternalEmail(cleanUser);
+      const userKey = encodeUserKey(displayUsername);
+      const internalEmail = `u_${userKey}@bac18.app`;
+      const authPass = normalizeAuthPassword(rawPassword);
 
       try {
         if (isSignup) {
-          const userRefCheck = doc(db, "usernames_v2", cleanUser);
-          const taken = await getDoc(userRefCheck);
-          if (taken.exists()) {
-            errEl.textContent = "اسم المستخدم محجوز مسبقاً، اختر اسماً آخر.";
+          const checkRef = doc(db, "usernames_v2", userKey);
+          const snap = await getDoc(checkRef);
+          if (snap.exists()) {
+            showError("اسم المستخدم مستعمل مسبقاً، اختر اسماً آخر.");
             return;
           }
 
-          const cred = await createUserWithEmailAndPassword(auth, internalEmail, password);
+          const cred = await createUserWithEmailAndPassword(auth, internalEmail, authPass);
           const stream = document.getElementById("auth-stream").value;
           const freshProfile = {
-            username: cleanUser,
+            username: displayUsername,
             stream,
             xp: 0,
             lessons: INITIAL_LESSONS
           };
 
-          await setDoc(userRefCheck, { uid: cred.user.uid });
+          await setDoc(checkRef, { uid: cred.user.uid, username: displayUsername });
           await setDoc(doc(db, "users_v2", cred.user.uid), freshProfile);
           await setDoc(doc(db, "leaderboard_v2", cred.user.uid), {
-            username: cleanUser,
+            username: displayUsername,
             stream,
             xp: 0
           });
         } else {
-          await signInWithEmailAndPassword(auth, internalEmail, password);
+          await signInWithEmailAndPassword(auth, internalEmail, authPass);
         }
       } catch (err) {
-        errEl.textContent = "تعذر الدخول أو إنشاء الحساب؛ تحقق من اسم المستخدم وكلمة السر.";
+        showError("تعذر إتمام العملية؛ تأكد من صحة اسم المستخدم وكلمة السر.");
       }
     };
 
@@ -243,12 +594,12 @@
         const snap = await getDoc(doc(db, "users_v2", user.uid));
         profile = snap.exists()
           ? snap.data()
-          : { username: user.email.split("@")[0], stream: "علوم تجريبية", xp: 0, lessons: INITIAL_LESSONS };
+          : { username: "طالب", stream: "علوم تجريبية", xp: 0, lessons: INITIAL_LESSONS };
 
         renderApp();
         subscribeLeaderboard();
       } else {
-        document.getElementById("auth-screen").style.display = "block";
+        document.getElementById("auth-screen").style.display = "flex";
         document.getElementById("main-screen").style.display = "none";
       }
     });
@@ -262,10 +613,14 @@
         snapshot.forEach((docSnap) => {
           const item = docSnap.data();
           const row = document.createElement("div");
-          row.className = "leader-row";
+          row.className = "leader-row" + (rank === 1 ? " top-1" : "");
           row.innerHTML = `
-            <div><strong>#${rank++}</strong> ${item.username} <small style="color:var(--muted);">(${item.stream || ""})</small></div>
-            <strong>${item.xp} XP</strong>
+            <div>
+              <span class="rank-num">${rank++}</span>
+              <strong>${item.username}</strong>
+              <small style="color:var(--text-muted); margin-right:6px;">${item.stream || ""}</small>
+            </div>
+            <strong style="color:var(--accent-cyan);">${item.xp} XP</strong>
           `;
           container.appendChild(row);
         });
@@ -298,18 +653,23 @@
       persistChanges();
     };
 
-    function getRankName(xp) {
-      if (xp >= 1500) return "مستوى 18/20";
-      if (xp >= 700) return "مرشح للامتياز";
-      if (xp >= 250) return "منافس";
-      return "مبتدئ";
+    function getRankInfo(xp) {
+      if (xp >= 1500) return { name: "مستوى 18/20", next: 2500, prev: 1500 };
+      if (xp >= 700) return { name: "مرشح للامتياز", next: 1500, prev: 700 };
+      if (xp >= 250) return { name: "منافس", next: 700, prev: 250 };
+      return { name: "مبتدئ", next: 250, prev: 0 };
     }
 
     function renderApp() {
+      const rankInfo = getRankInfo(profile.xp);
       document.getElementById("me-username").textContent = profile.username;
       document.getElementById("me-stream").textContent = profile.stream;
       document.getElementById("me-xp").textContent = profile.xp;
-      document.getElementById("me-rank").textContent = getRankName(profile.xp);
+      document.getElementById("me-rank").textContent = rankInfo.name;
+
+      const pct = Math.min(100, Math.round(((profile.xp - rankInfo.prev) / (rankInfo.next - rankInfo.prev)) * 100));
+      document.getElementById("xp-bar").style.width = `${pct}%`;
+      document.getElementById("xp-next-label").textContent = `${profile.xp} / ${rankInfo.next} XP`;
 
       const listEl = document.getElementById("lessons-container");
       listEl.innerHTML = "";
@@ -317,10 +677,10 @@
         const cls = lesson.status === "unlocked" ? "unlocked" : (lesson.status === "active" ? "active" : "locked");
         const label = lesson.status === "unlocked" ? "مفتوح للاختبار" : (lesson.status === "active" ? "قيد الدراسة" : "مقفول");
         const row = document.createElement("div");
-        row.className = "lesson";
+        row.className = "lesson-item";
         row.innerHTML = `
           <div>
-            <div>${lesson.title}</div>
+            <div class="lesson-title">${lesson.title}</div>
             <span class="badge ${cls}">${label}</span>
           </div>
           <select onchange="updateLessonStatus(${lesson.id}, this.value)">
@@ -336,7 +696,7 @@
       const scopeEl = document.getElementById("scope-container");
       scopeEl.innerHTML = allowed.length
         ? allowed.map((l) => `<li>${l.title}</li>`).join("")
-        : "<li>لا توجد دروس مفتوحة حالياً؛ افتح درساً واحداً على الأقل لبدء التحدي.</li>";
+        : "<li>لا توجد دروس مفتوحة حالياً؛ افتح درساً واحداً على الأقل.</li>";
     }
   </script>
 </body>
