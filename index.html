@@ -10,19 +10,13 @@
       --bg-base: #07090e;
       --bg-glow-1: rgba(59, 130, 246, 0.14);
       --bg-glow-2: rgba(139, 92, 246, 0.12);
-      --surface: rgba(17, 24, 39, 0.72);
-      --surface-solid: #111827;
-      --surface-hover: rgba(30, 41, 59, 0.85);
-      --border: rgba(255, 255, 255, 0.08);
+      --surface: rgba(17, 24, 39, 0.78);
+      --border: rgba(255, 255, 255, 0.09);
       --border-focus: #6366f1;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --primary: #6366f1;
-      --primary-hover: #4f46e5;
       --accent-cyan: #06b6d4;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
       --gold: #fbbf24;
     }
 
@@ -42,12 +36,8 @@
       padding: 20px 16px;
     }
 
-    .container {
-      max-width: 1120px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1120px; margin: 0 auto; }
 
-    /* شاشة الدخول */
     .auth-wrapper {
       min-height: calc(100vh - 40px);
       display: flex;
@@ -60,16 +50,15 @@
       max-width: 420px;
       background: var(--surface);
       backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 32px 28px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
     }
 
     .brand-badge {
       display: inline-block;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.2));
+      background: rgba(99, 102, 241, 0.18);
       border: 1px solid rgba(99, 102, 241, 0.4);
       color: #a5b4fc;
       font-size: 12px;
@@ -79,21 +68,9 @@
       margin-bottom: 12px;
     }
 
-    .auth-box h2 {
-      margin: 0 0 6px 0;
-      font-size: 24px;
-      font-weight: 800;
-    }
-
-    .auth-subtitle {
-      color: var(--text-muted);
-      font-size: 13px;
-      margin-bottom: 22px;
-    }
-
-    .input-group {
-      margin-bottom: 14px;
-    }
+    .auth-box h2 { margin: 0 0 6px 0; font-size: 24px; font-weight: 800; }
+    .auth-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 18px; }
+    .input-group { margin-bottom: 14px; }
 
     .input-group label {
       display: block;
@@ -105,13 +82,12 @@
 
     input, select {
       width: 100%;
-      background: rgba(9, 13, 22, 0.85);
+      background: rgba(9, 13, 22, 0.9);
       color: var(--text-main);
       border: 1px solid var(--border);
       padding: 12px 14px;
       border-radius: 12px;
       font-size: 14px;
-      transition: all 0.2s ease;
       outline: none;
     }
 
@@ -131,41 +107,36 @@
       transition: all 0.2s ease;
     }
 
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
     button.primary {
       background: linear-gradient(135deg, var(--primary), #4f46e5);
       color: #fff;
-      box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.6);
-    }
-
-    button.primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 24px -6px rgba(99, 102, 241, 0.75);
     }
 
     button.ghost {
       background: transparent;
       color: var(--text-muted);
       margin-top: 10px;
-      font-weight: 600;
-    }
-
-    button.ghost:hover {
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.04);
     }
 
     .error {
       color: #fca5a5;
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.25);
-      padding: 8px 12px;
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 10px 12px;
       border-radius: 10px;
       font-size: 13px;
       margin-bottom: 14px;
       display: none;
     }
 
-    /* لوحة التحكم */
+    .mode-note {
+      font-size: 12px;
+      color: var(--accent-cyan);
+      margin-bottom: 12px;
+    }
+
     header {
       background: var(--surface);
       backdrop-filter: blur(16px);
@@ -180,53 +151,26 @@
       gap: 16px;
     }
 
-    .user-welcome h2 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .user-welcome small {
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    .hud-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+    .hud-stats { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
     .stat-pill {
-      background: rgba(9, 13, 22, 0.8);
+      background: rgba(9, 13, 22, 0.85);
       border: 1px solid var(--border);
       padding: 8px 14px;
       border-radius: 12px;
       font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
-    .stat-pill strong {
-      color: var(--accent-cyan);
-      font-size: 15px;
-    }
+    .stat-pill strong { color: var(--accent-cyan); font-size: 15px; }
 
     .btn-logout {
       width: auto;
-      background: rgba(239, 68, 68, 0.12);
+      background: rgba(239, 68, 68, 0.14);
       color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.25);
+      border: 1px solid rgba(239, 68, 68, 0.3);
       padding: 8px 14px;
     }
 
-    .btn-logout:hover {
-      background: rgba(239, 68, 68, 0.22);
-    }
-
-    /* شريط تقدم الرتبة */
     .rank-progress-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -249,18 +193,15 @@
       background: rgba(9, 13, 22, 0.9);
       border-radius: 999px;
       overflow: hidden;
-      border: 1px solid var(--border);
     }
 
     .progress-fill {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--primary), var(--accent-cyan));
-      border-radius: 999px;
       transition: width 0.4s ease;
     }
 
-    /* الشبكة الرئيسية */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -275,14 +216,7 @@
       padding: 20px;
     }
 
-    .card h3 {
-      margin: 0 0 14px 0;
-      font-size: 17px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .card h3 { margin: 0 0 14px 0; font-size: 17px; font-weight: 800; }
 
     .lesson-item {
       display: flex;
@@ -290,28 +224,13 @@
       align-items: center;
       gap: 12px;
       padding: 12px;
-      background: rgba(9, 13, 22, 0.6);
+      background: rgba(9, 13, 22, 0.65);
       border: 1px solid var(--border);
       border-radius: 12px;
       margin-bottom: 10px;
-      transition: border-color 0.2s;
     }
 
-    .lesson-item:hover {
-      border-color: rgba(99, 102, 241, 0.35);
-    }
-
-    .lesson-title {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .lesson-item select {
-      width: auto;
-      padding: 6px 10px;
-      font-size: 12px;
-      border-radius: 8px;
-    }
+    .lesson-item select { width: auto; padding: 6px 10px; font-size: 12px; }
 
     .badge {
       font-size: 11px;
@@ -322,17 +241,11 @@
       margin-top: 5px;
     }
 
-    .unlocked { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
-    .active { background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
-    .locked { background: rgba(148, 163, 184, 0.14); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.25); }
+    .unlocked { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+    .active { background: rgba(245, 158, 11, 0.18); color: #fcd34d; }
+    .locked { background: rgba(148, 163, 184, 0.14); color: #94a3b8; }
 
-    .scope-list {
-      margin: 10px 0 0 0;
-      padding-right: 18px;
-      font-size: 14px;
-      line-height: 1.8;
-      color: #cbd5e1;
-    }
+    .scope-list { margin: 10px 0 0 0; padding-right: 18px; font-size: 14px; line-height: 1.8; }
 
     .leader-row {
       display: flex;
@@ -340,7 +253,7 @@
       align-items: center;
       padding: 11px 14px;
       border-radius: 12px;
-      background: rgba(9, 13, 22, 0.65);
+      background: rgba(9, 13, 22, 0.7);
       border: 1px solid var(--border);
       margin-bottom: 8px;
       font-size: 14px;
@@ -348,7 +261,7 @@
 
     .leader-row.top-1 {
       border-color: rgba(251, 191, 36, 0.45);
-      background: linear-gradient(90deg, rgba(251, 191, 36, 0.1), rgba(9, 13, 22, 0.7));
+      background: linear-gradient(90deg, rgba(251, 191, 36, 0.12), rgba(9, 13, 22, 0.75));
     }
 
     .rank-num {
@@ -358,26 +271,23 @@
       width: 26px;
       height: 26px;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.08);
       font-weight: 800;
       font-size: 12px;
       margin-left: 8px;
     }
 
-    .top-1 .rank-num {
-      background: var(--gold);
-      color: #000;
-    }
+    .top-1 .rank-num { background: var(--gold); color: #000; }
   </style>
 </head>
 <body>
 
-  <!-- شاشة الدخول / إنشاء حساب -->
   <div id="auth-screen" class="auth-wrapper">
     <div class="auth-box">
       <span class="brand-badge">BAC 2027 • EDITION</span>
       <h2 id="auth-heading">تسجيل الدخول</h2>
-      <div class="auth-subtitle" id="auth-sub">ادخل باسم المستخدم وكلمة السر التي تختارها</div>
+      <div class="auth-subtitle" id="auth-sub">ادخل باسم المستخدم وكلمة السر</div>
+      <div class="mode-note" id="mode-indicator"></div>
 
       <div id="auth-error" class="error"></div>
 
@@ -400,22 +310,21 @@
         </select>
       </div>
 
-      <button class="primary" id="auth-submit" onclick="submitAuth()">دخول إلى المنصة</button>
-      <button class="ghost" id="auth-switch" onclick="toggleMode()">ليس لديك حساب؟ أنشئ حساباً الآن</button>
+      <button type="button" class="primary" id="auth-submit">دخول إلى المنصة</button>
+      <button type="button" class="ghost" id="auth-switch">ليس لديك حساب؟ أنشئ حساباً الآن</button>
     </div>
   </div>
 
-  <!-- لوحة التحكم الرئيسية -->
   <div id="main-screen" class="container" style="display:none;">
     <header>
-      <div class="user-welcome">
-        <h2>أهلاً، <span id="me-username"></span></h2>
-        <small>الشعبة: <span id="me-stream"></span></small>
+      <div>
+        <h2 style="margin:0;">أهلاً، <span id="me-username"></span></h2>
+        <small style="color:var(--text-muted);">الشعبة: <span id="me-stream"></span></small>
       </div>
       <div class="hud-stats">
         <div class="stat-pill">الخبرة: <strong id="me-xp">0</strong> XP</div>
         <div class="stat-pill">الرتبة: <strong id="me-rank">مبتدئ</strong></div>
-        <button class="btn-logout" onclick="logout()">تسجيل خروج</button>
+        <button type="button" class="btn-logout" id="logout-btn">تسجيل خروج</button>
       </div>
     </header>
 
@@ -430,25 +339,22 @@
     </div>
 
     <div class="grid">
-      <!-- مسار الدروس -->
       <div class="card">
         <h3>مسار الدروس (الرياضيات)</h3>
         <div id="lessons-container"></div>
       </div>
 
-      <!-- نطاق الاختبار والتحدي -->
       <div class="card">
         <h3>نطاق الاختبار والتحدي</h3>
         <p style="color:var(--text-muted); margin:0 0 8px 0; font-size:13px;">
           النظام يختبرك فقط في الدروس المفتوحة أو قيد الدراسة:
         </p>
         <ul id="scope-container" class="scope-list"></ul>
-        <button class="primary" style="margin-top:18px;" onclick="completeChallenge()">
+        <button type="button" class="primary" style="margin-top:18px;" id="challenge-btn">
           إتمام تحدي الدروس المفتوحة (+75 XP)
         </button>
       </div>
 
-      <!-- لوحة المتصدرين -->
       <div class="card">
         <h3>لوحة المتصدرين</h3>
         <div id="leaderboard-container"></div>
@@ -461,7 +367,6 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    // ضع إعدادات مشروع Firebase الخاص بك هنا
     const firebaseConfig = {
       apiKey: "YOUR_NEW_API_KEY",
       authDomain: "YOUR_NEW_PROJECT.firebaseapp.com",
@@ -471,9 +376,19 @@
       appId: "YOUR_NEW_APP_ID"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const hasRealFirebase = !String(firebaseConfig.apiKey || "").includes("YOUR_NEW_");
+    let auth = null;
+    let db = null;
+
+    if (hasRealFirebase) {
+      try {
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+      } catch (e) {
+        console.error("Firebase init error:", e);
+      }
+    }
 
     const INITIAL_LESSONS = [
       { id: 1, title: "الدوال العددية (نهايات، اشتقاق، مناقشة)", status: "unlocked" },
@@ -488,7 +403,11 @@
     let profile = null;
     let unsubLeaderboard = null;
 
-    // تحويل أي اسم مستخدم (عربي/إنجليزي/رموز) إلى معرّف آمن لـ Firebase Auth مع الاحتفاظ بالاسم الأصلي للعرض
+    const modeNoteEl = document.getElementById("mode-indicator");
+    modeNoteEl.textContent = hasRealFirebase && auth && db
+      ? "وضع السحابة مفعّل (Firebase)"
+      : "وضع التجربة الفورية المحلي — يعمل فوراً حتى تضيف مفاتيح Firebase";
+
     function encodeUserKey(raw) {
       const trimmed = raw.trim().toLowerCase();
       const hex = Array.from(new TextEncoder().encode(trimmed))
@@ -497,7 +416,6 @@
       return hex || "user";
     }
 
-    // السماح بأي كلمة سر يكتبها المستخدم (حتى لو قصيرة) عبر إكمالها داخلياً لتجاوز شرط Firebase الأدنى (6 خانات)
     function normalizeAuthPassword(rawPass) {
       return rawPass.length >= 6 ? rawPass : rawPass + "__bac18_pad";
     }
@@ -513,7 +431,83 @@
       }
     }
 
-    window.toggleMode = () => {
+    function getLocalAccounts() {
+      return JSON.parse(localStorage.getItem("bac18_local_accounts_v2") || "{}");
+    }
+
+    function saveLocalAccounts(accounts) {
+      localStorage.setItem("bac18_local_accounts_v2", JSON.stringify(accounts));
+    }
+
+    function enterMainScreen(userObj, profileData) {
+      currentUser = userObj;
+      profile = profileData;
+      document.getElementById("auth-screen").style.display = "none";
+      document.getElementById("main-screen").style.display = "block";
+      renderApp();
+      renderLocalLeaderboard();
+    }
+
+    function renderLocalLeaderboard() {
+      const accounts = getLocalAccounts();
+      const list = Object.values(accounts)
+        .map(acc => ({
+          username: acc.profile.username,
+          stream: acc.profile.stream,
+          xp: acc.profile.xp || 0
+        }))
+        .sort((a, b) => b.xp - a.xp)
+        .slice(0, 15);
+
+      const container = document.getElementById("leaderboard-container");
+      container.innerHTML = "";
+      list.forEach((item, idx) => {
+        const rank = idx + 1;
+        const row = document.createElement("div");
+        row.className = "leader-row" + (rank === 1 ? " top-1" : "");
+        row.innerHTML = `
+          <div>
+            <span class="rank-num">${rank}</span>
+            <strong>${item.username}</strong>
+            <small style="color:var(--text-muted); margin-right:6px;">${item.stream || ""}</small>
+          </div>
+          <strong style="color:var(--accent-cyan);">${item.xp} XP</strong>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function handleLocalAuth(displayUsername, rawPassword, stream) {
+      const key = encodeUserKey(displayUsername);
+      const accounts = getLocalAccounts();
+
+      if (isSignup) {
+        if (accounts[key]) {
+          showError("اسم المستخدم مستعمل مسبقاً في هذا المتصفح.");
+          return;
+        }
+        const freshProfile = {
+          username: displayUsername,
+          stream: stream || "علوم تجريبية",
+          xp: 0,
+          lessons: JSON.parse(JSON.stringify(INITIAL_LESSONS))
+        };
+        accounts[key] = { password: rawPassword, profile: freshProfile };
+        saveLocalAccounts(accounts);
+        localStorage.setItem("bac18_active_user_v2", key);
+        enterMainScreen({ uid: key, isLocal: true }, freshProfile);
+      } else {
+        const existing = accounts[key];
+        if (!existing || existing.password !== rawPassword) {
+          showError("اسم المستخدم أو كلمة السر غير صحيحة.");
+          return;
+        }
+        localStorage.setItem("bac18_active_user_v2", key);
+        enterMainScreen({ uid: key, isLocal: true }, existing.profile);
+      }
+    }
+
+    document.getElementById("auth-switch").addEventListener("click", () => {
       isSignup = !isSignup;
       showError("");
       document.getElementById("auth-heading").textContent = isSignup ? "إنشاء حساب جديد" : "تسجيل الدخول";
@@ -525,12 +519,14 @@
       document.getElementById("auth-switch").textContent = isSignup
         ? "لديك حساب بالفعل؟ سجّل الدخول"
         : "ليس لديك حساب؟ أنشئ حساباً الآن";
-    };
+    });
 
-    window.submitAuth = async () => {
+    document.getElementById("auth-submit").addEventListener("click", async () => {
       showError("");
+      const submitBtn = document.getElementById("auth-submit");
       const displayUsername = document.getElementById("auth-username").value.trim();
       const rawPassword = document.getElementById("auth-password").value;
+      const stream = document.getElementById("auth-stream").value;
 
       if (!displayUsername) {
         showError("يرجى كتابة اسم المستخدم.");
@@ -541,11 +537,17 @@
         return;
       }
 
-      const userKey = encodeUserKey(displayUsername);
-      const internalEmail = `u_${userKey}@bac18.app`;
-      const authPass = normalizeAuthPassword(rawPassword);
-
+      submitBtn.disabled = true;
       try {
+        if (!hasRealFirebase || !auth || !db) {
+          handleLocalAuth(displayUsername, rawPassword, stream);
+          return;
+        }
+
+        const userKey = encodeUserKey(displayUsername);
+        const internalEmail = `u_${userKey}@bac18.app`;
+        const authPass = normalizeAuthPassword(rawPassword);
+
         if (isSignup) {
           const checkRef = doc(db, "usernames_v2", userKey);
           const snap = await getDoc(checkRef);
@@ -555,7 +557,6 @@
           }
 
           const cred = await createUserWithEmailAndPassword(auth, internalEmail, authPass);
-          const stream = document.getElementById("auth-stream").value;
           const freshProfile = {
             username: displayUsername,
             stream,
@@ -574,37 +575,40 @@
           await signInWithEmailAndPassword(auth, internalEmail, authPass);
         }
       } catch (err) {
-        showError("تعذر إتمام العملية؛ تأكد من صحة اسم المستخدم وكلمة السر.");
+        const code = err?.code || "";
+        if (code.includes("email-already-in-use")) {
+          showError("اسم المستخدم مسجل مسبقاً.");
+        } else if (code.includes("invalid-credential") || code.includes("user-not-found") || code.includes("wrong-password")) {
+          showError("اسم المستخدم أو كلمة السر غير صحيحة.");
+        } else {
+          showError("تعذر الاتصال بالخادم؛ تأكد من إعدادات Firebase وتفعيل Email/Password.");
+        }
+      } finally {
+        submitBtn.disabled = false;
       }
-    };
+    });
 
-    window.logout = () => signOut(auth);
-
-    onAuthStateChanged(auth, async (user) => {
-      currentUser = user;
-      if (unsubLeaderboard) {
-        unsubLeaderboard();
-        unsubLeaderboard = null;
-      }
-
-      if (user) {
-        document.getElementById("auth-screen").style.display = "none";
-        document.getElementById("main-screen").style.display = "block";
-
-        const snap = await getDoc(doc(db, "users_v2", user.uid));
-        profile = snap.exists()
-          ? snap.data()
-          : { username: "طالب", stream: "علوم تجريبية", xp: 0, lessons: INITIAL_LESSONS };
-
-        renderApp();
-        subscribeLeaderboard();
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      if (hasRealFirebase && auth && currentUser && !currentUser.isLocal) {
+        await signOut(auth);
       } else {
+        localStorage.removeItem("bac18_active_user_v2");
+        currentUser = null;
+        profile = null;
         document.getElementById("auth-screen").style.display = "flex";
         document.getElementById("main-screen").style.display = "none";
       }
     });
 
+    document.getElementById("challenge-btn").addEventListener("click", () => {
+      const allowed = profile.lessons.filter((l) => l.status === "unlocked" || l.status === "active");
+      if (!allowed.length) return;
+      profile.xp = (profile.xp || 0) + 75;
+      persistChanges();
+    });
+
     function subscribeLeaderboard() {
+      if (!hasRealFirebase || !db) return;
       const q = query(collection(db, "leaderboard_v2"), orderBy("xp", "desc"), limit(15));
       unsubLeaderboard = onSnapshot(q, (snapshot) => {
         const container = document.getElementById("leaderboard-container");
@@ -630,6 +634,18 @@
     async function persistChanges() {
       renderApp();
       if (!currentUser || !profile) return;
+
+      if (currentUser.isLocal || !hasRealFirebase || !db) {
+        const accounts = getLocalAccounts();
+        accounts[currentUser.uid] = {
+          ...(accounts[currentUser.uid] || {}),
+          profile
+        };
+        saveLocalAccounts(accounts);
+        renderLocalLeaderboard();
+        return;
+      }
+
       await setDoc(doc(db, "users_v2", currentUser.uid), profile, { merge: true });
       await setDoc(doc(db, "leaderboard_v2", currentUser.uid), {
         username: profile.username,
@@ -637,21 +653,6 @@
         xp: profile.xp
       }, { merge: true });
     }
-
-    window.updateLessonStatus = (id, status) => {
-      const target = profile.lessons.find((l) => l.id === id);
-      if (target) {
-        target.status = status;
-        persistChanges();
-      }
-    };
-
-    window.completeChallenge = () => {
-      const allowed = profile.lessons.filter((l) => l.status === "unlocked" || l.status === "active");
-      if (!allowed.length) return;
-      profile.xp += 75;
-      persistChanges();
-    };
 
     function getRankInfo(xp) {
       if (xp >= 1500) return { name: "مستوى 18/20", next: 2500, prev: 1500 };
@@ -661,15 +662,16 @@
     }
 
     function renderApp() {
-      const rankInfo = getRankInfo(profile.xp);
+      const xpVal = profile.xp || 0;
+      const rankInfo = getRankInfo(xpVal);
       document.getElementById("me-username").textContent = profile.username;
       document.getElementById("me-stream").textContent = profile.stream;
-      document.getElementById("me-xp").textContent = profile.xp;
+      document.getElementById("me-xp").textContent = xpVal;
       document.getElementById("me-rank").textContent = rankInfo.name;
 
-      const pct = Math.min(100, Math.round(((profile.xp - rankInfo.prev) / (rankInfo.next - rankInfo.prev)) * 100));
+      const pct = Math.min(100, Math.max(0, Math.round(((xpVal - rankInfo.prev) / (rankInfo.next - rankInfo.prev)) * 100)));
       document.getElementById("xp-bar").style.width = `${pct}%`;
-      document.getElementById("xp-next-label").textContent = `${profile.xp} / ${rankInfo.next} XP`;
+      document.getElementById("xp-next-label").textContent = `${xpVal} / ${rankInfo.next} XP`;
 
       const listEl = document.getElementById("lessons-container");
       listEl.innerHTML = "";
@@ -678,17 +680,30 @@
         const label = lesson.status === "unlocked" ? "مفتوح للاختبار" : (lesson.status === "active" ? "قيد الدراسة" : "مقفول");
         const row = document.createElement("div");
         row.className = "lesson-item";
-        row.innerHTML = `
-          <div>
-            <div class="lesson-title">${lesson.title}</div>
-            <span class="badge ${cls}">${label}</span>
-          </div>
-          <select onchange="updateLessonStatus(${lesson.id}, this.value)">
-            <option value="unlocked" ${lesson.status === "unlocked" ? "selected" : ""}>مفتوح للاختبار</option>
-            <option value="active" ${lesson.status === "active" ? "selected" : ""}>قيد الدراسة</option>
-            <option value="locked" ${lesson.status === "locked" ? "selected" : ""}>مقفول</option>
-          </select>
-        `;
+
+        const infoDiv = document.createElement("div");
+        infoDiv.innerHTML = `<div style="font-size:14px; font-weight:600;">${lesson.title}</div><span class="badge ${cls}">${label}</span>`;
+
+        const selectEl = document.createElement("select");
+        [
+          ["unlocked", "مفتوح للاختبار"],
+          ["active", "قيد الدراسة"],
+          ["locked", "مقفول"]
+        ].forEach(([val, txt]) => {
+          const opt = document.createElement("option");
+          opt.value = val;
+          opt.textContent = txt;
+          if (lesson.status === val) opt.selected = true;
+          selectEl.appendChild(opt);
+        });
+
+        selectEl.addEventListener("change", (e) => {
+          lesson.status = e.target.value;
+          persistChanges();
+        });
+
+        row.appendChild(infoDiv);
+        row.appendChild(selectEl);
         listEl.appendChild(row);
       });
 
@@ -697,6 +712,38 @@
       scopeEl.innerHTML = allowed.length
         ? allowed.map((l) => `<li>${l.title}</li>`).join("")
         : "<li>لا توجد دروس مفتوحة حالياً؛ افتح درساً واحداً على الأقل.</li>";
+    }
+
+    if (hasRealFirebase && auth && db) {
+      onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        if (unsubLeaderboard) {
+          unsubLeaderboard();
+          unsubLeaderboard = null;
+        }
+
+        if (user) {
+          document.getElementById("auth-screen").style.display = "none";
+          document.getElementById("main-screen").style.display = "block";
+
+          const snap = await getDoc(doc(db, "users_v2", user.uid));
+          profile = snap.exists()
+            ? snap.data()
+            : { username: "طالب", stream: "علوم تجريبية", xp: 0, lessons: INITIAL_LESSONS };
+
+          renderApp();
+          subscribeLeaderboard();
+        } else {
+          document.getElementById("auth-screen").style.display = "flex";
+          document.getElementById("main-screen").style.display = "none";
+        }
+      });
+    } else {
+      const savedKey = localStorage.getItem("bac18_active_user_v2");
+      const accounts = getLocalAccounts();
+      if (savedKey && accounts[savedKey]) {
+        enterMainScreen({ uid: savedKey, isLocal: true }, accounts[savedKey].profile);
+      }
     }
   </script>
 </body>
